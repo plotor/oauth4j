@@ -1,9 +1,11 @@
-### OAuth2.0 授权服务
+### OAuth2.0 implementation for passport
 
 ---
 
-基于SpringMVC + Spring + MyBatis实现，数据库采用MySQL
+This project based on __SpringMVC__, __Spring__, and __MyBatis__
+
+database: MySQL 5.7
 
 jdk version: 1.8
 
-后续考虑改为[Play!](https://www.playframework.com/)框架实现
+In the future, we will take [Play!](https://www.playframework.com/) as the web framework!
