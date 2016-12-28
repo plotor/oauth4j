@@ -1,9 +1,10 @@
 package org.zhenchao.passport.oauth.dao;
 
-import java.util.List;
 import org.apache.ibatis.annotations.Param;
 import org.zhenchao.passport.oauth.model.Scope;
 import org.zhenchao.passport.oauth.model.ScopeExample;
+
+import java.util.List;
 
 public interface ScopeMapper {
     /**
