@@ -1,4 +1,4 @@
-package org.zhenchao.oauth.controllers;
+package org.zhenchao.passport.oauth.controllers;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
