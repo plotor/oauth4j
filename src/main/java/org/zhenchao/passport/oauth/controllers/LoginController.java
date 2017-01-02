@@ -1,6 +1,5 @@
 package org.zhenchao.passport.oauth.controllers;
 
-import net.sf.json.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,10 +15,12 @@ import org.zhenchao.passport.oauth.exceptions.EncryptException;
 import org.zhenchao.passport.oauth.model.User;
 import org.zhenchao.passport.oauth.service.UserService;
 import org.zhenchao.passport.oauth.utils.ResultUtils;
+import org.zhenchao.passport.oauth.utils.SessionUtils;
 
 import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.Resource;
+import javax.servlet.http.HttpSession;
 
 /**
  * 登录相关控制器
@@ -36,9 +37,29 @@ public class LoginController {
     @Resource
     private UserService userService;
 
+    /**
+     * 跳转登录页
+     *
+     * @return
+     */
+    @RequestMapping(value = PATH_ROOT_LOGIN, method = RequestMethod.GET)
+    public String login() {
+        return "redirect:/login";
+    }
+
+    /**
+     * 用户登录验证
+     *
+     * @param session
+     * @param username
+     * @param password
+     * @param callback
+     * @return
+     */
     @ResponseBody
     @RequestMapping(value = PATH_ROOT_LOGIN, method = RequestMethod.POST)
-    public JSONObject login(
+    public String login(
+            HttpSession session,
             @RequestParam(value = "username") String username,
             @RequestParam("password") String password,
             @RequestParam(value = "callback", required = false) String callback) {
@@ -47,7 +68,7 @@ public class LoginController {
 
         if (StringUtils.isBlank(username) || StringUtils.isBlank(password)) {
             log.error("Login params error, username or password is null or empty!");
-            return ResultUtils.genFailedJsonResult(ErrorCode.PARAMETER_ERROR, callback);
+            return ResultUtils.genFailedStringResult(ErrorCode.PARAMETER_ERROR, callback);
         }
 
         User user;
@@ -55,18 +76,19 @@ public class LoginController {
             user = userService.validatePassword(username, password);
         } catch (EncryptException e) {
             log.error("Validate user[{}] error", username);
-            return ResultUtils.genFailedJsonResult(ErrorCode.VALIDATE_USER_ERROR, callback);
+            return ResultUtils.genFailedStringResult(ErrorCode.VALIDATE_USER_ERROR, callback);
         }
 
         if (null == user) {
             log.info("User[{}] password[{}] is wrong!", username, password);
-            return ResultUtils.genFailedJsonResult(ErrorCode.ILLEGAL_USER, callback);
+            return ResultUtils.genFailedStringResult(ErrorCode.ILLEGAL_USER, callback);
         }
 
-
+        SessionUtils.putUser(session, user); // session user
         Map<String, Object> data = new HashMap<>();
         data.put(ResultUtils.CALLBACK, callback);
-        return ResultUtils.genSuccessJsonResult(data);
+        return ResultUtils.genSuccessStringResult(data);
+
     }
 
 }

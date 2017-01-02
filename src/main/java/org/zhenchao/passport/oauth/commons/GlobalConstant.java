@@ -15,6 +15,12 @@ public interface GlobalConstant {
 
     String PATH_ROOT_OAUTH = "/oauth";
 
+    String PATH_OAUTH_AUTHORIZE_CODE = "/authorize/code";
+
+    String PATH_OAUTH_AUTHORIZE_token = "/authorize/token";
+
+    String PATH_OAUTH_IMPLICIT_token = "/implicit/token";
+
     /** 盐 */
     String SALT = "U2FsdGVkX18jBB+UX3z4J1Qy9z24/JX5U28ELFYb+ehc8WH/QetV6bbbxUhhM3zvkY/M";
 }

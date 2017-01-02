@@ -42,6 +42,16 @@ public class ResultUtils {
     }
 
     /**
+     * 生成错误的String返回数据
+     *
+     * @param errorCode
+     * @return
+     */
+    public static String genFailedStringResult(ErrorCode errorCode) {
+        return genFailedJsonResult(errorCode).toString();
+    }
+
+    /**
      * 生成错误的JSON返回数据，带callback
      *
      * @param errorCode
@@ -58,6 +68,17 @@ public class ResultUtils {
     }
 
     /**
+     * 生成错误的String返回数据，带callback
+     *
+     * @param errorCode
+     * @param callback
+     * @return
+     */
+    public static String genFailedStringResult(ErrorCode errorCode, String callback) {
+        return genFailedJsonResult(errorCode, callback).toString();
+    }
+
+    /**
      * 生成正确的JSON返回数据
      *
      * @param data
@@ -68,6 +89,16 @@ public class ResultUtils {
         result.put(RESULT, OK);
         result.put(CODE, RIGHT_CODE);
         return result;
+    }
+
+    /**
+     * 生成正确的String返回数据
+     *
+     * @param data
+     * @return
+     */
+    public static String genSuccessStringResult(Map<String, Object> data) {
+        return genSuccessJsonResult(data).toString();
     }
 
 }
