@@ -63,6 +63,7 @@ public class LoginController {
             return ResultUtils.genFailedJsonResult(ErrorCode.ILLEGAL_USER, callback);
         }
 
+
         Map<String, Object> data = new HashMap<>();
         data.put(ResultUtils.CALLBACK, callback);
         return ResultUtils.genSuccessJsonResult(data);

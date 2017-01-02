@@ -8,12 +8,31 @@
     <name>passport-oauth</name>
     <url>http://maven.apache.org</url>
 
+    <repositories>
+        <repository>
+            <id>aliyun</id>
+            <name>aliyun Nexus</name>
+            <layout>default</layout>
+            <url>http://maven.aliyun.com/nexus/content/groups/public</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+        </repository>
+    </repositories>
+
     <profiles>
         <profile>
             <id>local</id>
-            <datasource.url.master>jdbc:mysql://localhost:3306/passport_oauth?useUnicode=true&amp;amp;characterEncoding=utf8</datasource.url.master>
-            <datasource.username>root</datasource.username>
-            <datasource.password>VomIiP8yZNR/NYpP+1U+OmOLEQcpzSzQLUkG5ramVmfzLAPrd230BEZ0W9ZvSY4CxMGEuT7OdMa9sneZ8dgJ1Q==</datasource.password>
+            <properties>
+                <datasource.url.master>jdbc:mysql://localhost:3306/passport_oauth?useUnicode=true&amp;amp;characterEncoding=utf8
+                </datasource.url.master>
+                <datasource.username>root</datasource.username>
+                <datasource.password>VomIiP8yZNR/NYpP+1U+OmOLEQcpzSzQLUkG5ramVmfzLAPrd230BEZ0W9ZvSY4CxMGEuT7OdMa9sneZ8dgJ1Q==
+                </datasource.password>
+            </properties>
         </profile>
     </profiles>
 
@@ -189,6 +208,17 @@
             <groupId>net.sf.ezmorph</groupId>
             <artifactId>ezmorph</artifactId>
             <version>1.0.6</version>
+        </dependency>
+        <dependency>
+            <groupId>Javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>3.1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>jsp-api</artifactId>
+            <version>2.0</version>
+            <scope>compile</scope>
         </dependency>
         <!-- rest-assured -->
         <dependency>
