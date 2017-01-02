@@ -16,7 +16,15 @@ public enum ErrorCode {
 
     REMOTE_SERVICE_ERROR(100150, "remote service error"),
 
-    PARAMETER_ERROR(100200, "parameter error");
+    PARAMETER_ERROR(100200, "parameter error"),
+
+    ENCRYPT_ERROR(100300, "encrypt error"),
+
+    /** 验证用户错误 */
+    VALIDATE_USER_ERROR(200000, "validate user error"),
+
+    /** 无效的用户 */
+    ILLEGAL_USER(200001, "illegal user");
 
     /** 错误码 */
     private int code;

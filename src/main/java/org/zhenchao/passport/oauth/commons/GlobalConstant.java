@@ -14,4 +14,7 @@ public interface GlobalConstant {
     String PATH_ROOT_LOGIN = "/login";
 
     String PATH_ROOT_OAUTH = "/oauth";
+
+    /** 盐 */
+    String SALT = "U2FsdGVkX18jBB+UX3z4J1Qy9z24/JX5U28ELFYb+ehc8WH/QetV6bbbxUhhM3zvkY/M";
 }

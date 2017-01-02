@@ -13,6 +13,20 @@ import java.util.Map;
  */
 public class ResultUtils {
 
+    public static final String RESULT = "result";
+
+    public static final String CODE = "code";
+
+    public static final String DESC = "description";
+
+    public static final String CALLBACK = "callback";
+
+    public static final String OK = "OK";
+
+    public static final String ERROR = "ERROR";
+
+    public static final int RIGHT_CODE = 0;
+
     /**
      * 生成错误的JSON返回数据
      *
@@ -21,9 +35,25 @@ public class ResultUtils {
      */
     public static JSONObject genFailedJsonResult(ErrorCode errorCode) {
         JSONObject result = new JSONObject();
-        result.put("result", "ERROR");
-        result.put("code", errorCode.getCode());
-        result.put("description", errorCode.getDesc());
+        result.put(RESULT, ERROR);
+        result.put(CODE, errorCode.getCode());
+        result.put(DESC, errorCode.getDesc());
+        return result;
+    }
+
+    /**
+     * 生成错误的JSON返回数据，带callback
+     *
+     * @param errorCode
+     * @param callback
+     * @return
+     */
+    public static JSONObject genFailedJsonResult(ErrorCode errorCode, String callback) {
+        JSONObject result = new JSONObject();
+        result.put(RESULT, ERROR);
+        result.put(CODE, errorCode.getCode());
+        result.put(DESC, errorCode.getDesc());
+        result.put(CALLBACK, callback);
         return result;
     }
 
@@ -35,8 +65,8 @@ public class ResultUtils {
      */
     public static JSONObject genSuccessJsonResult(Map<String, Object> data) {
         JSONObject result = JSONObject.fromObject(data);
-        result.put("result", "OK");
-        result.put("code", "0");
+        result.put(RESULT, OK);
+        result.put(CODE, RIGHT_CODE);
         return result;
     }
 

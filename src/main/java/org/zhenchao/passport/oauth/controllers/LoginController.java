@@ -12,10 +12,14 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.zhenchao.passport.oauth.commons.ErrorCode;
 import static org.zhenchao.passport.oauth.commons.GlobalConstant.PATH_ROOT;
 import static org.zhenchao.passport.oauth.commons.GlobalConstant.PATH_ROOT_LOGIN;
+import org.zhenchao.passport.oauth.exceptions.EncryptException;
+import org.zhenchao.passport.oauth.model.User;
+import org.zhenchao.passport.oauth.service.UserService;
 import org.zhenchao.passport.oauth.utils.ResultUtils;
 
 import java.util.HashMap;
 import java.util.Map;
+import javax.annotation.Resource;
 
 /**
  * 登录相关控制器
@@ -29,6 +33,9 @@ public class LoginController {
 
     private static final Logger log = LoggerFactory.getLogger(LoginController.class);
 
+    @Resource
+    private UserService userService;
+
     @ResponseBody
     @RequestMapping(value = PATH_ROOT_LOGIN, method = RequestMethod.POST)
     public JSONObject login(
@@ -38,13 +45,27 @@ public class LoginController {
 
         log.debug("Entering login method...");
 
-        if(StringUtils.isBlank(username) || StringUtils.isBlank(password)) {
+        if (StringUtils.isBlank(username) || StringUtils.isBlank(password)) {
             log.error("Login params error, username or password is null or empty!");
-            return ResultUtils.genFailedJsonResult(ErrorCode.PARAMETER_ERROR);
+            return ResultUtils.genFailedJsonResult(ErrorCode.PARAMETER_ERROR, callback);
+        }
+
+        User user;
+        try {
+            user = userService.validatePassword(username, password);
+        } catch (EncryptException e) {
+            log.error("Validate user[{}] error", username);
+            return ResultUtils.genFailedJsonResult(ErrorCode.VALIDATE_USER_ERROR, callback);
+        }
+
+        if (null == user) {
+            log.info("User[{}] password[{}] is wrong!", username, password);
+            return ResultUtils.genFailedJsonResult(ErrorCode.ILLEGAL_USER, callback);
         }
 
         Map<String, Object> data = new HashMap<>();
+        data.put(ResultUtils.CALLBACK, callback);
         return ResultUtils.genSuccessJsonResult(data);
-
     }
+
 }
