@@ -8,23 +8,43 @@ package org.zhenchao.passport.oauth.commons;
  */
 public enum ErrorCode {
 
+    /** 基础错误 **/
+
     SYSTEM_ERROR(100000, "system error"),
 
-    SERVICE_ERROR(100100, "service error"),
+    SERVICE_ERROR(100050, "service error"),
 
-    LOCAL_SERVICE_ERROR(100101, "local service error"),
+    SERVICE_TEMPORARILY_UNAVAILABLE(100051, "service temporarily unavailable"),
+
+    LOCAL_SERVICE_ERROR(100100, "local service error"),
+
+    LOCAL_SERVICE_TEMPORARILY_UNAVAILABLE(100101, "local service temporarily unavailable"),
 
     REMOTE_SERVICE_ERROR(100150, "remote service error"),
+
+    REMOTE_SERVICE_TEMPORARILY_UNAVAILABLE(100151, "remote service temporarily unavailable"),
 
     PARAMETER_ERROR(100200, "parameter error"),
 
     ENCRYPT_ERROR(100300, "encrypt error"),
 
-    /** 验证用户错误 */
-    VALIDATE_USER_ERROR(200000, "validate user error"),
+    /** OAuth相关错误 **/
 
-    /** 无效的用户 */
-    ILLEGAL_USER(200001, "illegal user");
+    INVALID_REQUEST(200000, "invalid request"),
+
+    UNAUTHORIZED_CLIENT(200001, "unauthorized client"),
+
+    ACCESS_DENIED(200002, "access denied"),
+
+    UNSUPPORTED_RESPONSE_TYPE(200003, "unsupported response type"),
+
+    INVALID_SCOPE(200004, "invalid scope"),
+
+    /** 业务相关错误 **/
+
+    VALIDATE_USER_ERROR(300000, "validate user error"),
+
+    ILLEGAL_USER(300001, "illegal user");
 
     /** 错误码 */
     private int code;
