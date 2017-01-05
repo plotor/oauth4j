@@ -1,5 +1,6 @@
 package org.zhenchao.passport.oauth.utils;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.Cookie;
@@ -22,6 +23,9 @@ public class CookieUtils {
      */
     public static String get(HttpServletRequest request, String key) {
         Cookie[] cookies = request.getCookies();
+        if(ArrayUtils.isEmpty(cookies)) {
+            return StringUtils.EMPTY;
+        }
         for (final Cookie cookie : cookies) {
             if (StringUtils.equals(cookie.getName(), key)) {
                 return cookie.getValue();
@@ -30,8 +34,19 @@ public class CookieUtils {
         return StringUtils.EMPTY;
     }
 
-    public static void set() {
-
+    /**
+     * 创建一个新的cookie
+     *
+     * @param key
+     * @param value
+     * @return
+     */
+    public static Cookie create(String key, String value) {
+        Cookie cookie = new Cookie(key, value);
+        cookie.setHttpOnly(true);
+        cookie.setPath("/");
+        cookie.setMaxAge(24 * 3600);
+        return cookie;
     }
 
 }

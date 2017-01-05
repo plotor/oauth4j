@@ -1,6 +1,8 @@
 package org.zhenchao.passport.oauth.utils;
 
+import org.apache.commons.codec.digest.HmacUtils;
 import org.apache.commons.lang3.StringUtils;
+import static org.zhenchao.passport.oauth.commons.GlobalConstant.AES_KEY;
 import org.zhenchao.passport.oauth.model.User;
 
 import javax.servlet.http.HttpSession;
@@ -24,8 +26,7 @@ public class SessionUtils {
         if (null == user || StringUtils.isBlank(user.getUsername())) {
             return false;
         }
-
-        session.setAttribute("user-" + user.getUsername(), user);
+        session.setAttribute("user-" + HmacUtils.hmacSha1Hex(AES_KEY, user.getUsername()), user);
         return true;
     }
 
@@ -33,15 +34,14 @@ public class SessionUtils {
      * 从session中获取用户信息
      *
      * @param session
-     * @param username
+     * @param key
      * @return
      */
-    public static User getUser(HttpSession session, String username) {
-        if (StringUtils.isBlank(username)) {
+    public static User getUser(HttpSession session, String key) {
+        if (StringUtils.isBlank(key)) {
             return null;
         }
-
-        return (User) session.getAttribute("user-" + username);
+        return (User) session.getAttribute("user-" + key);
     }
 
 }

@@ -1,5 +1,6 @@
 package org.zhenchao.passport.oauth.controllers;
 
+import org.apache.commons.codec.digest.HmacUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 import org.zhenchao.passport.oauth.commons.ErrorCode;
+import static org.zhenchao.passport.oauth.commons.GlobalConstant.COOKIE_KEY_USER_LOGIN_SIGN;
+import static org.zhenchao.passport.oauth.commons.GlobalConstant.AES_KEY;
 import static org.zhenchao.passport.oauth.commons.GlobalConstant.PATH_ROOT_LOGIN;
 import org.zhenchao.passport.oauth.exceptions.EncryptException;
 import org.zhenchao.passport.oauth.model.User;
@@ -20,6 +23,8 @@ import org.zhenchao.passport.oauth.utils.SessionUtils;
 import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.Resource;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 /**
@@ -64,6 +69,7 @@ public class LoginController {
     @RequestMapping(value = PATH_ROOT_LOGIN, method = RequestMethod.POST)
     public String login(
             HttpSession session,
+            HttpServletResponse response,
             @RequestParam(value = "username") String username,
             @RequestParam("password") String password,
             @RequestParam(value = "callback", required = false) String callback) {
@@ -88,7 +94,15 @@ public class LoginController {
             return ResultUtils.genFailedStringResult(ErrorCode.ILLEGAL_USER, callback);
         }
 
-        SessionUtils.putUser(session, user); // session user
+        // session user
+        SessionUtils.putUser(session, user);
+
+        // cookie user
+        Cookie cookie = new Cookie(COOKIE_KEY_USER_LOGIN_SIGN, HmacUtils.hmacSha1Hex(AES_KEY, username));
+        cookie.setPath("/");
+        cookie.setHttpOnly(true);
+        cookie.setMaxAge(24 * 3600);
+        response.addCookie(cookie);
 
         Map<String, Object> data = new HashMap<>();
         data.put(ResultUtils.CALLBACK, callback);

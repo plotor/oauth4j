@@ -29,7 +29,7 @@
             <properties>
                 <datasource.url.master>jdbc:mysql://localhost:3306/passport_oauth?useUnicode=true&amp;amp;characterEncoding=utf8</datasource.url.master>
                 <datasource.username>root</datasource.username>
-                <datasource.password>HyFLVyTsxI/AxEB1ydkQIgtB/s+h2Q9jtrpr6xG5AYwEUOggvnrhV7Ru0fVN1539QvMo+9bjPXSzPhtimMBOow==</datasource.password>
+                <datasource.password>o+b6gjOb/YuhA1qspu7Z3wO/qlmKPm37nKqE4xZcHHul5uCasMcCcl2UpB6NRH/+sKg5AippMCI4L1sMhoGNaw==</datasource.password>
             </properties>
             <activation>
                 <activeByDefault>true</activeByDefault>
@@ -120,6 +120,16 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
             <version>3.5</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+            <version>1.10</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-crypto</artifactId>
+            <version>1.0.0</version>
         </dependency>
         <!--<dependency>
             <groupId>commons-lang</groupId>

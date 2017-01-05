@@ -21,6 +21,10 @@ public interface GlobalConstant {
 
     String PATH_OAUTH_IMPLICIT_token = "/implicit/token";
 
+    String COOKIE_KEY_USER_LOGIN_SIGN = "ck_sign_ul";
+
     /** 盐 */
     String SALT = "U2FsdGVkX18jBB+UX3z4J1Qy9z24/JX5U28ELFYb+ehc8WH/QetV6bbbxUhhM3zvkY/M";
+
+    String AES_KEY = "a7995a00458f969bd381bbbe86778a9b32e43f29";
 }
