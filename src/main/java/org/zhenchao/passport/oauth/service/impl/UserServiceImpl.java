@@ -5,7 +5,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.springframework.util.DigestUtils;
 import org.zhenchao.passport.oauth.commons.ErrorCode;
 import org.zhenchao.passport.oauth.commons.GlobalConstant;
 import org.zhenchao.passport.oauth.dao.UserMapper;
@@ -46,6 +45,7 @@ public class UserServiceImpl implements UserService {
         List<User> users = userMapper.selectByExample(userExample);
         if (CollectionUtils.isEmpty(users)) {
             log.error("Can't find any user by name[{}]!", username);
+            return null;
         }
 
         String encryptPassword;
@@ -56,6 +56,7 @@ public class UserServiceImpl implements UserService {
         }
 
         User user = users.get(0);
+        log.debug("Password validate[current={}, expected={}]", encryptPassword, user.getPassword());
         return StringUtils.equals(encryptPassword, user.getPassword()) ? user : null;
     }
 

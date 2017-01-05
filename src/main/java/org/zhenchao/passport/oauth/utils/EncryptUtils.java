@@ -49,7 +49,7 @@ public class EncryptUtils {
      * @throws EncryptException
      */
     public static String pbkdf2(String text, String salt) throws InvalidKeySpecException {
-        return pbkdf2(text, salt, 8, 32);
+        return pbkdf2(text, salt, 8, 128);
     }
 
 }

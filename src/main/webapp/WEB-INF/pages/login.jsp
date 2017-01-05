@@ -26,6 +26,7 @@
     </div>
     <div class="panel-body">
         <form role="form" action="/login" method="post">
+            <input type="hidden" name="callback" value="${callback}">
             <div class="form-group">
                 <label for="username">用户名</label>
                 <input type="text" class="form-control" name="username" placeholder="请输入用户名">

@@ -7,6 +7,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.zhenchao.passport.oauth.utils.CookieUtils;
+import org.zhenchao.passport.oauth.utils.HttpRequestUtils;
 import org.zhenchao.passport.oauth.utils.SessionUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -40,7 +41,7 @@ public class LoginInterceptor implements HandlerInterceptor {
 
         // 用户未登录，跳转到登录页
         UriComponentsBuilder builder = UriComponentsBuilder.newInstance();
-        builder.path("/login").queryParam("callback", request.getRequestURI());
+        builder.path("/login").queryParam("callback", HttpRequestUtils.getEncodeRequestUrl(request));
         response.sendRedirect(builder.build().toUriString());
 
         return false;

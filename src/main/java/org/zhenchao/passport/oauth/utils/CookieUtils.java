@@ -30,4 +30,8 @@ public class CookieUtils {
         return StringUtils.EMPTY;
     }
 
+    public static void set() {
+
+    }
+
 }

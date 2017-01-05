@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
 import org.zhenchao.passport.oauth.commons.ErrorCode;
-import static org.zhenchao.passport.oauth.commons.GlobalConstant.PATH_ROOT;
 import static org.zhenchao.passport.oauth.commons.GlobalConstant.PATH_ROOT_LOGIN;
 import org.zhenchao.passport.oauth.exceptions.EncryptException;
 import org.zhenchao.passport.oauth.model.User;
@@ -29,7 +29,6 @@ import javax.servlet.http.HttpSession;
  * @version 1.0.0
  */
 @Controller
-@RequestMapping(PATH_ROOT)
 public class LoginController {
 
     private static final Logger log = LoggerFactory.getLogger(LoginController.class);
@@ -43,8 +42,13 @@ public class LoginController {
      * @return
      */
     @RequestMapping(value = PATH_ROOT_LOGIN, method = RequestMethod.GET)
-    public String login() {
-        return "redirect:/login";
+    public ModelAndView login(@RequestParam(value = "callback", required = false) String callback) {
+        ModelAndView mav = new ModelAndView();
+        if (StringUtils.isNotBlank(callback)) {
+            mav.addObject("callback", callback);
+        }
+        mav.setViewName("login");
+        return mav;
     }
 
     /**
@@ -85,6 +89,7 @@ public class LoginController {
         }
 
         SessionUtils.putUser(session, user); // session user
+
         Map<String, Object> data = new HashMap<>();
         data.put(ResultUtils.CALLBACK, callback);
         return ResultUtils.genSuccessStringResult(data);
