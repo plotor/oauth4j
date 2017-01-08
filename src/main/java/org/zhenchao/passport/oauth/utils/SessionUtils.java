@@ -1,8 +1,7 @@
 package org.zhenchao.passport.oauth.utils;
 
-import org.apache.commons.codec.digest.HmacUtils;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
-import static org.zhenchao.passport.oauth.commons.GlobalConstant.AES_KEY;
 import org.zhenchao.passport.oauth.model.User;
 
 import javax.servlet.http.HttpSession;
@@ -26,7 +25,7 @@ public class SessionUtils {
         if (null == user || StringUtils.isBlank(user.getUsername())) {
             return false;
         }
-        session.setAttribute("user-" + HmacUtils.hmacSha1Hex(AES_KEY, user.getUsername()), user);
+        session.setAttribute("user-" + DigestUtils.md5Hex(user.getUsername()), user);
         return true;
     }
 
