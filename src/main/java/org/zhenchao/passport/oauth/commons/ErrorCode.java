@@ -28,6 +28,12 @@ public enum ErrorCode {
 
     ENCRYPT_ERROR(100300, "encrypt error"),
 
+    AES_ENCRYPT_ERROR(100301, "aes encrypt error"),
+
+    DECRYPT_ERROR(100400, "decrypt error"),
+
+    AES_DECRYPT_ERROR(100401, "aes decrypt error"),
+
     /** OAuth相关错误 **/
 
     INVALID_REQUEST(200000, "invalid request"),

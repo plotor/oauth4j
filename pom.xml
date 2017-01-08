@@ -29,7 +29,8 @@
             <properties>
                 <datasource.url.master>jdbc:mysql://localhost:3306/passport_oauth?useUnicode=true&amp;amp;characterEncoding=utf8</datasource.url.master>
                 <datasource.username>root</datasource.username>
-                <datasource.password>o+b6gjOb/YuhA1qspu7Z3wO/qlmKPm37nKqE4xZcHHul5uCasMcCcl2UpB6NRH/+sKg5AippMCI4L1sMhoGNaw==</datasource.password>
+                <!--暂时不启用密码加密-->
+                <datasource.password>123456</datasource.password>
             </properties>
             <activation>
                 <activeByDefault>true</activeByDefault>

@@ -9,7 +9,7 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.util.UriComponentsBuilder;
 import static org.zhenchao.passport.oauth.commons.GlobalConstant.COOKIE_KEY_USER_LOGIN_SIGN;
 import org.zhenchao.passport.oauth.utils.CookieUtils;
-import org.zhenchao.passport.oauth.utils.EncryptUtils;
+import org.zhenchao.passport.oauth.utils.EncryptAndDecryptUtils;
 import org.zhenchao.passport.oauth.utils.HttpRequestUtils;
 import org.zhenchao.passport.oauth.utils.SessionUtils;
 
@@ -32,7 +32,8 @@ public class LoginInterceptor implements HandlerInterceptor {
         String username = request.getParameter("username");
         if (StringUtils.isBlank(username)) {
             String key = CookieUtils.get(request, COOKIE_KEY_USER_LOGIN_SIGN);
-            username = new String(EncryptUtils.aesDecrypt(key));
+            username = new String(EncryptAndDecryptUtils.aesDecrypt(key));
+            log.debug("Get key[{}] from cookie, decrypt value[username={}]", username);
         }
 
         if (StringUtils.isNotBlank(username)) {

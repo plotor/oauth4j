@@ -1,6 +1,6 @@
 package org.zhenchao.passport.oauth.service;
 
-import org.zhenchao.passport.oauth.exceptions.EncryptException;
+import org.zhenchao.passport.oauth.exceptions.EncryptOrDecryptException;
 import org.zhenchao.passport.oauth.model.User;
 
 /**
@@ -18,5 +18,5 @@ public interface UserService {
      * @param password
      * @return 验证成功返回user对象，否则返回null
      */
-    User validatePassword(String username, String password) throws EncryptException;
+    User validatePassword(String username, String password) throws EncryptOrDecryptException;
 }

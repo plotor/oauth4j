@@ -8,11 +8,11 @@ import org.springframework.stereotype.Service;
 import org.zhenchao.passport.oauth.commons.ErrorCode;
 import org.zhenchao.passport.oauth.commons.GlobalConstant;
 import org.zhenchao.passport.oauth.dao.UserMapper;
-import org.zhenchao.passport.oauth.exceptions.EncryptException;
+import org.zhenchao.passport.oauth.exceptions.EncryptOrDecryptException;
 import org.zhenchao.passport.oauth.model.User;
 import org.zhenchao.passport.oauth.model.UserExample;
 import org.zhenchao.passport.oauth.service.UserService;
-import org.zhenchao.passport.oauth.utils.EncryptUtils;
+import org.zhenchao.passport.oauth.utils.EncryptAndDecryptUtils;
 
 import java.security.spec.InvalidKeySpecException;
 import java.util.List;
@@ -33,7 +33,7 @@ public class UserServiceImpl implements UserService {
     private UserMapper userMapper;
 
     @Override
-    public User validatePassword(String username, String password) throws EncryptException {
+    public User validatePassword(String username, String password) throws EncryptOrDecryptException {
         if (StringUtils.isBlank(username) || StringUtils.isBlank(password)) {
             log.error("Params error, username or password is null or empty!");
             return null;
@@ -50,9 +50,9 @@ public class UserServiceImpl implements UserService {
 
         String encryptPassword;
         try {
-            encryptPassword = EncryptUtils.pbkdf2(password, GlobalConstant.SALT);
+            encryptPassword = EncryptAndDecryptUtils.pbkdf2(password, GlobalConstant.SALT);
         } catch (InvalidKeySpecException e) {
-            throw new EncryptException("PBKDF2 error, invalid ke spec", e, ErrorCode.ENCRYPT_ERROR);
+            throw new EncryptOrDecryptException("PBKDF2 error, invalid ke spec", e, ErrorCode.ENCRYPT_ERROR);
         }
 
         User user = users.get(0);

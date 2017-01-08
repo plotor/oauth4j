@@ -1,5 +1,6 @@
 package org.zhenchao.passport.oauth.utils;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.zhenchao.passport.oauth.commons.GlobalConstant;
 
@@ -8,9 +9,17 @@ import org.zhenchao.passport.oauth.commons.GlobalConstant;
  * @version 1.0.0
  */
 public class EncryptUtilsTest {
+
     @Test
     public void pbkdf2() throws Exception {
-        System.out.println(EncryptUtils.pbkdf2("123456", GlobalConstant.SALT));
+        System.out.println(EncryptAndDecryptUtils.pbkdf2("123456", GlobalConstant.SALT));
+    }
+
+    @Test
+    public void aesTest() throws Exception {
+        String username = "zhenchao";
+        String decryptDate = new String(EncryptAndDecryptUtils.aesDecrypt(EncryptAndDecryptUtils.aesEncrypt(username)));
+        Assert.assertEquals(username, decryptDate);
     }
 
 }

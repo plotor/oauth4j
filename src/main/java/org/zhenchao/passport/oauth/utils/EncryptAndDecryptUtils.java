@@ -2,18 +2,26 @@ package org.zhenchao.passport.oauth.utils;
 
 import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.zhenchao.passport.oauth.exceptions.EncryptException;
+import org.zhenchao.passport.oauth.commons.ErrorCode;
+import org.zhenchao.passport.oauth.exceptions.EncryptOrDecryptException;
 
+import java.io.UnsupportedEncodingException;
 import java.security.AlgorithmParameters;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.security.Security;
 import java.security.spec.InvalidKeySpecException;
+import java.security.spec.InvalidParameterSpecException;
 import java.security.spec.KeySpec;
 import java.util.Arrays;
 import java.util.Base64;
+import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.KeyGenerator;
+import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
@@ -25,7 +33,7 @@ import javax.crypto.spec.SecretKeySpec;
  * @author zhenchao.wang 2017-01-02 13:49
  * @version 1.0.0
  */
-public class EncryptUtils {
+public class EncryptAndDecryptUtils {
 
     private static final String AES = "AES";
 
@@ -51,18 +59,24 @@ public class EncryptUtils {
 
     /**
      * AES 加密
+     * 返回结果进行base64编码
      *
      * @param data
      * @return
      * @throws Exception
      */
-    public static byte[] aesEncrypt(byte[] data) throws Exception {
+    public static byte[] aesEncrypt(byte[] data) throws EncryptOrDecryptException {
         Key key = new SecretKeySpec(aesKey, AES);
         Security.addProvider(new BouncyCastleProvider());
-        Cipher cipher = Cipher.getInstance(AES_CIPHER_ALGORITHM);
-        //设置为加密模式
-        cipher.init(Cipher.ENCRYPT_MODE, key, generateIV());
-        return cipher.doFinal(data);
+        try {
+            Cipher cipher = Cipher.getInstance(AES_CIPHER_ALGORITHM);
+            //设置为加密模式
+            cipher.init(Cipher.ENCRYPT_MODE, key, generateIV());
+            return Base64.getEncoder().encode(cipher.doFinal(data));
+        } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | InvalidAlgorithmParameterException |
+                IllegalBlockSizeException | BadPaddingException | InvalidParameterSpecException e) {
+            throw new EncryptOrDecryptException("Aes encrypt error!", e, ErrorCode.AES_ENCRYPT_ERROR);
+        }
     }
 
     /**
@@ -72,13 +86,13 @@ public class EncryptUtils {
      * @return
      * @throws Exception
      */
-    public static byte[] aesEncrypt(String data) throws Exception {
-        Key key = new SecretKeySpec(aesKey, AES);
-        Security.addProvider(new BouncyCastleProvider());
-        Cipher cipher = Cipher.getInstance(AES_CIPHER_ALGORITHM);
-        //设置为加密模式
-        cipher.init(Cipher.ENCRYPT_MODE, key, generateIV());
-        return cipher.doFinal(data.getBytes("UTF-8"));
+    public static byte[] aesEncrypt(String data) throws EncryptOrDecryptException {
+        try {
+            return aesEncrypt(data.getBytes("UTF-8"));
+        } catch (UnsupportedEncodingException e) {
+            // never happen
+        }
+        return new byte[0];
     }
 
     /**
@@ -88,12 +102,18 @@ public class EncryptUtils {
      * @return
      * @throws Exception
      */
-    public static byte[] aesDecrypt(byte[] encryptedData) throws Exception {
+    public static byte[] aesDecrypt(byte[] encryptedData) throws EncryptOrDecryptException {
         Key key = new SecretKeySpec(aesKey, AES);
-        Cipher cipher = Cipher.getInstance(AES_CIPHER_ALGORITHM);
-        //设置为解密模式
-        cipher.init(Cipher.DECRYPT_MODE, key, generateIV());
-        return cipher.doFinal(encryptedData);
+        try {
+            Cipher cipher = Cipher.getInstance(AES_CIPHER_ALGORITHM);
+            //设置为解密模式
+            cipher.init(Cipher.DECRYPT_MODE, key, generateIV());
+            return cipher.doFinal(Base64.getDecoder().decode(encryptedData));
+        } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | InvalidAlgorithmParameterException |
+                IllegalBlockSizeException | BadPaddingException | InvalidParameterSpecException e) {
+            throw new EncryptOrDecryptException("Aes decrypt error!", e, ErrorCode.AES_DECRYPT_ERROR);
+        }
+
     }
 
     /**
@@ -104,11 +124,7 @@ public class EncryptUtils {
      * @throws Exception
      */
     public static byte[] aesDecrypt(String encryptedData) throws Exception {
-        Key key = new SecretKeySpec(aesKey, AES);
-        Cipher cipher = Cipher.getInstance(AES_CIPHER_ALGORITHM);
-        //设置为解密模式
-        cipher.init(Cipher.DECRYPT_MODE, key, generateIV());
-        return cipher.doFinal(encryptedData.getBytes("UTF-8"));
+        return aesDecrypt(encryptedData.getBytes("UTF-8"));
     }
 
     /**
@@ -119,7 +135,7 @@ public class EncryptUtils {
      * @param iterationCount 迭代次数
      * @param length 密钥长度
      * @return
-     * @throws EncryptException
+     * @throws EncryptOrDecryptException
      */
     public static String pbkdf2(String text, String salt, int iterationCount, int length) throws InvalidKeySpecException {
         KeySpec keySpec = new PBEKeySpec(text.toCharArray(), salt.getBytes(), iterationCount, length);
@@ -139,7 +155,7 @@ public class EncryptUtils {
      * @param text 加密字符串
      * @param salt 盐
      * @return
-     * @throws EncryptException
+     * @throws EncryptOrDecryptException
      */
     public static String pbkdf2(String text, String salt) throws InvalidKeySpecException {
         return pbkdf2(text, salt, 8, 128);
@@ -152,7 +168,7 @@ public class EncryptUtils {
      * @return
      * @throws Exception
      */
-    private static AlgorithmParameters generateIV() throws Exception {
+    private static AlgorithmParameters generateIV() throws NoSuchAlgorithmException, InvalidParameterSpecException {
         byte[] iv = new byte[16];
         Arrays.fill(iv, (byte) 0x00);
         AlgorithmParameters params = AlgorithmParameters.getInstance(AES);
