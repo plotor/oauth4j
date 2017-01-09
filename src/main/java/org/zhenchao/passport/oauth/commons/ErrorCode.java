@@ -30,6 +30,8 @@ public enum ErrorCode {
 
     AES_ENCRYPT_ERROR(100301, "aes encrypt error"),
 
+    PBKDF2_ENCRYPT_ERROR(100302, "pbkdf2 encrypt error"),
+
     DECRYPT_ERROR(100400, "decrypt error"),
 
     AES_DECRYPT_ERROR(100401, "aes decrypt error"),

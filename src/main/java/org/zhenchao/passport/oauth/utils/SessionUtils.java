@@ -33,14 +33,14 @@ public class SessionUtils {
      * 从session中获取用户信息
      *
      * @param session
-     * @param key
+     * @param username
      * @return
      */
-    public static User getUser(HttpSession session, String key) {
-        if (StringUtils.isBlank(key)) {
+    public static User getUser(HttpSession session, String username) {
+        if (StringUtils.isBlank(username)) {
             return null;
         }
-        return (User) session.getAttribute("user-" + key);
+        return (User) session.getAttribute("user-" + DigestUtils.md5Hex(username));
     }
 
 }

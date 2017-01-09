@@ -1,5 +1,6 @@
 package org.zhenchao.passport.oauth.utils;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.zhenchao.passport.oauth.commons.ErrorCode;
@@ -66,9 +67,15 @@ public class EncryptAndDecryptUtils {
      * @throws Exception
      */
     public static byte[] aesEncrypt(byte[] data) throws EncryptOrDecryptException {
-        Key key = new SecretKeySpec(aesKey, AES);
-        Security.addProvider(new BouncyCastleProvider());
+
+        if (ArrayUtils.isEmpty(data)) {
+            throw new EncryptOrDecryptException("Aes encrypt error, the input data is empty!", ErrorCode.PARAMETER_ERROR);
+        }
+
+        // AES加密
         try {
+            Key key = new SecretKeySpec(aesKey, AES);
+            Security.addProvider(new BouncyCastleProvider());
             Cipher cipher = Cipher.getInstance(AES_CIPHER_ALGORITHM);
             //设置为加密模式
             cipher.init(Cipher.ENCRYPT_MODE, key, generateIV());
@@ -77,6 +84,7 @@ public class EncryptAndDecryptUtils {
                 IllegalBlockSizeException | BadPaddingException | InvalidParameterSpecException e) {
             throw new EncryptOrDecryptException("Aes encrypt error!", e, ErrorCode.AES_ENCRYPT_ERROR);
         }
+
     }
 
     /**
@@ -87,12 +95,19 @@ public class EncryptAndDecryptUtils {
      * @throws Exception
      */
     public static byte[] aesEncrypt(String data) throws EncryptOrDecryptException {
+
+        if (StringUtils.isBlank(data)) {
+            throw new EncryptOrDecryptException("Aes encrypt error, the input data is empty!", ErrorCode.PARAMETER_ERROR);
+        }
+
+        // AES加密
         try {
             return aesEncrypt(data.getBytes("UTF-8"));
         } catch (UnsupportedEncodingException e) {
             // never happen
         }
         return new byte[0];
+
     }
 
     /**
@@ -103,8 +118,14 @@ public class EncryptAndDecryptUtils {
      * @throws Exception
      */
     public static byte[] aesDecrypt(byte[] encryptedData) throws EncryptOrDecryptException {
-        Key key = new SecretKeySpec(aesKey, AES);
+
+        if (ArrayUtils.isEmpty(encryptedData)) {
+            throw new EncryptOrDecryptException("Aes decrypt error, the input data is empty!", ErrorCode.PARAMETER_ERROR);
+        }
+
+        // AES解密
         try {
+            Key key = new SecretKeySpec(aesKey, AES);
             Cipher cipher = Cipher.getInstance(AES_CIPHER_ALGORITHM);
             //设置为解密模式
             cipher.init(Cipher.DECRYPT_MODE, key, generateIV());
@@ -123,8 +144,20 @@ public class EncryptAndDecryptUtils {
      * @return
      * @throws Exception
      */
-    public static byte[] aesDecrypt(String encryptedData) throws Exception {
-        return aesDecrypt(encryptedData.getBytes("UTF-8"));
+    public static byte[] aesDecrypt(String encryptedData) throws EncryptOrDecryptException {
+
+        if (StringUtils.isBlank(encryptedData)) {
+            throw new EncryptOrDecryptException("Aes decrypt error, the input data is empty!", ErrorCode.PARAMETER_ERROR);
+        }
+
+        // AES解密
+        try {
+            return aesDecrypt(encryptedData.getBytes("UTF-8"));
+        } catch (UnsupportedEncodingException e) {
+            // never happen
+        }
+        return new byte[0];
+
     }
 
     /**
@@ -137,15 +170,14 @@ public class EncryptAndDecryptUtils {
      * @return
      * @throws EncryptOrDecryptException
      */
-    public static String pbkdf2(String text, String salt, int iterationCount, int length) throws InvalidKeySpecException {
+    public static String pbkdf2(String text, String salt, int iterationCount, int length) throws EncryptOrDecryptException {
         KeySpec keySpec = new PBEKeySpec(text.toCharArray(), salt.getBytes(), iterationCount, length);
         try {
             SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
             return Base64.getEncoder().encodeToString(secretKeyFactory.generateSecret(keySpec).getEncoded());
-        } catch (NoSuchAlgorithmException e) {
-            // never happen
+        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+            throw new EncryptOrDecryptException("PDKDF2 Error", e, ErrorCode.PBKDF2_ENCRYPT_ERROR);
         }
-        return StringUtils.EMPTY;
     }
 
     /**
@@ -157,7 +189,7 @@ public class EncryptAndDecryptUtils {
      * @return
      * @throws EncryptOrDecryptException
      */
-    public static String pbkdf2(String text, String salt) throws InvalidKeySpecException {
+    public static String pbkdf2(String text, String salt) throws EncryptOrDecryptException {
         return pbkdf2(text, salt, 8, 128);
     }
 

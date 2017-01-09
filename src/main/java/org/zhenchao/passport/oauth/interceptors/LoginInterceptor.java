@@ -1,6 +1,5 @@
 package org.zhenchao.passport.oauth.interceptors;
 
-import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,16 +31,18 @@ public class LoginInterceptor implements HandlerInterceptor {
         String username = request.getParameter("username");
         if (StringUtils.isBlank(username)) {
             String key = CookieUtils.get(request, COOKIE_KEY_USER_LOGIN_SIGN);
-            username = new String(EncryptAndDecryptUtils.aesDecrypt(key));
-            log.debug("Get key[{}] from cookie, decrypt value[username={}]", username);
-        }
-
-        if (StringUtils.isNotBlank(username)) {
-            if (null != SessionUtils.getUser(request.getSession(), DigestUtils.md5Hex(username))) {
-                return true;
+            if(StringUtils.isNotBlank(key)) {
+                log.debug("Get key from cookie[key={}, value={}]", COOKIE_KEY_USER_LOGIN_SIGN, key);
+                username = new String(EncryptAndDecryptUtils.aesDecrypt(key));
+                log.debug("Get user info from cookie, decrypt value[username={}]", username);
             }
         }
 
+        if (StringUtils.isNotBlank(username) && null != SessionUtils.getUser(request.getSession(), username)) {
+            return true;
+        }
+
+        log.info("The user[{}] is not login, redirect to login page!");
         // 用户未登录，跳转到登录页
         UriComponentsBuilder builder = UriComponentsBuilder.newInstance();
         builder.path("/login").queryParam("callback", HttpRequestUtils.getEncodeRequestUrl(request));
