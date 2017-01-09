@@ -1,5 +1,6 @@
 package org.zhenchao.passport.oauth.interceptors;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,7 +9,6 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.util.UriComponentsBuilder;
 import static org.zhenchao.passport.oauth.commons.GlobalConstant.COOKIE_KEY_USER_LOGIN_SIGN;
 import org.zhenchao.passport.oauth.utils.CookieUtils;
-import org.zhenchao.passport.oauth.utils.EncryptAndDecryptUtils;
 import org.zhenchao.passport.oauth.utils.HttpRequestUtils;
 import org.zhenchao.passport.oauth.utils.SessionUtils;
 
@@ -29,16 +29,9 @@ public class LoginInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 
         String username = request.getParameter("username");
-        if (StringUtils.isBlank(username)) {
-            String key = CookieUtils.get(request, COOKIE_KEY_USER_LOGIN_SIGN);
-            if(StringUtils.isNotBlank(key)) {
-                log.debug("Get key from cookie[key={}, value={}]", COOKIE_KEY_USER_LOGIN_SIGN, key);
-                username = new String(EncryptAndDecryptUtils.aesDecrypt(key));
-                log.debug("Get user info from cookie, decrypt value[username={}]", username);
-            }
-        }
+        String key = StringUtils.isBlank(username) ? CookieUtils.get(request, COOKIE_KEY_USER_LOGIN_SIGN) : DigestUtils.md5Hex(username);
 
-        if (StringUtils.isNotBlank(username) && null != SessionUtils.getUser(request.getSession(), username)) {
+        if (StringUtils.isNotBlank(key) && null != SessionUtils.getUser(request.getSession(), key)) {
             return true;
         }
 

@@ -1,5 +1,6 @@
 package org.zhenchao.passport.oauth.controllers;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,7 +16,6 @@ import static org.zhenchao.passport.oauth.commons.GlobalConstant.PATH_ROOT_LOGIN
 import org.zhenchao.passport.oauth.exceptions.EncryptOrDecryptException;
 import org.zhenchao.passport.oauth.model.User;
 import org.zhenchao.passport.oauth.service.UserService;
-import org.zhenchao.passport.oauth.utils.EncryptAndDecryptUtils;
 import org.zhenchao.passport.oauth.utils.ResultUtils;
 import org.zhenchao.passport.oauth.utils.SessionUtils;
 
@@ -96,17 +96,12 @@ public class LoginController {
         // session user
         SessionUtils.putUser(session, user);
 
-        try {
-            // cookie user
-            Cookie cookie = new Cookie(COOKIE_KEY_USER_LOGIN_SIGN, new String(EncryptAndDecryptUtils.aesEncrypt(username)));
-            cookie.setPath("/");
-            cookie.setHttpOnly(true);
-            cookie.setMaxAge(24 * 3600);
-            response.addCookie(cookie);
-        } catch (EncryptOrDecryptException e) {
-            log.error("Put user[{}] info to cookie error!", username, e);
-            return ResultUtils.genFailedStringResult(ErrorCode.ENCRYPT_ERROR, callback);
-        }
+        // cookie user
+        Cookie cookie = new Cookie(COOKIE_KEY_USER_LOGIN_SIGN, DigestUtils.md5Hex(username));
+        cookie.setPath("/");
+        cookie.setHttpOnly(true);
+        cookie.setMaxAge(24 * 3600);
+        response.addCookie(cookie);
 
         Map<String, Object> data = new HashMap<>();
         data.put(ResultUtils.CALLBACK, callback);

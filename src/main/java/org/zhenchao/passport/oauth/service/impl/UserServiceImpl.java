@@ -5,7 +5,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.zhenchao.passport.oauth.commons.ErrorCode;
 import org.zhenchao.passport.oauth.commons.GlobalConstant;
 import org.zhenchao.passport.oauth.dao.UserMapper;
 import org.zhenchao.passport.oauth.exceptions.EncryptOrDecryptException;
@@ -14,7 +13,6 @@ import org.zhenchao.passport.oauth.model.UserExample;
 import org.zhenchao.passport.oauth.service.UserService;
 import org.zhenchao.passport.oauth.utils.EncryptAndDecryptUtils;
 
-import java.security.spec.InvalidKeySpecException;
 import java.util.List;
 import javax.annotation.Resource;
 
@@ -48,13 +46,7 @@ public class UserServiceImpl implements UserService {
             return null;
         }
 
-        String encryptPassword;
-        try {
-            encryptPassword = EncryptAndDecryptUtils.pbkdf2(password, GlobalConstant.SALT);
-        } catch (InvalidKeySpecException e) {
-            throw new EncryptOrDecryptException("PBKDF2 error, invalid ke spec", e, ErrorCode.ENCRYPT_ERROR);
-        }
-
+        String encryptPassword = EncryptAndDecryptUtils.pbkdf2(password, GlobalConstant.SALT);
         User user = users.get(0);
         log.debug("Password validate[current={}, expected={}]", encryptPassword, user.getPassword());
         return StringUtils.equals(encryptPassword, user.getPassword()) ? user : null;

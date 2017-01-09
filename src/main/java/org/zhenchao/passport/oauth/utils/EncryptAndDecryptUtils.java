@@ -38,24 +38,29 @@ public class EncryptAndDecryptUtils {
 
     private static final String AES = "AES";
 
+    private static final String AES_KEY = "b8ixjPV1z608PETq+lRfRQ==";
+
     /**
      * 加解密算法/模式/填充方式
      * ECB模式只用密钥即可对数据进行加密解密，CBC模式需要添加一个参数iv
      */
     private static final String AES_CIPHER_ALGORITHM = "AES/CBC/PKCS7Padding";
 
-    /** AES 密钥 */
-    private static byte[] aesKey;
-
-    static {
+    /**
+     * 生成AES密钥
+     *
+     * @return
+     */
+    public static byte[] genAesKey() {
         try {
             Security.addProvider(new BouncyCastleProvider());
             KeyGenerator keyGenerator = KeyGenerator.getInstance("AES");
             keyGenerator.init(128);
-            aesKey = keyGenerator.generateKey().getEncoded();
+            return keyGenerator.generateKey().getEncoded();
         } catch (NoSuchAlgorithmException e) {
             // never happen
         }
+        return new byte[0];
     }
 
     /**
@@ -74,7 +79,7 @@ public class EncryptAndDecryptUtils {
 
         // AES加密
         try {
-            Key key = new SecretKeySpec(aesKey, AES);
+            Key key = new SecretKeySpec(Base64.getDecoder().decode(AES_KEY), AES);
             Security.addProvider(new BouncyCastleProvider());
             Cipher cipher = Cipher.getInstance(AES_CIPHER_ALGORITHM);
             //设置为加密模式
@@ -125,7 +130,7 @@ public class EncryptAndDecryptUtils {
 
         // AES解密
         try {
-            Key key = new SecretKeySpec(aesKey, AES);
+            Key key = new SecretKeySpec(Base64.getDecoder().decode(AES_KEY), AES);
             Cipher cipher = Cipher.getInstance(AES_CIPHER_ALGORITHM);
             //设置为解密模式
             cipher.init(Cipher.DECRYPT_MODE, key, generateIV());
