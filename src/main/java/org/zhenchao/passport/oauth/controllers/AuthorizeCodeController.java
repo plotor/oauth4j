@@ -36,6 +36,7 @@ public class AuthorizeCodeController {
 
         log.debug("Entering authorize code method...");
 
+
         return "redirect:/error";
     }
 
