@@ -34,7 +34,7 @@ import javax.crypto.spec.SecretKeySpec;
  * @author zhenchao.wang 2017-01-02 13:49
  * @version 1.0.0
  */
-public class EncryptAndDecryptUtils {
+public class CryptUtils {
 
     private static final String AES = "AES";
 

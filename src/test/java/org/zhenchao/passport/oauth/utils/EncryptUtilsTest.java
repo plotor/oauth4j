@@ -14,19 +14,19 @@ public class EncryptUtilsTest {
 
     @Test
     public void pbkdf2() throws Exception {
-        System.out.println(EncryptAndDecryptUtils.pbkdf2("123456", GlobalConstant.SALT));
+        System.out.println(CryptUtils.pbkdf2("123456", GlobalConstant.SALT));
     }
 
     @Test
     public void aesTest() throws Exception {
         String username = "zhenchao";
-        String decryptDate = new String(EncryptAndDecryptUtils.aesDecrypt(EncryptAndDecryptUtils.aesEncrypt(username)));
+        String decryptDate = new String(CryptUtils.aesDecrypt(CryptUtils.aesEncrypt(username)));
         Assert.assertEquals(username, decryptDate);
     }
 
     @Test
     public void generateAesKeyTest() throws Exception {
-        byte[] key = EncryptAndDecryptUtils.genAesKey();
+        byte[] key = CryptUtils.genAesKey();
         System.out.println(new String(Base64.getEncoder().encode(key)));
     }
 

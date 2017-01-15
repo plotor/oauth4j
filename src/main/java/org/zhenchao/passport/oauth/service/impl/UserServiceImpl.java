@@ -11,7 +11,7 @@ import org.zhenchao.passport.oauth.exceptions.EncryptOrDecryptException;
 import org.zhenchao.passport.oauth.model.User;
 import org.zhenchao.passport.oauth.model.UserExample;
 import org.zhenchao.passport.oauth.service.UserService;
-import org.zhenchao.passport.oauth.utils.EncryptAndDecryptUtils;
+import org.zhenchao.passport.oauth.utils.CryptUtils;
 
 import java.util.List;
 import javax.annotation.Resource;
@@ -46,7 +46,7 @@ public class UserServiceImpl implements UserService {
             return null;
         }
 
-        String encryptPassword = EncryptAndDecryptUtils.pbkdf2(password, GlobalConstant.SALT);
+        String encryptPassword = CryptUtils.pbkdf2(password, GlobalConstant.SALT);
         User user = users.get(0);
         log.debug("Password validate[current={}, expected={}]", encryptPassword, user.getPassword());
         return StringUtils.equals(encryptPassword, user.getPassword()) ? user : null;
