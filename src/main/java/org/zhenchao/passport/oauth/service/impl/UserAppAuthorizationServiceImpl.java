@@ -4,6 +4,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 import org.zhenchao.passport.oauth.dao.UserAppAuthorizationMapper;
 import org.zhenchao.passport.oauth.model.UserAppAuthorization;
 import org.zhenchao.passport.oauth.model.UserAppAuthorizationExample;
@@ -20,6 +21,7 @@ import javax.annotation.Resource;
  * @author zhenchao.wang 2017-01-20 23:19
  * @version 1.0.0
  */
+@Service
 public class UserAppAuthorizationServiceImpl implements UserAppAuthorizationService {
 
     private static final Logger log = LoggerFactory.getLogger(UserAppAuthorizationServiceImpl.class);

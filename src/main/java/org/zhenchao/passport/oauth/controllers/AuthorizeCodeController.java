@@ -14,8 +14,10 @@ import org.zhenchao.passport.oauth.commons.GlobalConstant;
 import static org.zhenchao.passport.oauth.commons.GlobalConstant.COOKIE_KEY_USER_LOGIN_SIGN;
 import static org.zhenchao.passport.oauth.commons.GlobalConstant.PATH_OAUTH_AUTHORIZE_CODE;
 import org.zhenchao.passport.oauth.model.AuthorizeRequestParams;
+import org.zhenchao.passport.oauth.model.Scope;
 import org.zhenchao.passport.oauth.model.User;
 import org.zhenchao.passport.oauth.model.UserAppAuthorization;
+import org.zhenchao.passport.oauth.service.ScopeService;
 import org.zhenchao.passport.oauth.service.UserAppAuthorizationService;
 import org.zhenchao.passport.oauth.utils.CommonUtils;
 import org.zhenchao.passport.oauth.utils.CookieUtils;
@@ -26,6 +28,7 @@ import org.zhenchao.passport.oauth.validate.AuthorizeParamsValidator;
 import org.zhenchao.passport.oauth.validate.ParamsValidator;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -46,6 +49,9 @@ public class AuthorizeCodeController {
 
     @Resource
     private UserAppAuthorizationService authorizationService;
+
+    @Resource
+    private ScopeService scopeService;
 
     @RequestMapping(value = PATH_OAUTH_AUTHORIZE_CODE, method = {GET, POST}, params = "response_type=code")
     public String authorize(
@@ -95,6 +101,13 @@ public class AuthorizeCodeController {
             // 用户已授权该APP
         } else {
             // 用户未授权该APP，跳转到授权页面
+            List<Scope> scopes = scopeService.getScopes(params.getScope());
+            UriComponentsBuilder builder = UriComponentsBuilder.newInstance();
+            builder.path(PATH_OAUTH_AUTHORIZE_CODE).queryParam("callback", "callback", HttpRequestUtils.getEncodeRequestUrl(request));
+            request.setAttribute("callback", builder.build(true));
+            request.setAttribute("scopes", scopes);
+            request.setAttribute("user", user);
+            return "user-authorize";
         }
 
         return "redirect:/error";
