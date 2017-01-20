@@ -10,6 +10,8 @@ public enum ErrorCode {
 
     /** 基础错误 **/
 
+    NO_ERROR(0, "no error"),
+
     SYSTEM_ERROR(100000, "system error"),
 
     SERVICE_ERROR(100050, "service error"),
@@ -47,6 +49,10 @@ public enum ErrorCode {
     UNSUPPORTED_RESPONSE_TYPE(200003, "unsupported response type"),
 
     INVALID_SCOPE(200004, "invalid scope"),
+
+    CLIENT_NOT_EXIST(200005, "unknown client"),
+
+    INVALID_REDIRECT_URI(200006, "invalid redirect uri"),
 
     /** 业务相关错误 **/
 

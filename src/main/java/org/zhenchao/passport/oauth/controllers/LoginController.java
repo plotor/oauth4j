@@ -21,6 +21,7 @@ import org.zhenchao.passport.oauth.utils.SessionUtils;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import javax.annotation.Resource;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
@@ -80,32 +81,25 @@ public class LoginController {
             return ResultUtils.genFailedStringResult(ErrorCode.PARAMETER_ERROR, callback);
         }
 
-        User user;
         try {
-            user = userService.validatePassword(username, password);
-        } catch (EncryptOrDecryptException e) {
-            log.error("Validate user[{}] error", username);
+            User user = userService.validatePassword(username, password).get();
+            // session user
+            SessionUtils.putUser(session, user);
+
+            // cookie user
+            Cookie cookie = new Cookie(COOKIE_KEY_USER_LOGIN_SIGN, DigestUtils.md5Hex(username));
+            cookie.setPath("/");
+            cookie.setHttpOnly(true);
+            cookie.setMaxAge(24 * 3600);
+            response.addCookie(cookie);
+
+            Map<String, Object> data = new HashMap<>();
+            data.put(ResultUtils.CALLBACK, callback);
+            return ResultUtils.genSuccessStringResult(data);
+        } catch (EncryptOrDecryptException | NoSuchElementException e) {
+            log.error("Validate user[{}] error!", username, e);
             return ResultUtils.genFailedStringResult(ErrorCode.VALIDATE_USER_ERROR, callback);
         }
-
-        if (null == user) {
-            log.info("User[{}] password[{}] is wrong!", username, password);
-            return ResultUtils.genFailedStringResult(ErrorCode.ILLEGAL_USER, callback);
-        }
-
-        // session user
-        SessionUtils.putUser(session, user);
-
-        // cookie user
-        Cookie cookie = new Cookie(COOKIE_KEY_USER_LOGIN_SIGN, DigestUtils.md5Hex(username));
-        cookie.setPath("/");
-        cookie.setHttpOnly(true);
-        cookie.setMaxAge(24 * 3600);
-        response.addCookie(cookie);
-
-        Map<String, Object> data = new HashMap<>();
-        data.put(ResultUtils.CALLBACK, callback);
-        return ResultUtils.genSuccessStringResult(data);
 
     }
 

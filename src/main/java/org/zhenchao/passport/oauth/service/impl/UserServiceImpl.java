@@ -14,6 +14,7 @@ import org.zhenchao.passport.oauth.service.UserService;
 import org.zhenchao.passport.oauth.utils.CryptUtils;
 
 import java.util.List;
+import java.util.Optional;
 import javax.annotation.Resource;
 
 /**
@@ -31,10 +32,10 @@ public class UserServiceImpl implements UserService {
     private UserMapper userMapper;
 
     @Override
-    public User validatePassword(String username, String password) throws EncryptOrDecryptException {
+    public Optional<User> validatePassword(String username, String password) throws EncryptOrDecryptException {
         if (StringUtils.isBlank(username) || StringUtils.isBlank(password)) {
             log.error("Params error, username or password is null or empty!");
-            return null;
+            return Optional.empty();
         }
 
         UserExample userExample = new UserExample();
@@ -43,13 +44,13 @@ public class UserServiceImpl implements UserService {
         List<User> users = userMapper.selectByExample(userExample);
         if (CollectionUtils.isEmpty(users)) {
             log.error("Can't find any user by name[{}]!", username);
-            return null;
+            return Optional.empty();
         }
 
         String encryptPassword = CryptUtils.pbkdf2(password, GlobalConstant.SALT);
         User user = users.get(0);
         log.debug("Password validate[current={}, expected={}]", encryptPassword, user.getPassword());
-        return StringUtils.equals(encryptPassword, user.getPassword()) ? user : null;
+        return StringUtils.equals(encryptPassword, user.getPassword()) ? Optional.of(user) : Optional.empty();
     }
 
 }

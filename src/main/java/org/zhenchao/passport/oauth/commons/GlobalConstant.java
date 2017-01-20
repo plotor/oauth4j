@@ -1,5 +1,8 @@
 package org.zhenchao.passport.oauth.commons;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * 全局常量
  *
@@ -27,4 +30,26 @@ public interface GlobalConstant {
     String SALT = "U2FsdGVkX18jBB+UX3z4J1Qy9z24/JX5U28ELFYb+ehc8WH/QetV6bbbxUhhM3zvkY/M";
 
     String AES_KEY = "a7995a00458f969bd381bbbe86778a9b32e43f29";
+
+    /** 分隔符 */
+
+    String SEPARATOR_REDIRECT_URI = ";";
+
+    String SEPARATOR_REDIRECT_SCOPE = "-";
+
+    /** 授权码模式 */
+    String RESPONSE_TYPE_CODE = "code";
+
+    /** 隐式授权模式 */
+    String RESPONSE_TYPE_TOKEN = "token";
+
+    /** allowed response type */
+    Set<String> ALLOWNED_RESPONSE_TYPE = new HashSet<String>() {
+        private static final long serialVersionUID = -7941095619455398619L;
+
+        {
+            add("code"); // Authorization Code
+            add("token"); // implicit
+        }
+    };
 }

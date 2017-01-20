@@ -25,14 +25,14 @@ public class AuthorizeCodeController {
     @RequestMapping(value = PATH_OAUTH_AUTHORIZE_CODE, method = {GET, POST}, params = "response_type=code")
     public String authorize(
             @RequestParam("response_type") String responseType,
-            @RequestParam("client_id") String clientId,
+            @RequestParam("client_id") long clientId,
             @RequestParam(value = "redirect_uri", required = false) String redirectUri,
             @RequestParam(value = "scope", required = false) String scope,
             @RequestParam(value = "state", required = false) String state,
             @RequestParam(value = "skip_confirm", required = false, defaultValue = "false") boolean skipConfirm,
             @RequestParam(value = "force_login", required = false, defaultValue = "false") boolean forceLogin,
             @RequestParam(value = "issue_refresh_token", required = false, defaultValue = "true")  boolean issueRefreshToken,
-            @RequestParam(value = "json", required = false, defaultValue = "false") boolean json ) {
+            @RequestParam(value = "_json", required = false, defaultValue = "false") boolean jsonResponse ) {
 
         log.debug("Entering authorize code method...");
 
