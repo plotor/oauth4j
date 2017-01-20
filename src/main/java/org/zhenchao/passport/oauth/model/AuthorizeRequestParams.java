@@ -1,5 +1,8 @@
 package org.zhenchao.passport.oauth.model;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
+
 /**
  * 授权请求参数
  *
@@ -35,43 +38,53 @@ public class AuthorizeRequestParams implements RequestParams {
         this.state = state;
     }
 
+    @Override
+    public String toString() {
+        return ToStringBuilder.reflectionToString(this, ToStringStyle.JSON_STYLE);
+    }
+
     public String getResponseType() {
         return responseType;
     }
 
-    public void setResponseType(String responseType) {
+    public AuthorizeRequestParams setResponseType(String responseType) {
         this.responseType = responseType;
+        return this;
     }
 
     public long getClientId() {
         return clientId;
     }
 
-    public void setClientId(long clientId) {
+    public AuthorizeRequestParams setClientId(long clientId) {
         this.clientId = clientId;
+        return this;
     }
 
     public String getRedirectUri() {
         return redirectUri;
     }
 
-    public void setRedirectUri(String redirectUri) {
+    public AuthorizeRequestParams setRedirectUri(String redirectUri) {
         this.redirectUri = redirectUri;
+        return this;
     }
 
     public String getScope() {
         return scope;
     }
 
-    public void setScope(String scope) {
+    public AuthorizeRequestParams setScope(String scope) {
         this.scope = scope;
+        return this;
     }
 
     public String getState() {
         return state;
     }
 
-    public void setState(String state) {
+    public AuthorizeRequestParams setState(String state) {
         this.state = state;
+        return this;
     }
 }
