@@ -3,13 +3,11 @@ package org.zhenchao.passport.oauth.validate;
 import org.apache.commons.lang3.StringUtils;
 import org.zhenchao.passport.oauth.commons.ErrorCode;
 import static org.zhenchao.passport.oauth.commons.GlobalConstant.RESPONSE_TYPE_CODE;
-import static org.zhenchao.passport.oauth.commons.GlobalConstant.SEPARATOR_REDIRECT_SCOPE;
 import org.zhenchao.passport.oauth.model.AuthorizeRequestParams;
 import org.zhenchao.passport.oauth.model.OAuthAppInfo;
 import org.zhenchao.passport.oauth.model.RequestParams;
 import org.zhenchao.passport.oauth.service.OAuthAppInfoService;
 
-import java.util.Arrays;
 import java.util.Optional;
 import javax.annotation.Resource;
 
@@ -48,9 +46,7 @@ public class AuthorizeParamsValidator implements ParamsValidator {
             if (StringUtils.isBlank(authorizeParams.getRedirectUri()) || StringUtils.isBlank(appInfo.getRedirectUri())) {
                 return ErrorCode.INVALID_REDIRECT_URI;
             }
-
-            if (!this.validateRedirectUri(Arrays.asList(StringUtils.split(appInfo.getRedirectUri(), SEPARATOR_REDIRECT_SCOPE)),
-                    authorizeParams.getRedirectUri())) {
+            if (!this.validateRedirectUri(appInfo.getRedirectUri(), authorizeParams.getRedirectUri())) {
                 return ErrorCode.INVALID_REDIRECT_URI;
             }
 

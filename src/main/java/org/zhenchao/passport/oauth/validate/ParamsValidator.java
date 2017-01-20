@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zhenchao.passport.oauth.commons.ErrorCode;
 import static org.zhenchao.passport.oauth.commons.GlobalConstant.SEPARATOR_REDIRECT_SCOPE;
+import static org.zhenchao.passport.oauth.commons.GlobalConstant.SEPARATOR_REDIRECT_URI;
 import org.zhenchao.passport.oauth.model.RequestParams;
 
 import java.net.URI;
@@ -34,14 +35,15 @@ public interface ParamsValidator {
     /**
      * redirect uri 合法性校验
      *
-     * @param redirectUris
+     * @param redirectUriStr
      * @param input
      * @return
      */
-    default boolean validateRedirectUri(List<String> redirectUris, String input) {
-        if (CollectionUtils.isEmpty(redirectUris) || StringUtils.isBlank(input)) {
+    default boolean validateRedirectUri(String redirectUriStr, String input) {
+        if (StringUtils.isBlank(redirectUriStr) || StringUtils.isBlank(input)) {
             return false;
         }
+        String[] redirectUris = StringUtils.trim(redirectUriStr).replaceAll("\\s+", "").split(SEPARATOR_REDIRECT_URI);
         try {
             URI inputUri = new URI(input);
             String inputUriPath = inputUri.getPath().endsWith("/") ? inputUri.getPath() : inputUri.getPath() + "/";
