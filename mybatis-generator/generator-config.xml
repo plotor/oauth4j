@@ -13,7 +13,7 @@
         </commentGenerator>
         <!--数据库链接URL，用户名、密码 -->
         <jdbcConnection driverClass="com.mysql.jdbc.Driver" connectionURL="jdbc:mysql://localhost:3306/passport_oauth" userId="root"
-                        password="***"/>
+                        password="123456"/>
         <javaTypeResolver>
             <property name="forceBigDecimals" value="false"/>
         </javaTypeResolver>
@@ -32,8 +32,8 @@
         </javaClientGenerator>
         <!-- 要生成哪些表-->
         <table tableName="t_oauth_app_info" domainObjectName="OAuthAppInfo"/>
-        <table tableName="t_scope" domainObjectName="Scope"/>
+        <!-- <table tableName="t_scope" domainObjectName="Scope"/>
         <table tableName="t_user" domainObjectName="User"/>
-        <table tableName="t_user_app_authorization" domainObjectName="UserAppAuthorization"/>
+        <table tableName="t_user_app_authorization" domainObjectName="UserAppAuthorization"/> -->
     </context>
 </generatorConfiguration>

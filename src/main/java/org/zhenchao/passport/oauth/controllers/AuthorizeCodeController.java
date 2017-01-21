@@ -14,9 +14,11 @@ import org.zhenchao.passport.oauth.commons.GlobalConstant;
 import static org.zhenchao.passport.oauth.commons.GlobalConstant.COOKIE_KEY_USER_LOGIN_SIGN;
 import static org.zhenchao.passport.oauth.commons.GlobalConstant.PATH_OAUTH_AUTHORIZE_CODE;
 import org.zhenchao.passport.oauth.model.AuthorizeRequestParams;
+import org.zhenchao.passport.oauth.model.OAuthAppInfo;
 import org.zhenchao.passport.oauth.model.Scope;
 import org.zhenchao.passport.oauth.model.User;
 import org.zhenchao.passport.oauth.model.UserAppAuthorization;
+import org.zhenchao.passport.oauth.service.OAuthAppInfoService;
 import org.zhenchao.passport.oauth.service.ScopeService;
 import org.zhenchao.passport.oauth.service.UserAppAuthorizationService;
 import org.zhenchao.passport.oauth.utils.CommonUtils;
@@ -46,6 +48,9 @@ import javax.servlet.http.HttpSession;
 public class AuthorizeCodeController {
 
     private static final Logger log = LoggerFactory.getLogger(AuthorizeCodeController.class);
+
+    @Resource
+    private OAuthAppInfoService appInfoService;
 
     @Resource
     private UserAppAuthorizationService authorizationService;
@@ -81,11 +86,16 @@ public class AuthorizeCodeController {
             return ResultUtils.genFailedStringResult(validateResult, StringUtils.EMPTY);
         }
 
+        // 获取APP信息
+        OAuthAppInfo appInfo = appInfoService.getAppInfo(clientId).get();
+
         User user = SessionUtils.getUser(session, CookieUtils.get(request, COOKIE_KEY_USER_LOGIN_SIGN));
         if (null == user) {
             // 用户未登录，跳转到登录页面
             UriComponentsBuilder builder = UriComponentsBuilder.newInstance();
-            builder.path("/login").queryParam("callback", HttpRequestUtils.getEncodeRequestUrl(request));
+            builder.path("/login")
+                    .queryParam("callback", HttpRequestUtils.getEncodeRequestUrl(request))
+                    .queryParam("app_name", appInfo.getAppName());
             try {
                 response.sendRedirect(builder.build().toUriString());
             } catch (IOException e) {
@@ -107,6 +117,7 @@ public class AuthorizeCodeController {
             request.setAttribute("callback", builder.build(true));
             request.setAttribute("scopes", scopes);
             request.setAttribute("user", user);
+            request.setAttribute("app", appInfo);
             return "user-authorize";
         }
 
