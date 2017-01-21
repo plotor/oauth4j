@@ -56,4 +56,33 @@ public class UserAppAuthorizationServiceImpl implements UserAppAuthorizationServ
         }
         return Optional.of(authorizations.get(0));
     }
+
+    @Override
+    public boolean replaceUserAndAppAuthorizationInfo(UserAppAuthorization authorization) {
+        if (null == authorization || StringUtils.isBlank(authorization.getScopeSign())) {
+            return false;
+        }
+        UserAppAuthorizationExample example = new UserAppAuthorizationExample();
+        UserAppAuthorizationExample.Criteria criteria = example.createCriteria();
+        criteria.andUserIdEqualTo(authorization.getUserId()).andAppIdEqualTo(
+                authorization.getUserId()).andScopeSignEqualTo(authorization.getScopeSign());
+        List<UserAppAuthorization> authorizations = userAppAuthorizationMapper.selectByExample(example);
+
+        if (CollectionUtils.isEmpty(authorizations)) {
+            // 用户与APP之间不存在特定授权关系
+            return userAppAuthorizationMapper.insertSelective(authorization) == 1;
+        } else {
+            // 用户与APP之间存在特定授权关系
+            UserAppAuthorization uaa = authorizations.get(0);
+            uaa.setRefreshTokenExpirationTime(authorization.getRefreshTokenExpirationTime());
+            uaa.setRefreshTokenKey(authorization.getRefreshTokenKey());
+            uaa.setTokenKey(authorization.getTokenKey());
+            uaa.setUpdateTime(authorization.getUpdateTime());
+            example = new UserAppAuthorizationExample();
+            criteria = example.createCriteria();
+            criteria.andUserIdEqualTo(uaa.getUserId()).andAppIdEqualTo(uaa.getAppId()).andScopeSignEqualTo(authorization.getScopeSign());
+            return userAppAuthorizationMapper.updateByExample(uaa, example) == 1;
+        }
+    }
+
 }

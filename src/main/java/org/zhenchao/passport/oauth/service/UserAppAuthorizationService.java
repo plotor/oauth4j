@@ -32,4 +32,12 @@ public interface UserAppAuthorizationService {
      */
     Optional<UserAppAuthorization> getUserAndAppAuthorizationInfo(long userId, long appId, String scopeSign);
 
+    /**
+     * 更新用户与APP之间的授权关系
+     *
+     * @param authorization
+     * @return
+     */
+    boolean replaceUserAndAppAuthorizationInfo(UserAppAuthorization authorization);
+
 }

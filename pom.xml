@@ -253,6 +253,12 @@
             <version>2.0</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>jstl</artifactId>
+            <version>1.2</version>
+            <scope>compile</scope>
+        </dependency>
         <!-- rest-assured -->
         <dependency>
             <groupId>io.rest-assured</groupId>

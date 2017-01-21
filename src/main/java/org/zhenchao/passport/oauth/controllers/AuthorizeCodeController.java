@@ -12,7 +12,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 import org.zhenchao.passport.oauth.commons.ErrorCode;
 import org.zhenchao.passport.oauth.commons.GlobalConstant;
 import static org.zhenchao.passport.oauth.commons.GlobalConstant.COOKIE_KEY_USER_LOGIN_SIGN;
-import static org.zhenchao.passport.oauth.commons.GlobalConstant.PATH_OAUTH_AUTHORIZE_CODE;
+import static org.zhenchao.passport.oauth.commons.GlobalConstant.PATH_OAUTH_USER_AUTHORIZE;
+import static org.zhenchao.passport.oauth.commons.GlobalConstant.PATH_ROOT_LOGIN;
 import org.zhenchao.passport.oauth.model.AuthorizeRequestParams;
 import org.zhenchao.passport.oauth.model.OAuthAppInfo;
 import org.zhenchao.passport.oauth.model.Scope;
@@ -30,6 +31,7 @@ import org.zhenchao.passport.oauth.validate.AuthorizeParamsValidator;
 import org.zhenchao.passport.oauth.validate.ParamsValidator;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import javax.annotation.Resource;
@@ -58,7 +60,7 @@ public class AuthorizeCodeController {
     @Resource
     private ScopeService scopeService;
 
-    @RequestMapping(value = PATH_OAUTH_AUTHORIZE_CODE, method = {GET, POST}, params = "response_type=code")
+    @RequestMapping(value = PATH_OAUTH_USER_AUTHORIZE, method = {GET, POST}, params = "response_type=code")
     public String authorize(
             HttpServletRequest request,
             HttpServletResponse response,
@@ -113,7 +115,7 @@ public class AuthorizeCodeController {
             // 用户未授权该APP，跳转到授权页面
             List<Scope> scopes = scopeService.getScopes(params.getScope());
             UriComponentsBuilder builder = UriComponentsBuilder.newInstance();
-            builder.path(PATH_OAUTH_AUTHORIZE_CODE).queryParam("callback", "callback", HttpRequestUtils.getEncodeRequestUrl(request));
+            builder.path(PATH_OAUTH_USER_AUTHORIZE).queryParam("callback", "callback", HttpRequestUtils.getEncodeRequestUrl(request));
             request.setAttribute("callback", builder.build(true));
             request.setAttribute("scopes", scopes);
             request.setAttribute("user", user);
@@ -122,6 +124,47 @@ public class AuthorizeCodeController {
         }
 
         return "redirect:/error";
+    }
+
+    @RequestMapping(value = PATH_OAUTH_USER_AUTHORIZE, method = {POST})
+    public String userAuthorize(
+            HttpServletResponse response,
+            @RequestParam("user_id") long userId,
+            @RequestParam("client_id") long clientId,
+            @RequestParam("scope") String scopes,
+            @RequestParam("callback") String callback) {
+
+        log.debug("Entering user authorize method...");
+
+        if (userId < 0 || StringUtils.isBlank(callback)) {
+            log.error("User authorize request params error, userId[{}], callback[{}]", userId, callback);
+            UriComponentsBuilder builder = UriComponentsBuilder.newInstance();
+            builder.path(PATH_ROOT_LOGIN);
+            builder.queryParam("callback", callback);
+            try {
+                response.sendRedirect(builder.toUriString());
+            } catch (IOException e) {
+                // never happen
+            }
+        }
+
+        // 添加用户授权关系
+        UserAppAuthorization authorization = new UserAppAuthorization();
+        authorization.setUserId(userId);
+        authorization.setAppId(clientId);
+        authorization.setScope(scopes);
+        authorization.setScopeSign(CommonUtils.genScopeSign(scopes));
+        authorization.setCreateTime(new Date());
+        authorization.setCreateTime(authorization.getCreateTime());
+        if (authorizationService.replaceUserAndAppAuthorizationInfo(authorization)) {
+            // 更新用户授权关系成功
+            try {
+                response.sendRedirect(callback);
+            } catch (IOException e) {
+                // never happen
+            }
+        }
+        return ResultUtils.genFailedStringResult(ErrorCode.LOCAL_SERVICE_ERROR);
     }
 
 }

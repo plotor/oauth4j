@@ -1,4 +1,5 @@
 <%@ page language="java" pageEncoding="utf-8" %>
+<%@ taglib uri="http://java.sun.com/jstl/core_rt" prefix="c" %>
 <%
     String path = request.getContextPath();
     String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + path + "/";
@@ -17,17 +18,17 @@
     </div>
     <div class="panel-body">
         <div><a href="${app.logo}"/></div>
-        <form role="form" action="#" method="post">
-            <input type="hidden" name="callback" value="${callback}">
-            <div class="form-group">
-                <label for="username">用户名</label>
-                <input type="text" class="form-control" name="username" placeholder="请输入用户名">
-            </div>
-            <div class="form-group">
-                <label for="password">密码</label>
-                <input type="password" class="form-control" name="password" placeholder="请输入密码">
-            </div>
-            <button type="submit" class="btn btn-default">普通登录</button>
+        <div><img src="${user.avatar}"/><span>${user.username}</span></div>
+        <ul class="list-group">
+            <c:forEach items="${scopes}" var="scope">
+                <li class="list-group-item"><c:out value="${scope.name}"/></li>
+            </c:forEach>
+        </ul>
+        <form role="form" action="/oauth/user/authorize" method="post">
+            <input type="hidden" name="callback" value="${callback}"/>
+            <input type="hidden" name="user_id" value="${user.id}"/>
+            <input type="hidden" name="client_id" value="${app.clientId}"/>
+            <button type="submit" class="btn btn-default">确认授权</button>
         </form>
     </div>
 </div>

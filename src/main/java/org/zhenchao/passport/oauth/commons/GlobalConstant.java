@@ -24,6 +24,8 @@ public interface GlobalConstant {
 
     String PATH_OAUTH_IMPLICIT_token = "/implicit/token";
 
+    String PATH_OAUTH_USER_AUTHORIZE = "/user/authorize";
+
     String COOKIE_KEY_USER_LOGIN_SIGN = "ck_sign_ul";
 
     /** 盐 */
