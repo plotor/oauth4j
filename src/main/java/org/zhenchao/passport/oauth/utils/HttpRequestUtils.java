@@ -33,13 +33,12 @@ public class HttpRequestUtils {
      * @return
      */
     public static String getEncodeRequestUrl(HttpServletRequest request) {
-        String requestUrl = getRequestUrl(request);
         try {
-            URLEncoder.encode(requestUrl, "UTF-8");
+            return URLEncoder.encode(getRequestUrl(request), "UTF-8");
         } catch (UnsupportedEncodingException e) {
             // never happen
         }
-        return requestUrl;
+        return StringUtils.EMPTY;
     }
 
 }

@@ -1,4 +1,4 @@
-package org.zhenchao.passport.oauth.validate;
+package org.zhenchao.passport.oauth.service;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -15,14 +15,14 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * params validator
+ * 参数验证服务
  *
  * @author zhenchao.wang 2017-01-20 17:22
  * @version 1.0.0
  */
-public interface ParamsValidator {
+public interface ParamsValidateService {
 
-    Logger log = LoggerFactory.getLogger(ParamsValidator.class);
+    Logger log = LoggerFactory.getLogger(ParamsValidateService.class);
 
     /**
      * 请求参数验证
@@ -30,7 +30,7 @@ public interface ParamsValidator {
      * @param params
      * @return
      */
-    ErrorCode validate(RequestParams params);
+    ErrorCode validateAuthorizeCodeRequestParams(RequestParams params);
 
     /**
      * redirect uri 合法性校验

@@ -1,29 +1,32 @@
-package org.zhenchao.passport.oauth.validate;
+package org.zhenchao.passport.oauth.service.impl;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Service;
 import org.zhenchao.passport.oauth.commons.ErrorCode;
 import static org.zhenchao.passport.oauth.commons.GlobalConstant.RESPONSE_TYPE_CODE;
 import org.zhenchao.passport.oauth.model.AuthorizeRequestParams;
 import org.zhenchao.passport.oauth.model.OAuthAppInfo;
 import org.zhenchao.passport.oauth.model.RequestParams;
 import org.zhenchao.passport.oauth.service.OAuthAppInfoService;
+import org.zhenchao.passport.oauth.service.ParamsValidateService;
 
 import java.util.Optional;
 import javax.annotation.Resource;
 
 /**
- * authorize code request validator
+ * {@link ParamsValidateService} 实现类
  *
  * @author zhenchao.wang 2017-01-20 17:37
  * @version 1.0.0
  */
-public class AuthorizeParamsValidator implements ParamsValidator {
+@Service
+public class ParamsValidateServiceImpl implements ParamsValidateService {
 
     @Resource
     private OAuthAppInfoService appInfoService;
 
     @Override
-    public ErrorCode validate(RequestParams params) {
+    public ErrorCode validateAuthorizeCodeRequestParams(RequestParams params) {
         if (!(params instanceof AuthorizeRequestParams)) {
             return ErrorCode.INVALID_REQUEST;
         }

@@ -22,10 +22,10 @@ public class SessionUtils {
      * @return
      */
     public static boolean putUser(HttpSession session, User user) {
-        if (null == user || StringUtils.isBlank(user.getUsername())) {
+        if (null == user) {
             return false;
         }
-        session.setAttribute("user-" + DigestUtils.md5Hex(user.getUsername()), user);
+        session.setAttribute("user-" + DigestUtils.md5Hex(String.valueOf(user.getId())), user);
         return true;
     }
 

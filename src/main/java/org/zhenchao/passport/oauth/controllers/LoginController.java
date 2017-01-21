@@ -19,6 +19,7 @@ import org.zhenchao.passport.oauth.service.UserService;
 import org.zhenchao.passport.oauth.utils.ResultUtils;
 import org.zhenchao.passport.oauth.utils.SessionUtils;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -50,7 +51,7 @@ public class LoginController {
     public ModelAndView login(@RequestParam(value = "callback", required = false) String callback) {
         ModelAndView mav = new ModelAndView();
         if (StringUtils.isNotBlank(callback)) {
-            mav.addObject("callback", callback);
+            mav.addObject(ResultUtils.CALLBACK, callback);
         }
         mav.setViewName("login");
         return mav;
@@ -87,15 +88,19 @@ public class LoginController {
             SessionUtils.putUser(session, user);
 
             // cookie user
-            Cookie cookie = new Cookie(COOKIE_KEY_USER_LOGIN_SIGN, DigestUtils.md5Hex(username));
+            Cookie cookie = new Cookie(COOKIE_KEY_USER_LOGIN_SIGN, DigestUtils.md5Hex(String.valueOf(user.getId())));
             cookie.setPath("/");
             cookie.setHttpOnly(true);
             cookie.setMaxAge(24 * 3600);
             response.addCookie(cookie);
-
-            Map<String, Object> data = new HashMap<>();
-            data.put(ResultUtils.CALLBACK, callback);
-            return ResultUtils.genSuccessStringResult(data);
+            try {
+                response.sendRedirect(callback);
+            } catch (IOException e) {
+                log.error("Send redirect to callback[{}] error!", callback, e);
+            }
+            Map<String, Object> params = new HashMap<>();
+            params.put(ResultUtils.CALLBACK, callback);
+            return ResultUtils.genSuccessStringResult(params);
         } catch (EncryptOrDecryptException | NoSuchElementException e) {
             log.error("Validate user[{}] error!", username, e);
             return ResultUtils.genFailedStringResult(ErrorCode.VALIDATE_USER_ERROR, callback);

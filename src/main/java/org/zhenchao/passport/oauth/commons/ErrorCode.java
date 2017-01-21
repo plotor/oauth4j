@@ -38,6 +38,8 @@ public enum ErrorCode {
 
     AES_DECRYPT_ERROR(100401, "aes decrypt error"),
 
+    REDIRECT_TO_DEST_URI_ERROR(100402, "redirect to dest url error"),
+
     /** OAuth相关错误 **/
 
     INVALID_REQUEST(200000, "invalid request"),

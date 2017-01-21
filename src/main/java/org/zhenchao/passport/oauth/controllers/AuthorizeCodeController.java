@@ -12,6 +12,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import org.zhenchao.passport.oauth.commons.ErrorCode;
 import org.zhenchao.passport.oauth.commons.GlobalConstant;
 import static org.zhenchao.passport.oauth.commons.GlobalConstant.COOKIE_KEY_USER_LOGIN_SIGN;
+import static org.zhenchao.passport.oauth.commons.GlobalConstant.PATH_OAUTH_AUTHORIZE_CODE;
 import static org.zhenchao.passport.oauth.commons.GlobalConstant.PATH_OAUTH_USER_AUTHORIZE;
 import static org.zhenchao.passport.oauth.commons.GlobalConstant.PATH_ROOT_LOGIN;
 import org.zhenchao.passport.oauth.model.AuthorizeRequestParams;
@@ -20,6 +21,7 @@ import org.zhenchao.passport.oauth.model.Scope;
 import org.zhenchao.passport.oauth.model.User;
 import org.zhenchao.passport.oauth.model.UserAppAuthorization;
 import org.zhenchao.passport.oauth.service.OAuthAppInfoService;
+import org.zhenchao.passport.oauth.service.ParamsValidateService;
 import org.zhenchao.passport.oauth.service.ScopeService;
 import org.zhenchao.passport.oauth.service.UserAppAuthorizationService;
 import org.zhenchao.passport.oauth.utils.CommonUtils;
@@ -27,8 +29,6 @@ import org.zhenchao.passport.oauth.utils.CookieUtils;
 import org.zhenchao.passport.oauth.utils.HttpRequestUtils;
 import org.zhenchao.passport.oauth.utils.ResultUtils;
 import org.zhenchao.passport.oauth.utils.SessionUtils;
-import org.zhenchao.passport.oauth.validate.AuthorizeParamsValidator;
-import org.zhenchao.passport.oauth.validate.ParamsValidator;
 
 import java.io.IOException;
 import java.util.Date;
@@ -60,7 +60,10 @@ public class AuthorizeCodeController {
     @Resource
     private ScopeService scopeService;
 
-    @RequestMapping(value = PATH_OAUTH_USER_AUTHORIZE, method = {GET, POST}, params = "response_type=code")
+    @Resource
+    private ParamsValidateService paramsValidateService;
+
+    @RequestMapping(value = PATH_OAUTH_AUTHORIZE_CODE, method = {GET, POST}, params = "response_type=code")
     public String authorize(
             HttpServletRequest request,
             HttpServletResponse response,
@@ -79,9 +82,8 @@ public class AuthorizeCodeController {
 
         AuthorizeRequestParams params = new AuthorizeRequestParams().setResponseType(responseType).setClientId(clientId)
                 .setRedirectUri(redirectUri).setScope(scope).setState(StringUtils.isBlank(state) ? StringUtils.EMPTY : state);
-        ParamsValidator paramsValidator = new AuthorizeParamsValidator();
         // 校验授权请求参数
-        ErrorCode validateResult = paramsValidator.validate(params);
+        ErrorCode validateResult = paramsValidateService.validateAuthorizeCodeRequestParams(params);
         if (!ErrorCode.NO_ERROR.equals(validateResult)) {
             // 请求参数有误
             log.error("Request authorize params error, params[{}], errorCode[{}]", params, validateResult);
