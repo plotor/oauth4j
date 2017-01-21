@@ -133,7 +133,7 @@ public class AuthorizeCodeController {
             HttpServletResponse response,
             @RequestParam("user_id") long userId,
             @RequestParam("client_id") long clientId,
-            @RequestParam("scope") String scopes,
+            @RequestParam("scope") String scope,
             @RequestParam("callback") String callback) {
 
         log.debug("Entering user authorize method...");
@@ -154,8 +154,8 @@ public class AuthorizeCodeController {
         UserAppAuthorization authorization = new UserAppAuthorization();
         authorization.setUserId(userId);
         authorization.setAppId(clientId);
-        authorization.setScope(scopes);
-        authorization.setScopeSign(CommonUtils.genScopeSign(scopes));
+        authorization.setScope(scope);
+        authorization.setScopeSign(CommonUtils.genScopeSign(scope));
         authorization.setCreateTime(new Date());
         authorization.setCreateTime(authorization.getCreateTime());
         if (authorizationService.replaceUserAndAppAuthorizationInfo(authorization)) {

@@ -29,7 +29,9 @@
         <div style="text-align: center;"><img src="${app.logo}"/></div>
         <hr/>
         <div><img style="width:50px; height:50px; border-radius:50px;" src="${user.avatar}"/>&emsp;
-            <span>${user.username}</span><button type="button" class="btn btn-default" style="float: right;">切换账号</button></div>
+            <span>${user.username}</span>
+            <button type="button" class="btn btn-default" style="float: right;">切换账号</button>
+        </div>
         <br/>
         <div style="font-weight: bold; margin-bottom: 10px; padding-left: 12px;">登录后应用将获取您的以下信息：</div>
         <ul class="list-group">
@@ -37,13 +39,20 @@
                 <li class="list-group-item" style="list-style-type:square;"><c:out value="${scope.name}"/></li>
             </c:forEach>
         </ul>
+        <input type="hidden" name="scopes" value="${scopes}"/>
         <form role="form" action="/oauth/user/authorize" method="post" style="text-align: center;">
             <input type="hidden" name="callback" value="${callback}"/>
             <input type="hidden" name="user_id" value="${user.id}"/>
             <input type="hidden" name="client_id" value="${app.appId}"/>
+            <input type="hidden" name="scope" value=""/>
             <button type="submit" class="btn btn-success" style="width: 50%;">确&emsp;认&emsp;授&emsp;权</button>
         </form>
     </div>
 </div>
+<script type="application/javascript">
+    $(document).ready(function () {
+        $("#scope").val($("#scopes").val().join('-'));
+    });
+</script>
 </body>
 </html>
