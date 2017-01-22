@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.zhenchao.passport.oauth.commons.GlobalConstant;
 import org.zhenchao.passport.oauth.dao.UserMapper;
-import org.zhenchao.passport.oauth.exceptions.EncryptOrDecryptException;
+import org.zhenchao.passport.oauth.exceptions.CryptException;
 import org.zhenchao.passport.oauth.model.User;
 import org.zhenchao.passport.oauth.model.UserExample;
 import org.zhenchao.passport.oauth.service.UserService;
@@ -32,7 +32,7 @@ public class UserServiceImpl implements UserService {
     private UserMapper userMapper;
 
     @Override
-    public Optional<User> validatePassword(String username, String password) throws EncryptOrDecryptException {
+    public Optional<User> validatePassword(String username, String password) throws CryptException {
         if (StringUtils.isBlank(username) || StringUtils.isBlank(password)) {
             log.error("Params error, username or password is null or empty!");
             return Optional.empty();

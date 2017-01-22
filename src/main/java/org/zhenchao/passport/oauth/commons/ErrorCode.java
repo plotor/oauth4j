@@ -60,7 +60,9 @@ public enum ErrorCode {
 
     VALIDATE_USER_ERROR(300000, "validate user error"),
 
-    ILLEGAL_USER(300001, "illegal user");
+    ILLEGAL_USER(300001, "illegal user"),
+
+    GENERATE_CODE_ERROR(300002, "generate authorization code error");
 
     /** 错误码 */
     private int code;

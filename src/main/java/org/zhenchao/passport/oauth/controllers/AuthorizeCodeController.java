@@ -15,11 +15,14 @@ import static org.zhenchao.passport.oauth.commons.GlobalConstant.COOKIE_KEY_USER
 import static org.zhenchao.passport.oauth.commons.GlobalConstant.PATH_OAUTH_AUTHORIZE_CODE;
 import static org.zhenchao.passport.oauth.commons.GlobalConstant.PATH_OAUTH_USER_AUTHORIZE;
 import static org.zhenchao.passport.oauth.commons.GlobalConstant.PATH_ROOT_LOGIN;
+import org.zhenchao.passport.oauth.exceptions.OAuthServiceException;
+import org.zhenchao.passport.oauth.model.AuthorizationCode;
 import org.zhenchao.passport.oauth.model.AuthorizeRequestParams;
 import org.zhenchao.passport.oauth.model.OAuthAppInfo;
 import org.zhenchao.passport.oauth.model.Scope;
 import org.zhenchao.passport.oauth.model.User;
 import org.zhenchao.passport.oauth.model.UserAppAuthorization;
+import org.zhenchao.passport.oauth.service.AuthorizeService;
 import org.zhenchao.passport.oauth.service.OAuthAppInfoService;
 import org.zhenchao.passport.oauth.service.ParamsValidateService;
 import org.zhenchao.passport.oauth.service.ScopeService;
@@ -62,6 +65,9 @@ public class AuthorizeCodeController {
 
     @Resource
     private ParamsValidateService paramsValidateService;
+
+    @Resource
+    private AuthorizeService authorizeService;
 
     @RequestMapping(value = PATH_OAUTH_AUTHORIZE_CODE, method = {GET, POST}, params = "response_type=code")
     public String authorize(
@@ -113,8 +119,29 @@ public class AuthorizeCodeController {
 
         if (authorization.isPresent() && !skipConfirm) {
             // 用户已授权该APP，下发授权码
-            UserAppAuthorization uaa = authorization.get();
-
+            try {
+                Optional<AuthorizationCode> optCode = authorizeService.generateAuthorizationCode(authorization.get());
+                if (optCode.isPresent()) {
+                    // 下发授权码
+                    String code = optCode.get().toStringCode();
+                    UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(appInfo.getRedirectUri());
+                    builder.queryParam("code", code);
+                    if (StringUtils.isNotEmpty(state)) {
+                        builder.queryParam("state", state);
+                    }
+                    String issueCodeUrl = builder.toUriString();
+                    try {
+                        response.sendRedirect(issueCodeUrl);
+                    } catch (IOException e) {
+                        log.error("Send redirect to dest url[{}] error!", issueCodeUrl, e);
+                        return "redirect:/error";
+                    }
+                }
+                return ResultUtils.genFailedStringResult(ErrorCode.GENERATE_CODE_ERROR);
+            } catch (OAuthServiceException e) {
+                log.error("Generate authorization code error!", e);
+                return ResultUtils.genFailedStringResult(e.getErrorCode());
+            }
         } else {
             // 用户未授权该APP，跳转到授权页面
             List<Scope> scopes = scopeService.getScopes(params.getScope());
@@ -127,7 +154,6 @@ public class AuthorizeCodeController {
             return "user-authorize";
         }
 
-        return "redirect:/error";
     }
 
     @RequestMapping(value = PATH_OAUTH_USER_AUTHORIZE, method = {POST})

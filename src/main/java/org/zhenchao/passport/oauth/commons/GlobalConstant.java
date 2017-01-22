@@ -33,6 +33,8 @@ public interface GlobalConstant {
 
     String AES_KEY = "a7995a00458f969bd381bbbe86778a9b32e43f29";
 
+    String CACHE_NAMESPACE_AUTHORIZATIONCODE = "passport-oauth-authorization-code";
+
     /** 分隔符 */
 
     String SEPARATOR_REDIRECT_URI = ";";

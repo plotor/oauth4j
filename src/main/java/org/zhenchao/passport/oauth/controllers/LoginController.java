@@ -13,7 +13,7 @@ import org.springframework.web.servlet.ModelAndView;
 import org.zhenchao.passport.oauth.commons.ErrorCode;
 import static org.zhenchao.passport.oauth.commons.GlobalConstant.COOKIE_KEY_USER_LOGIN_SIGN;
 import static org.zhenchao.passport.oauth.commons.GlobalConstant.PATH_ROOT_LOGIN;
-import org.zhenchao.passport.oauth.exceptions.EncryptOrDecryptException;
+import org.zhenchao.passport.oauth.exceptions.CryptException;
 import org.zhenchao.passport.oauth.model.User;
 import org.zhenchao.passport.oauth.service.UserService;
 import org.zhenchao.passport.oauth.utils.ResultUtils;
@@ -101,7 +101,7 @@ public class LoginController {
             Map<String, Object> params = new HashMap<>();
             params.put(ResultUtils.CALLBACK, callback);
             return ResultUtils.genSuccessStringResult(params);
-        } catch (EncryptOrDecryptException | NoSuchElementException e) {
+        } catch (CryptException | NoSuchElementException e) {
             log.error("Validate user[{}] error!", username, e);
             return ResultUtils.genFailedStringResult(ErrorCode.VALIDATE_USER_ERROR, callback);
         }
