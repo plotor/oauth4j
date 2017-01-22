@@ -37,21 +37,25 @@
         <ul class="list-group">
             <c:forEach items="${scopes}" var="scope">
                 <li class="list-group-item" style="list-style-type:square;"><c:out value="${scope.name}"/></li>
+                <input type="hidden" name="scope-id" value="${scope.id}"/>
             </c:forEach>
         </ul>
-        <input type="hidden" name="scopes" value="${scopes}"/>
         <form role="form" action="/oauth/user/authorize" method="post" style="text-align: center;">
             <input type="hidden" name="callback" value="${callback}"/>
             <input type="hidden" name="user_id" value="${user.id}"/>
             <input type="hidden" name="client_id" value="${app.appId}"/>
-            <input type="hidden" name="scope" value=""/>
+            <input type="hidden" id="scope" name="scope" value=""/>
             <button type="submit" class="btn btn-success" style="width: 50%;">确&emsp;认&emsp;授&emsp;权</button>
         </form>
     </div>
 </div>
 <script type="application/javascript">
-    $(document).ready(function () {
-        $("#scope").val($("#scopes").val().join('-'));
+    $(function () {
+        var scopes = [];
+        $(".list-group input").each(function (index, sid) {
+            scopes[index] = sid.value;
+        })
+        $("#scope").val(scopes.join('-'));
     });
 </script>
 </body>

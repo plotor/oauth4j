@@ -94,8 +94,8 @@ public class AuthorizeCodeController {
         OAuthAppInfo appInfo = appInfoService.getAppInfo(clientId).get();
 
         User user = SessionUtils.getUser(session, CookieUtils.get(request, COOKIE_KEY_USER_LOGIN_SIGN));
-        if (null == user) {
-            // 用户未登录，跳转到登录页面
+        if (null == user || forceLogin) {
+            // 用户未登录或需要强制登录，跳转到登录页面
             UriComponentsBuilder builder = UriComponentsBuilder.newInstance();
             builder.path("/login")
                     .queryParam("callback", HttpRequestUtils.getEncodeRequestUrl(request))
@@ -111,8 +111,10 @@ public class AuthorizeCodeController {
                 authorizationService.getUserAndAppAuthorizationInfo(
                         user.getId(), params.getClientId(), CommonUtils.genScopeSign(params.getScope()));
 
-        if (authorization.isPresent()) {
-            // 用户已授权该APP
+        if (authorization.isPresent() && !skipConfirm) {
+            // 用户已授权该APP，下发授权码
+            UserAppAuthorization uaa = authorization.get();
+
         } else {
             // 用户未授权该APP，跳转到授权页面
             List<Scope> scopes = scopeService.getScopes(params.getScope());
@@ -163,7 +165,7 @@ public class AuthorizeCodeController {
             try {
                 response.sendRedirect(callback);
             } catch (IOException e) {
-                // never happen
+                log.error("Send redirect to dest url [{}] error!", callback, e);
             }
         }
         return ResultUtils.genFailedStringResult(ErrorCode.LOCAL_SERVICE_ERROR);
