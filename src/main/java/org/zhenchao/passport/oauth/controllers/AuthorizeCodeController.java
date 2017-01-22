@@ -129,13 +129,7 @@ public class AuthorizeCodeController {
                     if (StringUtils.isNotEmpty(state)) {
                         builder.queryParam("state", state);
                     }
-                    String issueCodeUrl = builder.toUriString();
-                    try {
-                        response.sendRedirect(issueCodeUrl);
-                    } catch (IOException e) {
-                        log.error("Send redirect to dest url[{}] error!", issueCodeUrl, e);
-                        return "redirect:/error";
-                    }
+                    return "redirect:" + builder.toUriString();
                 }
                 return ResultUtils.genFailedStringResult(ErrorCode.GENERATE_CODE_ERROR);
             } catch (OAuthServiceException e) {

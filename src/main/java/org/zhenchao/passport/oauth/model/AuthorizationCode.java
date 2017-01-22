@@ -1,13 +1,14 @@
 package org.zhenchao.passport.oauth.model;
 
-import com.sun.xml.internal.messaging.saaj.util.ByteOutputStream;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import static org.zhenchao.passport.oauth.commons.GlobalConstant.SALT;
 import org.zhenchao.passport.oauth.utils.CommonUtils;
 
+import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.Serializable;
 
 /**
  * 授权码
@@ -15,7 +16,9 @@ import java.io.IOException;
  * @author zhenchao.wang 2017-01-22 14:26
  * @version 1.0.0
  */
-public class AuthorizationCode {
+public class AuthorizationCode implements Serializable {
+
+    private static final long serialVersionUID = 2991560593633764910L;
 
     private OAuthAppInfo appInfo;
 
@@ -39,23 +42,27 @@ public class AuthorizationCode {
      * @return
      */
     public String toStringCode() {
-        ByteOutputStream bos = null;
+        ByteArrayOutputStream baos = null;
         DataOutputStream dos = null;
         try {
-            bos = new ByteOutputStream();
-            dos = new DataOutputStream(bos);
+            baos = new ByteArrayOutputStream();
+            dos = new DataOutputStream(baos);
             dos.writeLong(appInfo.getAppId());
             dos.writeLong(this.userId);
             dos.writeUTF(this.scopes);
             dos.writeUTF(CommonUtils.genScopeSign(this.scopes));
             dos.writeUTF(SALT);
             dos.flush();
-            return DigestUtils.md5Hex(bos.getBytes()).toUpperCase();
+            return DigestUtils.md5Hex(baos.toByteArray()).toUpperCase();
         } catch (IOException e) {
             // ignore
         } finally {
-            if (null != bos) {
-                bos.close();
+            if (null != baos) {
+                try {
+                    baos.close();
+                } catch (IOException e) {
+                    // ignore
+                }
             }
             if (null != dos) {
                 try {
