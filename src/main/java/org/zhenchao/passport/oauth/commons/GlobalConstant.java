@@ -52,13 +52,29 @@ public interface GlobalConstant {
 
     String GRANT_TYPE_CODE = "authorization_code";
 
+    /** bearer token type */
+    String BEARER = "bearer";
+
+    /** mac token type */
+    String MAC = "mac";
+
     /** allowed response type */
-    Set<String> ALLOWNED_RESPONSE_TYPE = new HashSet<String>() {
+    Set<String> ALLOWNED_RESPONSE_TYPE = new HashSet<String>(2) {
         private static final long serialVersionUID = -7941095619455398619L;
 
         {
-            add("code"); // Authorization Code
-            add("token"); // implicit
+            add(RESPONSE_TYPE_CODE); // Authorization Code
+            add(RESPONSE_TYPE_TOKEN); // implicit
+        }
+    };
+
+    /** allowed token type */
+    Set<String> ALLOWNED_TOKEN_TYPE = new HashSet<String>(2) {
+        private static final long serialVersionUID = -7941095619455398619L;
+
+        {
+            add(BEARER); // Authorization Code
+            add(MAC); // implicit
         }
     };
 }

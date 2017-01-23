@@ -2,6 +2,7 @@ package org.zhenchao.passport.oauth.model;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
+import org.zhenchao.passport.oauth.commons.GlobalConstant;
 
 /**
  * 令牌请求参数
@@ -19,6 +20,9 @@ public class AuthorizationTokenParams implements RequestParams {
 
     private long clientId;
 
+    /** token类型，默认为mac类型 */
+    private String tokenType = GlobalConstant.MAC;
+
     private String clientSecret;
 
     private boolean irt;
@@ -34,11 +38,12 @@ public class AuthorizationTokenParams implements RequestParams {
     }
 
     public AuthorizationTokenParams(
-            String grantType, String code, String redirectUri, long clientId, String clientSecret, boolean irt) {
+            String grantType, String code, String redirectUri, long clientId, String tokenType, String clientSecret, boolean irt) {
         this.grantType = grantType;
         this.code = code;
         this.redirectUri = redirectUri;
         this.clientId = clientId;
+        this.tokenType = tokenType;
         this.clientSecret = clientSecret;
         this.irt = irt;
     }
@@ -81,6 +86,15 @@ public class AuthorizationTokenParams implements RequestParams {
 
     public AuthorizationTokenParams setClientId(long clientId) {
         this.clientId = clientId;
+        return this;
+    }
+
+    public String getTokenType() {
+        return tokenType;
+    }
+
+    public AuthorizationTokenParams setTokenType(String tokenType) {
+        this.tokenType = tokenType;
         return this;
     }
 

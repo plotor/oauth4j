@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.zhenchao.passport.oauth.commons.ErrorCode;
+import static org.zhenchao.passport.oauth.commons.GlobalConstant.ALLOWNED_TOKEN_TYPE;
 import static org.zhenchao.passport.oauth.commons.GlobalConstant.GRANT_TYPE_CODE;
 import static org.zhenchao.passport.oauth.commons.GlobalConstant.RESPONSE_TYPE_CODE;
 import org.zhenchao.passport.oauth.model.AuthorizationCode;
@@ -97,6 +98,14 @@ public class ParamsValidateServiceImpl implements ParamsValidateService {
         if (StringUtils.isBlank(tokenParams.getCode())) {
             log.error("Authorization code is null or empty when request access token!");
             return ErrorCode.INVALID_AUTHORIZATION_CODE;
+        }
+
+        // 验证token类型
+        if (StringUtils.isNotBlank(tokenParams.getTokenType())) {
+            if (!ALLOWNED_TOKEN_TYPE.contains(tokenParams.getTokenType())) {
+                log.error("The token type [{}] is unsupported!");
+                return ErrorCode.UNSUPPORTED_TOKEN_TYPE;
+            }
         }
 
         Optional<AuthorizationCode> optCode = authorizeService.getAuthorizationCodeFromCache(tokenParams.getCode());

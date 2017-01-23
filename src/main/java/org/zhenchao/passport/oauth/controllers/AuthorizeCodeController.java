@@ -173,6 +173,7 @@ public class AuthorizeCodeController {
             @RequestParam("redirect_uri") String redirectUri,
             @RequestParam("client_id") long clientId,
             @RequestParam(value = "client_secret", required = false) String clientSecret,
+            @RequestParam(value = "token_type", required = false) String tokenType,
             @RequestParam(value = "issue_refresh_token", required = false, defaultValue = "true") boolean irt) {
 
         log.debug("Entering authorize code method...");
@@ -180,11 +181,11 @@ public class AuthorizeCodeController {
         ModelAndView mav = new ModelAndView();
 
         AuthorizationTokenParams tokenParams = new AuthorizationTokenParams();
-        tokenParams.setGrantType(grantType).setCode(code).setRedirectUri(redirectUri)
-                .setClientId(clientId).setClientSecret(clientSecret).setIrt(irt);
+        tokenParams.setGrantType(grantType).setCode(code).setRedirectUri(redirectUri).setClientId(clientId)
+                .setTokenType(StringUtils.defaultString(tokenType, GlobalConstant.MAC)).setClientSecret(clientSecret).setIrt(irt);
 
         ErrorCode validateResult = paramsValidateService.validateTokenRequestParams(tokenParams);
-        if(!ErrorCode.NO_ERROR.equals(validateResult)) {
+        if (!ErrorCode.NO_ERROR.equals(validateResult)) {
             log.error("Params error when request token, params [{}], error code [{}]", tokenParams, validateResult);
             return JSONView.render(new ErrorInformation(validateResult, StringUtils.EMPTY), response);
         }

@@ -60,6 +60,8 @@ public enum ErrorCode {
 
     INVALID_AUTHORIZATION_CODE(200008, "invalid authorization code"),
 
+    UNSUPPORTED_TOKEN_TYPE(200009, "unsupported token type"),
+
     /** 业务相关错误 **/
 
     VALIDATE_USER_ERROR(300000, "validate user error (username or password error)"),
