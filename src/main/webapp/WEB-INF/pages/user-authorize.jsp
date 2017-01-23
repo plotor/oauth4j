@@ -45,6 +45,7 @@
             <input type="hidden" name="user_id" value="${user.id}"/>
             <input type="hidden" name="client_id" value="${app.appId}"/>
             <input type="hidden" id="scope" name="scope" value=""/>
+            <input type="hidden" name="state" value="${state}"/>
             <button type="submit" class="btn btn-success" style="width: 50%;">确&emsp;认&emsp;授&emsp;权</button>
         </form>
     </div>
@@ -54,7 +55,7 @@
         var scopes = [];
         $(".list-group input").each(function (index, sid) {
             scopes[index] = sid.value;
-        })
+        });
         $("#scope").val(scopes.join('-'));
     });
 </script>

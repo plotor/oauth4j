@@ -17,31 +17,37 @@ public class ErrorInformation {
 
     private String uri;
 
+    private String state;
+
     public ErrorInformation() {
     }
 
-    public ErrorInformation(int code, String desc) {
+    public ErrorInformation(int code, String desc, String state) {
         this.code = code;
         this.desc = desc;
         this.uri = StringUtils.EMPTY;
+        this.state = state;
     }
 
-    public ErrorInformation(int code, String desc, String uri) {
+    public ErrorInformation(int code, String desc, String uri, String state) {
         this.code = code;
         this.desc = desc;
         this.uri = uri;
+        this.state = state;
     }
 
-    public ErrorInformation(ErrorCode errorCode) {
+    public ErrorInformation(ErrorCode errorCode, String state) {
         this.code = errorCode.getCode();
         this.desc = errorCode.getDesc();
         this.uri = StringUtils.EMPTY;
+        this.state = state;
     }
 
-    public ErrorInformation(ErrorCode errorCode, String uri) {
+    public ErrorInformation(ErrorCode errorCode, String uri, String state) {
         this.code = errorCode.getCode();
         this.desc = errorCode.getDesc();
         this.uri = uri;
+        this.state = state;
     }
 
     public int getCode() {
@@ -66,5 +72,13 @@ public class ErrorInformation {
 
     public void setUri(String uri) {
         this.uri = uri;
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
     }
 }

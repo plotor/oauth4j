@@ -14,6 +14,7 @@ import org.zhenchao.passport.oauth.commons.ErrorCode;
 import org.zhenchao.passport.oauth.commons.GlobalConstant;
 import static org.zhenchao.passport.oauth.commons.GlobalConstant.COOKIE_KEY_USER_LOGIN_SIGN;
 import static org.zhenchao.passport.oauth.commons.GlobalConstant.PATH_OAUTH_AUTHORIZE_CODE;
+import static org.zhenchao.passport.oauth.commons.GlobalConstant.PATH_OAUTH_AUTHORIZE_TOKEN;
 import static org.zhenchao.passport.oauth.commons.GlobalConstant.PATH_OAUTH_USER_AUTHORIZE;
 import static org.zhenchao.passport.oauth.commons.GlobalConstant.PATH_ROOT_LOGIN;
 import org.zhenchao.passport.oauth.exceptions.OAuthServiceException;
@@ -70,6 +71,11 @@ public class AuthorizeCodeController {
     @Resource
     private AuthorizeService authorizeService;
 
+    /**
+     * 请求获取授权码
+     *
+     * @return
+     */
     @RequestMapping(value = PATH_OAUTH_AUTHORIZE_CODE, method = {GET, POST}, params = "response_type=code")
     public ModelAndView authorize(
             HttpServletRequest request,
@@ -96,14 +102,14 @@ public class AuthorizeCodeController {
         if (!ErrorCode.NO_ERROR.equals(validateResult)) {
             // 请求参数有误
             log.error("Request authorize params error, params[{}], errorCode[{}]", params, validateResult);
-            return JSONView.render(new ErrorInformation(validateResult), response);
+            return JSONView.render(new ErrorInformation(validateResult, state), response);
         }
 
         // 获取APP信息
         Optional<OAuthAppInfo> optAppInfo = appInfoService.getAppInfo(clientId);
         if (!optAppInfo.isPresent()) {
             log.error("Client[id={}] is not exist!", clientId);
-            return JSONView.render(new ErrorInformation(ErrorCode.CLIENT_NOT_EXIST), response);
+            return JSONView.render(new ErrorInformation(ErrorCode.CLIENT_NOT_EXIST, state), response);
         }
 
         OAuthAppInfo appInfo = optAppInfo.get();
@@ -111,8 +117,8 @@ public class AuthorizeCodeController {
         if (null == user || forceLogin) {
             // 用户未登录或需要强制登录，跳转到登录页面
             UriComponentsBuilder builder = UriComponentsBuilder.newInstance();
-            builder.path("/login")
-                    .queryParam("callback", HttpRequestUtils.getEncodeRequestUrl(request))
+            builder.path(PATH_ROOT_LOGIN)
+                    .queryParam(GlobalConstant.CALLBACK, HttpRequestUtils.getEncodeRequestUrl(request))
                     .queryParam("app_name", appInfo.getAppName());
             mav.setViewName("redirect:" + builder.toUriString());
             return mav;
@@ -137,10 +143,10 @@ public class AuthorizeCodeController {
                     mav.setViewName("redirect:" + builder.toUriString());
                     return mav;
                 }
-                return JSONView.render(new ErrorInformation(ErrorCode.GENERATE_CODE_ERROR), response);
+                return JSONView.render(new ErrorInformation(ErrorCode.GENERATE_CODE_ERROR, state), response);
             } catch (OAuthServiceException e) {
                 log.error("Generate authorization code error!", e);
-                return JSONView.render(new ErrorInformation(e.getErrorCode()), response);
+                return JSONView.render(new ErrorInformation(e.getErrorCode(), state), response);
             }
         } else {
             // 用户未授权该APP，跳转到授权页面
@@ -149,23 +155,30 @@ public class AuthorizeCodeController {
             builder.path(PATH_OAUTH_USER_AUTHORIZE).queryParam("callback", "callback", HttpRequestUtils.getEncodeRequestUrl(request));
             mav.setViewName("user-authorize");
             mav.addObject(GlobalConstant.CALLBACK, builder.build(true))
-                    .addObject("scopes", scopes).addObject("user", user).addObject("app", appInfo);
+                    .addObject("scopes", scopes).addObject("user", user).addObject("app", appInfo).addObject("state", state);
             return mav;
         }
 
     }
 
+    @RequestMapping(value = PATH_OAUTH_AUTHORIZE_TOKEN)
     public String issueAccessToken() {
 
         return StringUtils.EMPTY;
     }
 
+    /**
+     * 用户确认授权
+     *
+     * @return
+     */
     @RequestMapping(value = PATH_OAUTH_USER_AUTHORIZE, method = {POST})
     public ModelAndView userAuthorize(
             HttpServletResponse response,
             @RequestParam("user_id") long userId,
             @RequestParam("client_id") long clientId,
             @RequestParam("scope") String scope,
+            @RequestParam(value = "state", required = false) String state,
             @RequestParam("callback") String callback) {
 
         log.debug("Entering user authorize method...");
@@ -194,7 +207,7 @@ public class AuthorizeCodeController {
             mav.setViewName("redirect:" + callback);
             return mav;
         }
-        return JSONView.render(new ErrorInformation(ErrorCode.LOCAL_SERVICE_ERROR), response);
+        return JSONView.render(new ErrorInformation(ErrorCode.LOCAL_SERVICE_ERROR, state), response);
     }
 
 }

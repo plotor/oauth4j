@@ -20,9 +20,9 @@ public interface GlobalConstant {
 
     String PATH_OAUTH_AUTHORIZE_CODE = "/authorize/code";
 
-    String PATH_OAUTH_AUTHORIZE_token = "/authorize/token";
+    String PATH_OAUTH_AUTHORIZE_TOKEN = "/authorize/token";
 
-    String PATH_OAUTH_IMPLICIT_token = "/implicit/token";
+    String PATH_OAUTH_IMPLICIT_TOKEN = "/implicit/token";
 
     String PATH_OAUTH_USER_AUTHORIZE = "/user/authorize";
 
@@ -33,7 +33,7 @@ public interface GlobalConstant {
 
     String AES_KEY = "a7995a00458f969bd381bbbe86778a9b32e43f29";
 
-    String CACHE_NAMESPACE_AUTHORIZATIONCODE = "passport-oauth-authorization-code";
+    String CACHE_NAMESPACE_AUTHORIZATION_CODE = "passport-oauth-authorization-code";
 
     /** 响应参数 */
     String CALLBACK = "callback";
