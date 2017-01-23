@@ -101,7 +101,13 @@ public class ParamsValidateServiceImpl implements ParamsValidateService {
 
         Optional<AuthorizationCode> optCode = authorizeService.getAuthorizationCodeFromCache(tokenParams.getCode());
         if (optCode.isPresent()) {
-            // 授权码有效
+
+            // 从缓存中删除授权码，一个授权码只能被使用一次
+            if (!authorizeService.deleteAuthorizationCodeFromCache(tokenParams.getCode())) {
+                log.error("Delete authorization code [{}] from cache error!", tokenParams.getCode());
+                return ErrorCode.INVALID_AUTHORIZATION_CODE;
+            }
+
             AuthorizationCode code = optCode.get();
             // 回调地址验证
             String redirectUri = code.getRedirectUri();
@@ -116,12 +122,15 @@ public class ParamsValidateServiceImpl implements ParamsValidateService {
                         tokenParams.getRedirectUri(), code.getAppInfo().getRedirectUri());
                 return ErrorCode.INVALID_REDIRECT_URI;
             }
+
+            // 验证clientId
             // FIXME clientId的验证还需要进一步研究一下
             if (tokenParams.getClientId() != code.getAppInfo().getAppId()) {
                 log.error("The input client id [{}] is not equals to code request [client id = {}]",
                         tokenParams.getClientId(), code.getAppInfo().getAppId());
                 return ErrorCode.UNAUTHORIZED_CLIENT;
             }
+            // TODO client secret 验证
             return ErrorCode.NO_ERROR;
         }
         return ErrorCode.INVALID_AUTHORIZATION_CODE;

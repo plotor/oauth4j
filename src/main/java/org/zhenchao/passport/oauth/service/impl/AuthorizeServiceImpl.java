@@ -88,4 +88,15 @@ public class AuthorizeServiceImpl implements AuthorizeService {
         }
         return Optional.of(authorizationCode);
     }
+
+    @Override
+    public boolean deleteAuthorizationCodeFromCache(String code) {
+        if (StringUtils.isBlank(code)) {
+            return false;
+        }
+        Cache<String, AuthorizationCode> cache = CACHE_MANAGER.getCache(CACHE_NAMESPACE_AUTHORIZATION_CODE, String.class, AuthorizationCode.class);
+        cache.remove(StringUtils.trim(code));
+        log.info("Delete authorization code [{}] from cache!", code);
+        return true;
+    }
 }

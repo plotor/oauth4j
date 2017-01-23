@@ -34,4 +34,11 @@ public interface AuthorizeService {
      */
     Optional<AuthorizationCode> getAuthorizationCodeFromCache(String code);
 
+    /**
+     * 从缓存中删除对应的授权码
+     *
+     * @param code
+     */
+    boolean deleteAuthorizationCodeFromCache(String code);
+
 }
