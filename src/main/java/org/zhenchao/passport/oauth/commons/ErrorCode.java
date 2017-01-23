@@ -56,6 +56,10 @@ public enum ErrorCode {
 
     INVALID_REDIRECT_URI(200006, "invalid redirect uri"),
 
+    UNSUPPORTED_GRANT_TYPE(200007, "unsupported grant type"),
+
+    INVALID_AUTHORIZATION_CODE(200008, "invalid authorization code"),
+
     /** 业务相关错误 **/
 
     VALIDATE_USER_ERROR(300000, "validate user error (username or password error)"),

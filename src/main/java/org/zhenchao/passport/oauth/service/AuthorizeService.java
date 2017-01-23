@@ -2,6 +2,7 @@ package org.zhenchao.passport.oauth.service;
 
 import org.zhenchao.passport.oauth.exceptions.OAuthServiceException;
 import org.zhenchao.passport.oauth.model.AuthorizationCode;
+import org.zhenchao.passport.oauth.model.AuthorizationCodeParams;
 import org.zhenchao.passport.oauth.model.UserAppAuthorization;
 
 import java.util.Optional;
@@ -15,12 +16,22 @@ import java.util.Optional;
 public interface AuthorizeService {
 
     /**
-     * 生成授权码
+     * 生成并缓存授权码
      *
      * @param uaa
+     * @param codeParams
      * @return
      * @throws OAuthServiceException
      */
-    Optional<AuthorizationCode> generateAuthorizationCode(UserAppAuthorization uaa) throws OAuthServiceException;
+    Optional<AuthorizationCode> generateAndCacheAuthorizationCode(UserAppAuthorization uaa, AuthorizationCodeParams codeParams)
+            throws OAuthServiceException;
+
+    /**
+     * 从缓存中获取对应的授权码
+     *
+     * @param code
+     * @return
+     */
+    Optional<AuthorizationCode> getAuthorizationCodeFromCache(String code);
 
 }

@@ -19,7 +19,8 @@ import static org.zhenchao.passport.oauth.commons.GlobalConstant.PATH_OAUTH_USER
 import static org.zhenchao.passport.oauth.commons.GlobalConstant.PATH_ROOT_LOGIN;
 import org.zhenchao.passport.oauth.exceptions.OAuthServiceException;
 import org.zhenchao.passport.oauth.model.AuthorizationCode;
-import org.zhenchao.passport.oauth.model.AuthorizeRequestParams;
+import org.zhenchao.passport.oauth.model.AuthorizationCodeParams;
+import org.zhenchao.passport.oauth.model.AuthorizationTokenParams;
 import org.zhenchao.passport.oauth.model.ErrorInformation;
 import org.zhenchao.passport.oauth.model.OAuthAppInfo;
 import org.zhenchao.passport.oauth.model.Scope;
@@ -72,7 +73,7 @@ public class AuthorizeCodeController {
     private AuthorizeService authorizeService;
 
     /**
-     * 请求获取授权码
+     * issue authorization code
      *
      * @return
      */
@@ -87,21 +88,19 @@ public class AuthorizeCodeController {
             @RequestParam(value = "scope", required = false) String scope,
             @RequestParam(value = "state", required = false) String state,
             @RequestParam(value = "skip_confirm", required = false, defaultValue = "false") boolean skipConfirm,
-            @RequestParam(value = "force_login", required = false, defaultValue = "false") boolean forceLogin,
-            @RequestParam(value = "issue_refresh_token", required = false, defaultValue = "true") boolean issueRefreshToken,
-            @RequestParam(value = "_json", required = false, defaultValue = "false") boolean jsonResponse) {
+            @RequestParam(value = "force_login", required = false, defaultValue = "false") boolean forceLogin) {
 
         log.debug("Entering authorize code method...");
 
         ModelAndView mav = new ModelAndView();
 
-        AuthorizeRequestParams params = new AuthorizeRequestParams().setResponseType(responseType).setClientId(clientId)
+        AuthorizationCodeParams codeParams = new AuthorizationCodeParams().setResponseType(responseType).setClientId(clientId)
                 .setRedirectUri(redirectUri).setScope(scope).setState(StringUtils.isBlank(state) ? StringUtils.EMPTY : state);
         // 校验授权请求参数
-        ErrorCode validateResult = paramsValidateService.validateAuthorizeCodeRequestParams(params);
+        ErrorCode validateResult = paramsValidateService.validateCodeRequestParams(codeParams);
         if (!ErrorCode.NO_ERROR.equals(validateResult)) {
             // 请求参数有误
-            log.error("Request authorize params error, params[{}], errorCode[{}]", params, validateResult);
+            log.error("Request authorize params error, params[{}], errorCode[{}]", codeParams, validateResult);
             return JSONView.render(new ErrorInformation(validateResult, state), response);
         }
 
@@ -126,12 +125,12 @@ public class AuthorizeCodeController {
 
         Optional<UserAppAuthorization> authorization =
                 authorizationService.getUserAndAppAuthorizationInfo(
-                        user.getId(), params.getClientId(), CommonUtils.genScopeSign(params.getScope()));
+                        user.getId(), codeParams.getClientId(), CommonUtils.genScopeSign(codeParams.getScope()));
 
         if (authorization.isPresent() && !skipConfirm) {
             // 用户已授权该APP，下发授权码
             try {
-                Optional<AuthorizationCode> optCode = authorizeService.generateAuthorizationCode(authorization.get());
+                Optional<AuthorizationCode> optCode = authorizeService.generateAndCacheAuthorizationCode(authorization.get(), codeParams);
                 if (optCode.isPresent()) {
                     // 下发授权码
                     String code = optCode.get().toStringCode();
@@ -150,7 +149,7 @@ public class AuthorizeCodeController {
             }
         } else {
             // 用户未授权该APP，跳转到授权页面
-            List<Scope> scopes = scopeService.getScopes(params.getScope());
+            List<Scope> scopes = scopeService.getScopes(codeParams.getScope());
             UriComponentsBuilder builder = UriComponentsBuilder.newInstance();
             builder.path(PATH_OAUTH_USER_AUTHORIZE).queryParam("callback", "callback", HttpRequestUtils.getEncodeRequestUrl(request));
             mav.setViewName("user-authorize");
@@ -161,14 +160,40 @@ public class AuthorizeCodeController {
 
     }
 
-    @RequestMapping(value = PATH_OAUTH_AUTHORIZE_TOKEN)
-    public String issueAccessToken() {
+    /**
+     * issue accessToken (and refreshToken)
+     *
+     * @return
+     */
+    @RequestMapping(value = PATH_OAUTH_AUTHORIZE_TOKEN, method = {GET, POST}, params = "grant_type=authorization_code")
+    public ModelAndView issueAccessToken(
+            HttpServletResponse response,
+            @RequestParam("grant_type") String grantType,
+            @RequestParam("code") String code,
+            @RequestParam("redirect_uri") String redirectUri,
+            @RequestParam("client_id") long clientId,
+            @RequestParam(value = "client_secret", required = false) String clientSecret,
+            @RequestParam(value = "issue_refresh_token", required = false, defaultValue = "true") boolean irt) {
 
-        return StringUtils.EMPTY;
+        log.debug("Entering authorize code method...");
+
+        ModelAndView mav = new ModelAndView();
+
+        AuthorizationTokenParams tokenParams = new AuthorizationTokenParams();
+        tokenParams.setGrantType(grantType).setCode(code).setRedirectUri(redirectUri)
+                .setClientId(clientId).setClientSecret(clientSecret).setIrt(irt);
+
+        ErrorCode validateResult = paramsValidateService.validateTokenRequestParams(tokenParams);
+        if(!ErrorCode.NO_ERROR.equals(validateResult)) {
+            log.error("Params error when request token, params [{}], error code [{}]", tokenParams, validateResult);
+            return JSONView.render(new ErrorInformation(validateResult, StringUtils.EMPTY), response);
+        }
+
+        return new ModelAndView();
     }
 
     /**
-     * 用户确认授权
+     * user authorize on app
      *
      * @return
      */

@@ -26,6 +26,9 @@ public class AuthorizationCode implements Serializable {
 
     private String scopes;
 
+    /** 请求参数中的回调地址 */
+    private String redirectUri;
+
     public AuthorizationCode() {
     }
 
@@ -47,10 +50,11 @@ public class AuthorizationCode implements Serializable {
         try {
             baos = new ByteArrayOutputStream();
             dos = new DataOutputStream(baos);
-            dos.writeLong(appInfo.getAppId());
+            dos.writeLong(this.appInfo.getAppId());
             dos.writeLong(this.userId);
             dos.writeUTF(this.scopes);
             dos.writeUTF(CommonUtils.genScopeSign(this.scopes));
+            dos.writeUTF(StringUtils.trimToEmpty(this.redirectUri));
             dos.writeUTF(SALT);
             dos.flush();
             return DigestUtils.md5Hex(baos.toByteArray()).toUpperCase();
@@ -99,6 +103,15 @@ public class AuthorizationCode implements Serializable {
 
     public AuthorizationCode setScopes(String scopes) {
         this.scopes = scopes;
+        return this;
+    }
+
+    public String getRedirectUri() {
+        return redirectUri;
+    }
+
+    public AuthorizationCode setRedirectUri(String redirectUri) {
+        this.redirectUri = redirectUri;
         return this;
     }
 }

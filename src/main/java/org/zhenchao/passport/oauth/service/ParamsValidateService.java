@@ -25,12 +25,20 @@ public interface ParamsValidateService {
     Logger log = LoggerFactory.getLogger(ParamsValidateService.class);
 
     /**
-     * 请求参数验证
+     * 授权码请求参数验证
      *
      * @param params
      * @return
      */
-    ErrorCode validateAuthorizeCodeRequestParams(RequestParams params);
+    ErrorCode validateCodeRequestParams(RequestParams params);
+
+    /**
+     * 访问令牌请求参数验证
+     *
+     * @param params
+     * @return
+     */
+    ErrorCode validateTokenRequestParams(RequestParams params);
 
     /**
      * redirect uri 合法性校验

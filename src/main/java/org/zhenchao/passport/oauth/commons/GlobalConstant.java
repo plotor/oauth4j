@@ -50,6 +50,8 @@ public interface GlobalConstant {
     /** 隐式授权模式 */
     String RESPONSE_TYPE_TOKEN = "token";
 
+    String GRANT_TYPE_CODE = "authorization_code";
+
     /** allowed response type */
     Set<String> ALLOWNED_RESPONSE_TYPE = new HashSet<String>() {
         private static final long serialVersionUID = -7941095619455398619L;

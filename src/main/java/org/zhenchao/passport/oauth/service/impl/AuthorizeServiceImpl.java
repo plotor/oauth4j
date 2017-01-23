@@ -15,6 +15,7 @@ import org.zhenchao.passport.oauth.commons.ErrorCode;
 import static org.zhenchao.passport.oauth.commons.GlobalConstant.CACHE_NAMESPACE_AUTHORIZATION_CODE;
 import org.zhenchao.passport.oauth.exceptions.OAuthServiceException;
 import org.zhenchao.passport.oauth.model.AuthorizationCode;
+import org.zhenchao.passport.oauth.model.AuthorizationCodeParams;
 import org.zhenchao.passport.oauth.model.OAuthAppInfo;
 import org.zhenchao.passport.oauth.model.UserAppAuthorization;
 import org.zhenchao.passport.oauth.service.AuthorizeService;
@@ -53,15 +54,16 @@ public class AuthorizeServiceImpl implements AuthorizeService {
     private OAuthAppInfoService appInfoService;
 
     @Override
-    public Optional<AuthorizationCode> generateAuthorizationCode(UserAppAuthorization uaa) throws OAuthServiceException {
-        if (null == uaa) {
+    public Optional<AuthorizationCode> generateAndCacheAuthorizationCode(UserAppAuthorization uaa, AuthorizationCodeParams codeParams)
+            throws OAuthServiceException {
+        if (null == uaa || null == codeParams) {
             log.error("Generate authorization code error, the input params is null!");
             return Optional.empty();
         }
 
         OAuthAppInfo appInfo = appInfoService.getAppInfo(uaa.getAppId()).orElseThrow(() -> new OAuthServiceException(ErrorCode.CLIENT_NOT_EXIST));
         AuthorizationCode code = new AuthorizationCode();
-        code.setAppInfo(appInfo).setUserId(uaa.getUserId()).setScopes(uaa.getScope());
+        code.setAppInfo(appInfo).setUserId(uaa.getUserId()).setScopes(uaa.getScope()).setRedirectUri(codeParams.getRedirectUri());
         String strCode = code.toStringCode();
         if (StringUtils.isBlank(strCode)) {
             log.error("Generate authorization code error!");
@@ -72,4 +74,18 @@ public class AuthorizeServiceImpl implements AuthorizeService {
         return Optional.of(code);
     }
 
+    @Override
+    public Optional<AuthorizationCode> getAuthorizationCodeFromCache(String code) {
+        if (StringUtils.isBlank(code)) {
+            return Optional.empty();
+        }
+
+        Cache<String, AuthorizationCode> cache = CACHE_MANAGER.getCache(CACHE_NAMESPACE_AUTHORIZATION_CODE, String.class, AuthorizationCode.class);
+        AuthorizationCode authorizationCode = cache.get(StringUtils.trim(code));
+        if (null == authorizationCode) {
+            log.error("No cached authorization code [{}] founded!", code);
+            return Optional.empty();
+        }
+        return Optional.of(authorizationCode);
+    }
 }
