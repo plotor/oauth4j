@@ -7,10 +7,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.util.UriComponentsBuilder;
+import org.zhenchao.passport.oauth.commons.GlobalConstant;
 import static org.zhenchao.passport.oauth.commons.GlobalConstant.COOKIE_KEY_USER_LOGIN_SIGN;
 import org.zhenchao.passport.oauth.utils.CookieUtils;
 import org.zhenchao.passport.oauth.utils.HttpRequestUtils;
-import org.zhenchao.passport.oauth.utils.ResultUtils;
 import org.zhenchao.passport.oauth.utils.SessionUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -39,7 +39,7 @@ public class LoginInterceptor implements HandlerInterceptor {
         log.info("User not login, redirect to login page!");
         // 用户未登录，跳转到登录页
         UriComponentsBuilder builder = UriComponentsBuilder.newInstance();
-        builder.path("/login").queryParam(ResultUtils.CALLBACK, HttpRequestUtils.getEncodeRequestUrl(request));
+        builder.path("/login").queryParam(GlobalConstant.CALLBACK, HttpRequestUtils.getEncodeRequestUrl(request));
         response.sendRedirect(builder.build().toUriString());
 
         return false;

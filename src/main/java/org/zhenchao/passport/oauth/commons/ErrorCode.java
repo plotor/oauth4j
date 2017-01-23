@@ -58,7 +58,7 @@ public enum ErrorCode {
 
     /** 业务相关错误 **/
 
-    VALIDATE_USER_ERROR(300000, "validate user error"),
+    VALIDATE_USER_ERROR(300000, "validate user error (username or password error)"),
 
     ILLEGAL_USER(300001, "illegal user"),
 

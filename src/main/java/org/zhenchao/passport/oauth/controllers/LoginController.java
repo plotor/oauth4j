@@ -11,18 +11,17 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 import org.zhenchao.passport.oauth.commons.ErrorCode;
+import org.zhenchao.passport.oauth.commons.GlobalConstant;
 import static org.zhenchao.passport.oauth.commons.GlobalConstant.COOKIE_KEY_USER_LOGIN_SIGN;
 import static org.zhenchao.passport.oauth.commons.GlobalConstant.PATH_ROOT_LOGIN;
 import org.zhenchao.passport.oauth.exceptions.CryptException;
+import org.zhenchao.passport.oauth.model.ErrorInformation;
 import org.zhenchao.passport.oauth.model.User;
 import org.zhenchao.passport.oauth.service.UserService;
-import org.zhenchao.passport.oauth.utils.ResultUtils;
+import org.zhenchao.passport.oauth.utils.JSONView;
 import org.zhenchao.passport.oauth.utils.SessionUtils;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.NoSuchElementException;
+import java.util.Optional;
 import javax.annotation.Resource;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
@@ -50,9 +49,7 @@ public class LoginController {
     @RequestMapping(value = PATH_ROOT_LOGIN, method = RequestMethod.GET)
     public ModelAndView login(@RequestParam(value = "callback", required = false) String callback) {
         ModelAndView mav = new ModelAndView();
-        if (StringUtils.isNotBlank(callback)) {
-            mav.addObject(ResultUtils.CALLBACK, callback);
-        }
+        mav.addObject(GlobalConstant.CALLBACK, StringUtils.isBlank(callback) ? StringUtils.EMPTY : callback);
         mav.setViewName("login");
         return mav;
     }
@@ -68,7 +65,7 @@ public class LoginController {
      */
     @ResponseBody
     @RequestMapping(value = PATH_ROOT_LOGIN, method = RequestMethod.POST)
-    public String login(
+    public ModelAndView login(
             HttpSession session,
             HttpServletResponse response,
             @RequestParam(value = "username") String username,
@@ -77,35 +74,33 @@ public class LoginController {
 
         log.debug("Entering login method...");
 
+        ModelAndView mav = new ModelAndView();
+
         if (StringUtils.isBlank(username) || StringUtils.isBlank(password)) {
             log.error("Login params error, username or password is null or empty!");
-            return ResultUtils.genFailedStringResult(ErrorCode.PARAMETER_ERROR, callback);
+            return JSONView.render(new ErrorInformation(ErrorCode.PARAMETER_ERROR), response);
         }
 
         try {
-            User user = userService.validatePassword(username, password).get();
-            // session user
-            SessionUtils.putUser(session, user);
+            Optional<User> optUser = userService.validatePassword(username, password);
+            if (optUser.isPresent()) {
+                User user = optUser.get();
+                // session user
+                SessionUtils.putUser(session, user);
 
-            // cookie user
-            Cookie cookie = new Cookie(COOKIE_KEY_USER_LOGIN_SIGN, DigestUtils.md5Hex(String.valueOf(user.getId())));
-            cookie.setPath("/");
-            cookie.setHttpOnly(true);
-            cookie.setMaxAge(24 * 3600);
-            response.addCookie(cookie);
-            try {
-                response.sendRedirect(callback);
-            } catch (IOException e) {
-                log.error("Send redirect to callback[{}] error!", callback, e);
+                // cookie user
+                Cookie cookie = new Cookie(COOKIE_KEY_USER_LOGIN_SIGN, DigestUtils.md5Hex(String.valueOf(user.getId())));
+                cookie.setPath("/");
+                cookie.setHttpOnly(true);
+                cookie.setMaxAge(24 * 3600);
+                response.addCookie(cookie);
+                mav.setViewName("redirect:" + callback);
+                return mav;
             }
-            Map<String, Object> params = new HashMap<>();
-            params.put(ResultUtils.CALLBACK, callback);
-            return ResultUtils.genSuccessStringResult(params);
-        } catch (CryptException | NoSuchElementException e) {
+        } catch (CryptException e) {
             log.error("Validate user[{}] error!", username, e);
-            return ResultUtils.genFailedStringResult(ErrorCode.VALIDATE_USER_ERROR, callback);
         }
-
+        return JSONView.render(new ErrorInformation(ErrorCode.VALIDATE_USER_ERROR), response);
     }
 
 }

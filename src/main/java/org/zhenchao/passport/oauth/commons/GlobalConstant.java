@@ -35,6 +35,9 @@ public interface GlobalConstant {
 
     String CACHE_NAMESPACE_AUTHORIZATIONCODE = "passport-oauth-authorization-code";
 
+    /** 响应参数 */
+    String CALLBACK = "callback";
+
     /** 分隔符 */
 
     String SEPARATOR_REDIRECT_URI = ";";
