@@ -42,7 +42,7 @@ public interface GlobalConstant {
 
     String SEPARATOR_REDIRECT_URI = ";";
 
-    String SEPARATOR_REDIRECT_SCOPE = "-";
+    String SEPARATOR_REDIRECT_SCOPE = " ";
 
     /** 授权码模式 */
     String RESPONSE_TYPE_CODE = "code";
@@ -59,7 +59,7 @@ public interface GlobalConstant {
     String MAC = "mac";
 
     /** allowed response type */
-    Set<String> ALLOWNED_RESPONSE_TYPE = new HashSet<String>(2) {
+    Set<String> ALLOWED_RESPONSE_TYPE = new HashSet<String>(2) {
         private static final long serialVersionUID = -7941095619455398619L;
 
         {
@@ -69,7 +69,7 @@ public interface GlobalConstant {
     };
 
     /** allowed token type */
-    Set<String> ALLOWNED_TOKEN_TYPE = new HashSet<String>(2) {
+    Set<String> ALLOWED_TOKEN_TYPE = new HashSet<String>(2) {
         private static final long serialVersionUID = -7941095619455398619L;
 
         {

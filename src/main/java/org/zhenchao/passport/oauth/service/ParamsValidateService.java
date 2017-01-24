@@ -5,7 +5,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zhenchao.passport.oauth.commons.ErrorCode;
-import static org.zhenchao.passport.oauth.commons.GlobalConstant.SEPARATOR_REDIRECT_SCOPE;
 import static org.zhenchao.passport.oauth.commons.GlobalConstant.SEPARATOR_REDIRECT_URI;
 import org.zhenchao.passport.oauth.model.RequestParams;
 
@@ -51,7 +50,7 @@ public interface ParamsValidateService {
         if (StringUtils.isBlank(redirectUriStr) || StringUtils.isBlank(input)) {
             return false;
         }
-        String[] redirectUris = StringUtils.trim(redirectUriStr).replaceAll("\\s+", "").split(SEPARATOR_REDIRECT_URI);
+        String[] redirectUris = StringUtils.trim(redirectUriStr).split(SEPARATOR_REDIRECT_URI);
         try {
             URI inputUri = new URI(input);
             String inputUriPath = inputUri.getPath().endsWith("/") ? inputUri.getPath() : inputUri.getPath() + "/";
@@ -93,8 +92,8 @@ public interface ParamsValidateService {
         if (StringUtils.isBlank(pScopes) || StringUtils.isBlank(sScopes)) {
             return false;
         }
-        List<String> pScopeList = Arrays.asList(StringUtils.trim(pScopes).replaceAll("\\s+", "").split(SEPARATOR_REDIRECT_SCOPE));
-        List<String> sScopeList = Arrays.asList(StringUtils.trim(sScopes).replaceAll("\\s+", "").split(SEPARATOR_REDIRECT_SCOPE));
+        List<String> pScopeList = Arrays.asList(StringUtils.trim(pScopes).split("\\s+"));
+        List<String> sScopeList = Arrays.asList(StringUtils.trim(sScopes).split("\\s+"));
         return CollectionUtils.isSubCollection(sScopeList, pScopeList);
     }
 

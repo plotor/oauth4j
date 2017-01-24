@@ -1,18 +1,3 @@
-/*
-Navicat MariaDB Data Transfer
-
-Source Server         : localhost
-Source Server Version : 100120
-Source Host           : localhost:3306
-Source Database       : passport_oauth
-
-Target Server Type    : MariaDB
-Target Server Version : 100120
-File Encoding         : 65001
-
-Date: 2017-01-21 23:27:35
-*/
-
 SET FOREIGN_KEY_CHECKS=0;
 
 -- ----------------------------
@@ -38,7 +23,7 @@ CREATE TABLE `t_oauth_app_info` (
 -- ----------------------------
 -- Records of t_oauth_app_info
 -- ----------------------------
-INSERT INTO `t_oauth_app_info` VALUES ('2882303761517520186', '指间生活', 'https://github.com/ZhenchaoWang/zhenchaowang.github.io/blob/master/img/milogo@2x.png?raw=true', '0', 'http://www.zhenchao.com', '1-4', '7776000', 'empty', '1', '888888', '2017-01-21 15:53:37', '2017-01-21 18:19:42');
+INSERT INTO `t_oauth_app_info` VALUES ('2882303761517520186', '指间生活', 'https://github.com/ZhenchaoWang/zhenchaowang.github.io/blob/master/img/milogo@2x.png?raw=true', '0', 'http://www.zhenchao.com', '1 4', '7776000', 'empty', '1', '888888', '2017-01-21 15:53:37', '2017-01-21 18:19:42');
 
 -- ----------------------------
 -- Table structure for t_scope

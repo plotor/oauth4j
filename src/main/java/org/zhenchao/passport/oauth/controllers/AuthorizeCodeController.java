@@ -17,6 +17,7 @@ import static org.zhenchao.passport.oauth.commons.GlobalConstant.PATH_OAUTH_AUTH
 import static org.zhenchao.passport.oauth.commons.GlobalConstant.PATH_OAUTH_AUTHORIZE_TOKEN;
 import static org.zhenchao.passport.oauth.commons.GlobalConstant.PATH_OAUTH_USER_AUTHORIZE;
 import static org.zhenchao.passport.oauth.commons.GlobalConstant.PATH_ROOT_LOGIN;
+import static org.zhenchao.passport.oauth.commons.GlobalConstant.PATH_ROOT_OAUTH;
 import org.zhenchao.passport.oauth.exceptions.OAuthServiceException;
 import org.zhenchao.passport.oauth.model.AuthorizationCode;
 import org.zhenchao.passport.oauth.model.AuthorizationCodeParams;
@@ -52,7 +53,7 @@ import javax.servlet.http.HttpSession;
  * @version 1.0.0
  */
 @Controller
-@RequestMapping(GlobalConstant.PATH_ROOT_OAUTH)
+@RequestMapping(PATH_ROOT_OAUTH)
 public class AuthorizeCodeController {
 
     private static final Logger log = LoggerFactory.getLogger(AuthorizeCodeController.class);
@@ -95,7 +96,7 @@ public class AuthorizeCodeController {
         ModelAndView mav = new ModelAndView();
 
         AuthorizationCodeParams codeParams = new AuthorizationCodeParams().setResponseType(responseType).setClientId(clientId)
-                .setRedirectUri(redirectUri).setScope(scope).setState(StringUtils.isBlank(state) ? StringUtils.EMPTY : state);
+                .setRedirectUri(redirectUri).setScope(scope).setState(StringUtils.trimToEmpty(state));
         // 校验授权请求参数
         ErrorCode validateResult = paramsValidateService.validateCodeRequestParams(codeParams);
         if (!ErrorCode.NO_ERROR.equals(validateResult)) {
@@ -151,10 +152,10 @@ public class AuthorizeCodeController {
             // 用户未授权该APP，跳转到授权页面
             List<Scope> scopes = scopeService.getScopes(codeParams.getScope());
             UriComponentsBuilder builder = UriComponentsBuilder.newInstance();
-            builder.path(PATH_OAUTH_USER_AUTHORIZE).queryParam("callback", "callback", HttpRequestUtils.getEncodeRequestUrl(request));
+            builder.path(PATH_ROOT_OAUTH + PATH_OAUTH_USER_AUTHORIZE).queryParam("callback", "callback", HttpRequestUtils.getEncodeRequestUrl(request));
             mav.setViewName("user-authorize");
             mav.addObject(GlobalConstant.CALLBACK, builder.build(true))
-                    .addObject("scopes", scopes).addObject("user", user).addObject("app", appInfo).addObject("state", state);
+                    .addObject("scopes", scopes).addObject("user", user).addObject("app", appInfo).addObject("state", StringUtils.trimToEmpty(state));
             return mav;
         }
 

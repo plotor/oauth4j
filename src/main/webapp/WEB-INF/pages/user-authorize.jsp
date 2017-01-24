@@ -56,7 +56,7 @@
         $(".list-group input").each(function (index, sid) {
             scopes[index] = sid.value;
         });
-        $("#scope").val(scopes.join('-'));
+        $("#scope").val(scopes.join(' '));
     });
 </script>
 </body>

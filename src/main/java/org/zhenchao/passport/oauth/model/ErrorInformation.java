@@ -26,28 +26,28 @@ public class ErrorInformation {
         this.code = code;
         this.desc = desc;
         this.uri = StringUtils.EMPTY;
-        this.state = state;
+        this.state = StringUtils.trimToEmpty(state);
     }
 
     public ErrorInformation(int code, String desc, String uri, String state) {
         this.code = code;
         this.desc = desc;
         this.uri = uri;
-        this.state = state;
+        this.state = StringUtils.trimToEmpty(state);
     }
 
     public ErrorInformation(ErrorCode errorCode, String state) {
         this.code = errorCode.getCode();
         this.desc = errorCode.getDesc();
         this.uri = StringUtils.EMPTY;
-        this.state = state;
+        this.state = StringUtils.trimToEmpty(state);
     }
 
     public ErrorInformation(ErrorCode errorCode, String uri, String state) {
         this.code = errorCode.getCode();
         this.desc = errorCode.getDesc();
         this.uri = uri;
-        this.state = state;
+        this.state = StringUtils.trimToEmpty(state);
     }
 
     public int getCode() {

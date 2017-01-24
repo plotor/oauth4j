@@ -78,7 +78,7 @@ public class LoginController {
 
         if (StringUtils.isBlank(username) || StringUtils.isBlank(password)) {
             log.error("Login params error, username or password is null or empty!");
-            return JSONView.render(new ErrorInformation(ErrorCode.PARAMETER_ERROR), response);
+            return JSONView.render(new ErrorInformation(ErrorCode.PARAMETER_ERROR, StringUtils.EMPTY), response);
         }
 
         try {
@@ -100,7 +100,7 @@ public class LoginController {
         } catch (CryptException e) {
             log.error("Validate user[{}] error!", username, e);
         }
-        return JSONView.render(new ErrorInformation(ErrorCode.VALIDATE_USER_ERROR), response);
+        return JSONView.render(new ErrorInformation(ErrorCode.VALIDATE_USER_ERROR, StringUtils.EMPTY), response);
     }
 
 }
