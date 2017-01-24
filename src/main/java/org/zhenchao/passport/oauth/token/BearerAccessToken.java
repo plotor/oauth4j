@@ -7,4 +7,7 @@ package org.zhenchao.passport.oauth.token;
  * @version 1.0.0
  */
 public class BearerAccessToken extends AbstractAccessToken {
+
+    public BearerAccessToken() {
+    }
 }
