@@ -1,6 +1,7 @@
 package org.zhenchao.passport.oauth.controllers;
 
 import net.sf.json.JSONObject;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -159,7 +160,7 @@ public class AuthorizationCodeController {
             // 用户未授权该APP，跳转到授权页面
             List<Scope> scopes = scopeService.getScopes(codeParams.getScope());
             UriComponentsBuilder builder = UriComponentsBuilder.newInstance();
-            builder.path(PATH_ROOT_OAUTH + PATH_OAUTH_USER_AUTHORIZE).queryParam("callback", "callback", HttpRequestUtils.getEncodeRequestUrl(request));
+            builder.path(PATH_ROOT_OAUTH + PATH_OAUTH_USER_AUTHORIZE).queryParam(GlobalConstant.CALLBACK, HttpRequestUtils.getEncodeRequestUrl(request));
             mav.setViewName("user-authorize");
             mav.addObject(GlobalConstant.CALLBACK, builder.build(true))
                     .addObject("scopes", scopes).addObject("user", user).addObject("app", appInfo).addObject("state", StringUtils.trimToEmpty(state));
@@ -234,7 +235,7 @@ public class AuthorizationCodeController {
             result.put("refresh_token", refresh ? accessToken.getRefreshToken() : StringUtils.EMPTY);
             if (accessToken instanceof MacAccessToken) {
                 result.put("mac_key", accessToken.getKey());
-                result.put("mac_algorithm", ((MacAccessToken) accessToken).getAlgorithm());
+                result.put("mac_algorithm", ((MacAccessToken) accessToken).getAlgorithm().getValue());
             }
             return JSONView.render(result, response);
         } catch (IOException e) {
@@ -279,10 +280,9 @@ public class AuthorizationCodeController {
         authorization.setScopeSign(CommonUtils.genScopeSign(scope));
         authorization.setCreateTime(new Date());
         authorization.setCreateTime(authorization.getCreateTime());
-        // TODO 生成如下几个值 2017-2-11 16:12:08
-        /*authorization.setTokenKey();
-        authorization.setRefreshTokenKey();
-        authorization.setRefreshTokenExpirationTime();*/
+        authorization.setTokenKey(RandomStringUtils.randomAlphanumeric(64));  // 随机生成key
+        authorization.setRefreshTokenKey(RandomStringUtils.randomAlphanumeric(64));  // FIXME 这里是不是应该考虑采用AES加密
+        authorization.setRefreshTokenExpirationTime(365 * 24 * 3600L);  // 设置刷新令牌有效期
         if (authorizationService.replaceUserAndAppAuthorizationInfo(authorization)) {
             // 更新用户授权关系成功
             mav.setViewName("redirect:" + callback);

@@ -43,7 +43,7 @@ public class MacAccessTokenGenerator extends AbstractAccessTokenGenerator {
         long currentTime = System.currentTimeMillis();
         accessToken.setVersion(AbstractAccessToken.TokenVersion.V_1_0_0)
                 .setUserId(code.getUserId()).setClientId(params.getClientId()).setScope(code.getScopes())
-                .setIssueTime(currentTime).setExpirationTime(currentTime + code.getAppInfo().getTokenValidity())
+                .setIssueTime(currentTime).setExpirationTime(currentTime + code.getAppInfo().getTokenValidity() * 1000)  // 时间单位保持一致
                 .setType(MacAccessToken.TYPE).setKey(uaa.getTokenKey());
 
         if(params.isIrt()) {

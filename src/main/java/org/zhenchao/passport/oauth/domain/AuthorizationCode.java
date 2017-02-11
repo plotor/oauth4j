@@ -42,6 +42,7 @@ public class AuthorizationCode implements Serializable {
     /**
      * 将对象转换成字符串授权码
      * 出错则返回空值
+     * FIXME code生成应该加入时间戳
      *
      * @return
      */
