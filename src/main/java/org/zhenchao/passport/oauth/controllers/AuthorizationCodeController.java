@@ -142,7 +142,7 @@ public class AuthorizationCodeController {
                 Optional<AuthorizationCode> optCode = authorizeService.generateAndCacheAuthorizationCode(authorization.get(), codeParams);
                 if (optCode.isPresent()) {
                     // 下发授权码
-                    String code = optCode.get().toStringCode();
+                    String code = optCode.get().getValue();
                     UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(appInfo.getRedirectUri());
                     builder.queryParam("code", code);
                     if (StringUtils.isNotEmpty(state)) {
@@ -237,6 +237,7 @@ public class AuthorizationCodeController {
                 result.put("mac_key", accessToken.getKey());
                 result.put("mac_algorithm", ((MacAccessToken) accessToken).getAlgorithm().getValue());
             }
+            // TODO add json safe prefix
             return JSONView.render(result, response);
         } catch (IOException e) {
             log.error("Get string access token error by [{}]!", accessToken);

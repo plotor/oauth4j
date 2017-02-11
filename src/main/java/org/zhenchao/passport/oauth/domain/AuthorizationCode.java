@@ -30,6 +30,8 @@ public class AuthorizationCode implements Serializable {
     /** 请求参数中的回调地址 */
     private String redirectUri;
 
+    private String value;
+
     public AuthorizationCode() {
     }
 
@@ -40,13 +42,15 @@ public class AuthorizationCode implements Serializable {
     }
 
     /**
-     * 将对象转换成字符串授权码
-     * 出错则返回空值
-     * FIXME code生成应该加入时间戳
+     * 获取code的字符串形式
      *
      * @return
      */
-    public String toStringCode() {
+    public String getValue() {
+        if (StringUtils.isNotBlank(value)) {
+            return this.value;
+        }
+
         ByteArrayOutputStream baos = null;
         DataOutputStream dos = null;
         try {
@@ -54,12 +58,13 @@ public class AuthorizationCode implements Serializable {
             dos = new DataOutputStream(baos);
             dos.writeLong(this.appInfo.getAppId());
             dos.writeLong(this.userId);
-            dos.writeUTF(this.scopes);
-            dos.writeUTF(CommonUtils.genScopeSign(this.scopes));
-            dos.writeUTF(StringUtils.trimToEmpty(this.redirectUri));
-            dos.writeUTF(SALT);
+            dos.write(this.scopes.getBytes());
+            dos.write(CommonUtils.genScopeSign(this.scopes).getBytes());
+            dos.write(StringUtils.trimToEmpty(this.redirectUri).getBytes());
+            dos.write(SALT.getBytes());
+            dos.writeLong(System.currentTimeMillis());
             dos.flush();
-            return DigestUtils.md5Hex(baos.toByteArray()).toUpperCase();
+            this.value = DigestUtils.md5Hex(baos.toByteArray()).toUpperCase();
         } catch (IOException e) {
             // ignore
         } finally {
@@ -78,7 +83,7 @@ public class AuthorizationCode implements Serializable {
                 }
             }
         }
-        return StringUtils.EMPTY;
+        return this.value;
     }
 
     public OAuthAppInfo getAppInfo() {

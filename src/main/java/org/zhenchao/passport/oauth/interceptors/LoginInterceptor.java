@@ -41,7 +41,6 @@ public class LoginInterceptor implements HandlerInterceptor {
         UriComponentsBuilder builder = UriComponentsBuilder.newInstance();
         builder.path("/login").queryParam(GlobalConstant.CALLBACK, HttpRequestUtils.getEncodeRequestUrl(request));
         response.sendRedirect(builder.build().toUriString());
-
         return false;
     }
 

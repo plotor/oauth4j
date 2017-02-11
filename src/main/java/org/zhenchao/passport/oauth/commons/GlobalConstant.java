@@ -54,11 +54,7 @@ public interface GlobalConstant {
 
     String GRANT_TYPE_CODE = "authorization_code";
 
-    /** bearer token type */
-    // String BEARER = "bearer";
-
-    /** mac token type */
-    // String MAC = "mac";
+    String JSON_SAFE_PREFIX = "&&&START&&&";
 
     /** allowed response type */
     Set<String> ALLOWED_RESPONSE_TYPE = new HashSet<String>(2) {

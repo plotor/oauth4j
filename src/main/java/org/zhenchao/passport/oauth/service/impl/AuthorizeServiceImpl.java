@@ -13,9 +13,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.zhenchao.passport.oauth.commons.ErrorCode;
 import static org.zhenchao.passport.oauth.commons.GlobalConstant.CACHE_NAMESPACE_AUTHORIZATION_CODE;
-import org.zhenchao.passport.oauth.exceptions.OAuthServiceException;
 import org.zhenchao.passport.oauth.domain.AuthorizationCode;
 import org.zhenchao.passport.oauth.domain.AuthorizationCodeParams;
+import org.zhenchao.passport.oauth.exceptions.OAuthServiceException;
 import org.zhenchao.passport.oauth.model.OAuthAppInfo;
 import org.zhenchao.passport.oauth.model.UserAppAuthorization;
 import org.zhenchao.passport.oauth.service.AuthorizeService;
@@ -64,13 +64,13 @@ public class AuthorizeServiceImpl implements AuthorizeService {
         OAuthAppInfo appInfo = appInfoService.getAppInfo(uaa.getAppId()).orElseThrow(() -> new OAuthServiceException(ErrorCode.CLIENT_NOT_EXIST));
         AuthorizationCode code = new AuthorizationCode();
         code.setAppInfo(appInfo).setUserId(uaa.getUserId()).setScopes(uaa.getScope()).setRedirectUri(codeParams.getRedirectUri());
-        String strCode = code.toStringCode();
-        if (StringUtils.isBlank(strCode)) {
+        String key = code.getValue();
+        if (StringUtils.isBlank(key)) {
             log.error("Generate authorization code error!");
             throw new OAuthServiceException("generate authorization code error", ErrorCode.GENERATE_CODE_ERROR);
         }
         Cache<String, AuthorizationCode> cache = CACHE_MANAGER.getCache(CACHE_NAMESPACE_AUTHORIZATION_CODE, String.class, AuthorizationCode.class);
-        cache.put(strCode, code);
+        cache.put(key, code);
         return Optional.of(code);
     }
 
