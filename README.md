@@ -1,4 +1,4 @@
-### OAuth2.0 implementation for passport
+### OAuth2.0 Implementation for Passport (beta version)
 
 ---
 
