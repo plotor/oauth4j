@@ -1,4 +1,4 @@
-package org.zhenchao.passport.oauth.model;
+package org.zhenchao.passport.oauth.domain;
 
 /**
  * 请求参数标记接口

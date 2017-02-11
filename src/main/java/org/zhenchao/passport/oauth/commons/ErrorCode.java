@@ -62,6 +62,10 @@ public enum ErrorCode {
 
     UNSUPPORTED_TOKEN_TYPE(200009, "unsupported token type"),
 
+    INVALID_CLIENT(200010, "invalid client"),
+
+    INVALID_GRANT(200011, "invalid grant"),
+
     /** 业务相关错误 **/
 
     VALIDATE_USER_ERROR(300000, "validate user error (username or password error)"),

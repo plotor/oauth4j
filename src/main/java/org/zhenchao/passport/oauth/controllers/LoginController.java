@@ -15,7 +15,7 @@ import org.zhenchao.passport.oauth.commons.GlobalConstant;
 import static org.zhenchao.passport.oauth.commons.GlobalConstant.COOKIE_KEY_USER_LOGIN_SIGN;
 import static org.zhenchao.passport.oauth.commons.GlobalConstant.PATH_ROOT_LOGIN;
 import org.zhenchao.passport.oauth.exceptions.CryptException;
-import org.zhenchao.passport.oauth.model.ErrorInformation;
+import org.zhenchao.passport.oauth.domain.ErrorInformation;
 import org.zhenchao.passport.oauth.model.User;
 import org.zhenchao.passport.oauth.service.UserService;
 import org.zhenchao.passport.oauth.utils.JSONView;

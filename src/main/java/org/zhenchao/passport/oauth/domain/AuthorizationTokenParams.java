@@ -1,8 +1,9 @@
-package org.zhenchao.passport.oauth.model;
+package org.zhenchao.passport.oauth.domain;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
-import org.zhenchao.passport.oauth.commons.GlobalConstant;
+import org.zhenchao.passport.oauth.model.UserAppAuthorization;
+import org.zhenchao.passport.oauth.token.AbstractAccessToken;
 
 /**
  * 令牌请求参数
@@ -21,11 +22,15 @@ public class AuthorizationTokenParams implements RequestParams {
     private long clientId;
 
     /** token类型，默认为mac类型 */
-    private String tokenType = GlobalConstant.MAC;
+    private String tokenType = AbstractAccessToken.TokenType.MAC.getValue();
 
     private String clientSecret;
 
     private boolean irt;
+
+    private AuthorizationCode authorizationCode;
+
+    private UserAppAuthorization userAppAuthorization;
 
     public AuthorizationTokenParams() {
     }
@@ -113,6 +118,24 @@ public class AuthorizationTokenParams implements RequestParams {
 
     public AuthorizationTokenParams setIrt(boolean irt) {
         this.irt = irt;
+        return this;
+    }
+
+    public AuthorizationCode getAuthorizationCode() {
+        return authorizationCode;
+    }
+
+    public AuthorizationTokenParams setAuthorizationCode(AuthorizationCode authorizationCode) {
+        this.authorizationCode = authorizationCode;
+        return this;
+    }
+
+    public UserAppAuthorization getUserAppAuthorization() {
+        return userAppAuthorization;
+    }
+
+    public AuthorizationTokenParams setUserAppAuthorization(UserAppAuthorization userAppAuthorization) {
+        this.userAppAuthorization = userAppAuthorization;
         return this;
     }
 }

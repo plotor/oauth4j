@@ -1,5 +1,7 @@
 package org.zhenchao.passport.oauth.commons;
 
+import org.zhenchao.passport.oauth.token.AbstractAccessToken;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -53,10 +55,10 @@ public interface GlobalConstant {
     String GRANT_TYPE_CODE = "authorization_code";
 
     /** bearer token type */
-    String BEARER = "bearer";
+    // String BEARER = "bearer";
 
     /** mac token type */
-    String MAC = "mac";
+    // String MAC = "mac";
 
     /** allowed response type */
     Set<String> ALLOWED_RESPONSE_TYPE = new HashSet<String>(2) {
@@ -73,8 +75,8 @@ public interface GlobalConstant {
         private static final long serialVersionUID = -7941095619455398619L;
 
         {
-            add(BEARER); // Authorization Code
-            add(MAC); // implicit
+            add(AbstractAccessToken.TokenType.BEARER.getValue()); // bearer access token
+            add(AbstractAccessToken.TokenType.MAC.getValue()); // mac access token
         }
     };
 }

@@ -8,11 +8,11 @@ import org.zhenchao.passport.oauth.commons.ErrorCode;
 import static org.zhenchao.passport.oauth.commons.GlobalConstant.ALLOWED_TOKEN_TYPE;
 import static org.zhenchao.passport.oauth.commons.GlobalConstant.GRANT_TYPE_CODE;
 import static org.zhenchao.passport.oauth.commons.GlobalConstant.RESPONSE_TYPE_CODE;
-import org.zhenchao.passport.oauth.model.AuthorizationCode;
-import org.zhenchao.passport.oauth.model.AuthorizationCodeParams;
-import org.zhenchao.passport.oauth.model.AuthorizationTokenParams;
+import org.zhenchao.passport.oauth.domain.AuthorizationCode;
+import org.zhenchao.passport.oauth.domain.AuthorizationCodeParams;
+import org.zhenchao.passport.oauth.domain.AuthorizationTokenParams;
+import org.zhenchao.passport.oauth.domain.RequestParams;
 import org.zhenchao.passport.oauth.model.OAuthAppInfo;
-import org.zhenchao.passport.oauth.model.RequestParams;
 import org.zhenchao.passport.oauth.service.AuthorizeService;
 import org.zhenchao.passport.oauth.service.OAuthAppInfoService;
 import org.zhenchao.passport.oauth.service.ParamsValidateService;
@@ -118,13 +118,14 @@ public class ParamsValidateServiceImpl implements ParamsValidateService {
             }
 
             AuthorizationCode code = optCode.get();
+            tokenParams.setAuthorizationCode(code); // 记录一下，创建token时需要部分信息
             // 回调地址验证
             String redirectUri = code.getRedirectUri();
             if (StringUtils.isNotBlank(redirectUri) && !redirectUri.equals(tokenParams.getRedirectUri())) {
                 // 如果请求code时带redirectUri参数，那么请求token时的redirectUri必须与之前一致
                 log.error("The redirect uri [{}] is not equals to code request [redirect uri = {}]",
                         tokenParams.getRedirectUri(), redirectUri);
-                return ErrorCode.INVALID_REDIRECT_URI;
+                return ErrorCode.INVALID_GRANT;
             }
             if (!this.validateRedirectUri(code.getAppInfo().getRedirectUri(), tokenParams.getRedirectUri())) {
                 log.error("The input redirect uri [{}] is illegal, app redirect uri [{}]",

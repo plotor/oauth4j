@@ -8,6 +8,10 @@ package org.zhenchao.passport.oauth.token;
  */
 public class BearerAccessToken extends AbstractAccessToken {
 
-    public BearerAccessToken() {
+    public static final TokenType TYPE = TokenType.BEARER;
+
+    @Override
+    public TokenType getType() {
+        return TYPE;
     }
 }

@@ -6,7 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zhenchao.passport.oauth.commons.ErrorCode;
 import static org.zhenchao.passport.oauth.commons.GlobalConstant.SEPARATOR_REDIRECT_URI;
-import org.zhenchao.passport.oauth.model.RequestParams;
+import org.zhenchao.passport.oauth.domain.RequestParams;
 
 import java.net.URI;
 import java.net.URISyntaxException;

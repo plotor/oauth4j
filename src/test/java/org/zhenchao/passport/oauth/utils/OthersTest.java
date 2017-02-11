@@ -1,8 +1,9 @@
 package org.zhenchao.passport.oauth.utils;
 
+import org.apache.commons.codec.digest.HmacUtils;
 import org.junit.Test;
 
-import java.net.URLEncoder;
+import java.util.Base64;
 
 /**
  * @author zhenchao.wang 2017-01-21 17:19
@@ -12,8 +13,10 @@ public class OthersTest {
 
     @Test
     public void test() throws Exception {
-        String url = "http://localhost:8080/oauth/authorize/code?response_type=code&client_id=1000000000000000001&redirect_uri=http://www.zhenchao.com&scope=1-4";
-        System.out.println(URLEncoder.encode(url, "utf-8"));
+        String key = "zhenchao";
+        String value = "Hello World! Hello World!";
+        String result = Base64.getEncoder().encodeToString(HmacUtils.hmacSha1(key, value));
+        System.out.println(result);
     }
 
 }

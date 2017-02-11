@@ -1,5 +1,6 @@
 package org.zhenchao.passport.oauth.controllers;
 
+import net.sf.json.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,11 +19,11 @@ import static org.zhenchao.passport.oauth.commons.GlobalConstant.PATH_OAUTH_AUTH
 import static org.zhenchao.passport.oauth.commons.GlobalConstant.PATH_OAUTH_USER_AUTHORIZE;
 import static org.zhenchao.passport.oauth.commons.GlobalConstant.PATH_ROOT_LOGIN;
 import static org.zhenchao.passport.oauth.commons.GlobalConstant.PATH_ROOT_OAUTH;
+import org.zhenchao.passport.oauth.domain.AuthorizationCode;
+import org.zhenchao.passport.oauth.domain.AuthorizationCodeParams;
+import org.zhenchao.passport.oauth.domain.AuthorizationTokenParams;
+import org.zhenchao.passport.oauth.domain.ErrorInformation;
 import org.zhenchao.passport.oauth.exceptions.OAuthServiceException;
-import org.zhenchao.passport.oauth.model.AuthorizationCode;
-import org.zhenchao.passport.oauth.model.AuthorizationCodeParams;
-import org.zhenchao.passport.oauth.model.AuthorizationTokenParams;
-import org.zhenchao.passport.oauth.model.ErrorInformation;
 import org.zhenchao.passport.oauth.model.OAuthAppInfo;
 import org.zhenchao.passport.oauth.model.Scope;
 import org.zhenchao.passport.oauth.model.User;
@@ -32,12 +33,18 @@ import org.zhenchao.passport.oauth.service.OAuthAppInfoService;
 import org.zhenchao.passport.oauth.service.ParamsValidateService;
 import org.zhenchao.passport.oauth.service.ScopeService;
 import org.zhenchao.passport.oauth.service.UserAppAuthorizationService;
+import org.zhenchao.passport.oauth.token.AbstractAccessToken;
+import org.zhenchao.passport.oauth.token.MacAccessToken;
+import org.zhenchao.passport.oauth.token.generator.AbstractAccessTokenGenerator;
+import org.zhenchao.passport.oauth.token.generator.AbstractTokenGenerator;
+import org.zhenchao.passport.oauth.token.generator.TokenGeneratorFactory;
 import org.zhenchao.passport.oauth.utils.CommonUtils;
 import org.zhenchao.passport.oauth.utils.CookieUtils;
 import org.zhenchao.passport.oauth.utils.HttpRequestUtils;
 import org.zhenchao.passport.oauth.utils.JSONView;
 import org.zhenchao.passport.oauth.utils.SessionUtils;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -54,9 +61,9 @@ import javax.servlet.http.HttpSession;
  */
 @Controller
 @RequestMapping(PATH_ROOT_OAUTH)
-public class AuthorizeCodeController {
+public class AuthorizationCodeController {
 
-    private static final Logger log = LoggerFactory.getLogger(AuthorizeCodeController.class);
+    private static final Logger log = LoggerFactory.getLogger(AuthorizationCodeController.class);
 
     @Resource
     private OAuthAppInfoService appInfoService;
@@ -175,15 +182,14 @@ public class AuthorizeCodeController {
             @RequestParam("client_id") long clientId,
             @RequestParam(value = "client_secret", required = false) String clientSecret,
             @RequestParam(value = "token_type", required = false) String tokenType,
-            @RequestParam(value = "issue_refresh_token", required = false, defaultValue = "true") boolean irt) {
+            @RequestParam(value = "issue_refresh_token", required = false, defaultValue = "true") boolean refresh) {
 
         log.debug("Entering authorize code method...");
 
-        ModelAndView mav = new ModelAndView();
-
         AuthorizationTokenParams tokenParams = new AuthorizationTokenParams();
         tokenParams.setGrantType(grantType).setCode(code).setRedirectUri(redirectUri).setClientId(clientId)
-                .setTokenType(StringUtils.defaultString(tokenType, GlobalConstant.MAC)).setClientSecret(clientSecret).setIrt(irt);
+                .setTokenType(StringUtils.defaultString(tokenType, AbstractAccessToken.TokenType.MAC.getValue()))
+                .setClientSecret(clientSecret).setIrt(refresh);
 
         ErrorCode validateResult = paramsValidateService.validateTokenRequestParams(tokenParams);
         if (!ErrorCode.NO_ERROR.equals(validateResult)) {
@@ -191,7 +197,51 @@ public class AuthorizeCodeController {
             return JSONView.render(new ErrorInformation(validateResult, StringUtils.EMPTY), response);
         }
 
-        return new ModelAndView();
+        // 校验用户与APP之间是否存在授权关系
+        AuthorizationCode ac = tokenParams.getAuthorizationCode();
+        Optional<UserAppAuthorization> optuaa = authorizationService.getUserAndAppAuthorizationInfo(
+                ac.getUserId(), ac.getAppInfo().getAppId(), CommonUtils.genScopeSign(ac.getScopes()));
+        if (!optuaa.isPresent()) {
+            // 用户与APP之间不存在指定的授权关系
+            log.error("No authorization between user[{}] and app[{}] on scope[{}]!", ac.getUserId(), ac.getAppInfo().getAppId(), ac.getScopes());
+            return JSONView.render(new ErrorInformation(ErrorCode.UNAUTHORIZED_CLIENT, StringUtils.EMPTY), response);
+        }
+        tokenParams.setUserAppAuthorization(optuaa.get());
+
+        // 验证通过，下发accessToken
+        Optional<AbstractTokenGenerator> optTokenGenerator = TokenGeneratorFactory.getGenerator(tokenParams);
+        if (!optTokenGenerator.isPresent()) {
+            log.error("Unknown grantType[{}] or tokenType[{}]", tokenParams.getGrantType(), tokenParams.getTokenType());
+            return JSONView.render(new ErrorInformation(ErrorCode.UNSUPPORTED_GRANT_TYPE, StringUtils.EMPTY), response);
+        }
+
+        AbstractAccessTokenGenerator accessTokenGenerator = (AbstractAccessTokenGenerator) optTokenGenerator.get();
+        Optional<AbstractAccessToken> optAccessToken = accessTokenGenerator.create();
+        if (!optAccessToken.isPresent()) {
+            log.error("Generate access token failed, params[{}]", tokenParams);
+            return JSONView.render(new ErrorInformation(ErrorCode.INVALID_REQUEST, StringUtils.EMPTY), response);
+        }
+
+        // no cache
+        response.setHeader("Cache-Control", "no-store");
+        response.setHeader("Pragma", "no-cache");
+
+        AbstractAccessToken accessToken = optAccessToken.get();
+        try {
+            JSONObject result = new JSONObject();
+            result.put("access_token", accessToken.getValue());
+            result.put("expires_in", accessToken.getExpirationTime());
+            result.put("refresh_token", refresh ? accessToken.getRefreshToken() : StringUtils.EMPTY);
+            if (accessToken instanceof MacAccessToken) {
+                result.put("mac_key", accessToken.getKey());
+                result.put("mac_algorithm", ((MacAccessToken) accessToken).getAlgorithm());
+            }
+            return JSONView.render(result, response);
+        } catch (IOException e) {
+            log.error("Get string access token error by [{}]!", accessToken);
+        }
+
+        return JSONView.render(new ErrorInformation(ErrorCode.SERVICE_ERROR, StringUtils.EMPTY), response);
     }
 
     /**
@@ -229,6 +279,10 @@ public class AuthorizeCodeController {
         authorization.setScopeSign(CommonUtils.genScopeSign(scope));
         authorization.setCreateTime(new Date());
         authorization.setCreateTime(authorization.getCreateTime());
+        // TODO 生成如下几个值 2017-2-11 16:12:08
+        /*authorization.setTokenKey();
+        authorization.setRefreshTokenKey();
+        authorization.setRefreshTokenExpirationTime();*/
         if (authorizationService.replaceUserAndAppAuthorizationInfo(authorization)) {
             // 更新用户授权关系成功
             mav.setViewName("redirect:" + callback);

@@ -1,4 +1,4 @@
-package org.zhenchao.passport.oauth.model;
+package org.zhenchao.passport.oauth.domain;
 
 import org.apache.commons.lang3.StringUtils;
 import org.zhenchao.passport.oauth.commons.ErrorCode;
