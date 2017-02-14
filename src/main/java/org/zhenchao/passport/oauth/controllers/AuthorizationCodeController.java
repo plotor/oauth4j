@@ -42,7 +42,7 @@ import org.zhenchao.passport.oauth.token.generator.TokenGeneratorFactory;
 import org.zhenchao.passport.oauth.utils.CommonUtils;
 import org.zhenchao.passport.oauth.utils.CookieUtils;
 import org.zhenchao.passport.oauth.utils.HttpRequestUtils;
-import org.zhenchao.passport.oauth.utils.JSONView;
+import org.zhenchao.passport.oauth.utils.JsonView;
 import org.zhenchao.passport.oauth.utils.SessionUtils;
 
 import java.io.IOException;
@@ -110,14 +110,14 @@ public class AuthorizationCodeController {
         if (!ErrorCode.NO_ERROR.equals(validateResult)) {
             // 请求参数有误
             log.error("Request authorize params error, params[{}], errorCode[{}]", codeParams, validateResult);
-            return JSONView.render(new ErrorInformation(validateResult, state), response);
+            return JsonView.render(new ErrorInformation(validateResult, state), response, false);
         }
 
         // 获取APP信息
         Optional<OAuthAppInfo> optAppInfo = appInfoService.getAppInfo(clientId);
         if (!optAppInfo.isPresent()) {
             log.error("Client[id={}] is not exist!", clientId);
-            return JSONView.render(new ErrorInformation(ErrorCode.CLIENT_NOT_EXIST, state), response);
+            return JsonView.render(new ErrorInformation(ErrorCode.CLIENT_NOT_EXIST, state), response, false);
         }
 
         OAuthAppInfo appInfo = optAppInfo.get();
@@ -151,10 +151,10 @@ public class AuthorizationCodeController {
                     mav.setViewName("redirect:" + builder.toUriString());
                     return mav;
                 }
-                return JSONView.render(new ErrorInformation(ErrorCode.GENERATE_CODE_ERROR, state), response);
+                return JsonView.render(new ErrorInformation(ErrorCode.GENERATE_CODE_ERROR, state), response, false);
             } catch (OAuthServiceException e) {
                 log.error("Generate authorization code error!", e);
-                return JSONView.render(new ErrorInformation(e.getErrorCode(), state), response);
+                return JsonView.render(new ErrorInformation(e.getErrorCode(), state), response, false);
             }
         } else {
             // 用户未授权该APP，跳转到授权页面
@@ -195,7 +195,7 @@ public class AuthorizationCodeController {
         ErrorCode validateResult = paramsValidateService.validateTokenRequestParams(tokenParams);
         if (!ErrorCode.NO_ERROR.equals(validateResult)) {
             log.error("Params error when request token, params [{}], error code [{}]", tokenParams, validateResult);
-            return JSONView.render(new ErrorInformation(validateResult, StringUtils.EMPTY), response);
+            return JsonView.render(new ErrorInformation(validateResult, StringUtils.EMPTY), response, false);
         }
 
         // 校验用户与APP之间是否存在授权关系
@@ -205,7 +205,7 @@ public class AuthorizationCodeController {
         if (!optuaa.isPresent()) {
             // 用户与APP之间不存在指定的授权关系
             log.error("No authorization between user[{}] and app[{}] on scope[{}]!", ac.getUserId(), ac.getAppInfo().getAppId(), ac.getScopes());
-            return JSONView.render(new ErrorInformation(ErrorCode.UNAUTHORIZED_CLIENT, StringUtils.EMPTY), response);
+            return JsonView.render(new ErrorInformation(ErrorCode.UNAUTHORIZED_CLIENT, StringUtils.EMPTY), response, false);
         }
         tokenParams.setUserAppAuthorization(optuaa.get());
 
@@ -213,14 +213,14 @@ public class AuthorizationCodeController {
         Optional<AbstractTokenGenerator> optTokenGenerator = TokenGeneratorFactory.getGenerator(tokenParams);
         if (!optTokenGenerator.isPresent()) {
             log.error("Unknown grantType[{}] or tokenType[{}]", tokenParams.getGrantType(), tokenParams.getTokenType());
-            return JSONView.render(new ErrorInformation(ErrorCode.UNSUPPORTED_GRANT_TYPE, StringUtils.EMPTY), response);
+            return JsonView.render(new ErrorInformation(ErrorCode.UNSUPPORTED_GRANT_TYPE, StringUtils.EMPTY), response, false);
         }
 
         AbstractAccessTokenGenerator accessTokenGenerator = (AbstractAccessTokenGenerator) optTokenGenerator.get();
         Optional<AbstractAccessToken> optAccessToken = accessTokenGenerator.create();
         if (!optAccessToken.isPresent()) {
             log.error("Generate access token failed, params[{}]", tokenParams);
-            return JSONView.render(new ErrorInformation(ErrorCode.INVALID_REQUEST, StringUtils.EMPTY), response);
+            return JsonView.render(new ErrorInformation(ErrorCode.INVALID_REQUEST, StringUtils.EMPTY), response, false);
         }
 
         // no cache
@@ -238,12 +238,12 @@ public class AuthorizationCodeController {
                 result.put("mac_algorithm", ((MacAccessToken) accessToken).getAlgorithm().getValue());
             }
             // TODO add json safe prefix
-            return JSONView.render(result, response);
+            return JsonView.render(result, response, true);
         } catch (IOException e) {
             log.error("Get string access token error by [{}]!", accessToken);
         }
 
-        return JSONView.render(new ErrorInformation(ErrorCode.SERVICE_ERROR, StringUtils.EMPTY), response);
+        return JsonView.render(new ErrorInformation(ErrorCode.SERVICE_ERROR, StringUtils.EMPTY), response, false);
     }
 
     /**
@@ -289,7 +289,7 @@ public class AuthorizationCodeController {
             mav.setViewName("redirect:" + callback);
             return mav;
         }
-        return JSONView.render(new ErrorInformation(ErrorCode.LOCAL_SERVICE_ERROR, state), response);
+        return JsonView.render(new ErrorInformation(ErrorCode.LOCAL_SERVICE_ERROR, state), response, false);
     }
 
 }

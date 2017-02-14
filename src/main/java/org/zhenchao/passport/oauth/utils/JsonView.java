@@ -1,11 +1,13 @@
 package org.zhenchao.passport.oauth.utils;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.http.server.ServletServerHttpResponse;
 import org.springframework.web.servlet.ModelAndView;
+import org.zhenchao.passport.oauth.commons.GlobalConstant;
 
 import java.io.IOException;
 import javax.servlet.http.HttpServletResponse;
@@ -16,9 +18,9 @@ import javax.servlet.http.HttpServletResponse;
  * @author zhenchao.wang 2017-01-23 13:42
  * @version 1.0.0
  */
-public class JSONView {
+public class JsonView {
 
-    private static final Logger log = LoggerFactory.getLogger(JSONView.class);
+    private static final Logger log = LoggerFactory.getLogger(JsonView.class);
 
     /**
      * 以json视图返回
@@ -27,17 +29,15 @@ public class JSONView {
      * @param response
      * @return
      */
-    public static ModelAndView render(Object model, HttpServletResponse response) {
+    public static ModelAndView render(Object model, HttpServletResponse response, boolean jsonSafe) {
         MappingJackson2HttpMessageConverter jsonConverter = new MappingJackson2HttpMessageConverter();
-        MediaType jsonMimeType = MediaType.APPLICATION_JSON;
-
         try {
-            jsonConverter.write(model, jsonMimeType, new ServletServerHttpResponse(response));
+            String safeJsonStr = jsonSafe ? StringUtils.join(GlobalConstant.JSON_SAFE_PREFIX, model) : String.valueOf(model);
+            jsonConverter.write(safeJsonStr, MediaType.APPLICATION_JSON, new ServletServerHttpResponse(response));
         } catch (IOException e) {
-            log.error("Write response data as json view error!", e);
+            log.error("Write response data [{}] as json view error!", model, e);
         }
-
-        return new ModelAndView("error");
+        return null;
     }
 
 }

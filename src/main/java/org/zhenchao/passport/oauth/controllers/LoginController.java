@@ -18,7 +18,7 @@ import org.zhenchao.passport.oauth.exceptions.CryptException;
 import org.zhenchao.passport.oauth.domain.ErrorInformation;
 import org.zhenchao.passport.oauth.model.User;
 import org.zhenchao.passport.oauth.service.UserService;
-import org.zhenchao.passport.oauth.utils.JSONView;
+import org.zhenchao.passport.oauth.utils.JsonView;
 import org.zhenchao.passport.oauth.utils.SessionUtils;
 
 import java.util.Optional;
@@ -78,7 +78,7 @@ public class LoginController {
 
         if (StringUtils.isBlank(username) || StringUtils.isBlank(password)) {
             log.error("Login params error, username or password is null or empty!");
-            return JSONView.render(new ErrorInformation(ErrorCode.PARAMETER_ERROR, StringUtils.EMPTY), response);
+            return JsonView.render(new ErrorInformation(ErrorCode.PARAMETER_ERROR, StringUtils.EMPTY), response, false);
         }
 
         try {
@@ -100,7 +100,7 @@ public class LoginController {
         } catch (CryptException e) {
             log.error("Validate user[{}] error!", username, e);
         }
-        return JSONView.render(new ErrorInformation(ErrorCode.VALIDATE_USER_ERROR, StringUtils.EMPTY), response);
+        return JsonView.render(new ErrorInformation(ErrorCode.VALIDATE_USER_ERROR, StringUtils.EMPTY), response, false);
     }
 
 }
