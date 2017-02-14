@@ -33,8 +33,6 @@ public interface GlobalConstant {
     /** 盐 */
     String SALT = "U2FsdGVkX18jBB+UX3z4J1Qy9z24/JX5U28ELFYb+ehc8WH/QetV6bbbxUhhM3zvkY/M";
 
-    String AES_KEY = "a7995a00458f969bd381bbbe86778a9b32e43f29";
-
     String CACHE_NAMESPACE_AUTHORIZATION_CODE = "passport-oauth-authorization-code";
 
     /** 响应参数 */

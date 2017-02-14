@@ -2,7 +2,7 @@ package org.zhenchao.passport.oauth.token.generator;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.zhenchao.passport.oauth.domain.AuthorizationTokenParams;
+import org.zhenchao.passport.oauth.domain.TokenRequestParams;
 import org.zhenchao.passport.oauth.token.AbstractAccessToken;
 
 import java.util.Optional;
@@ -17,9 +17,9 @@ public abstract class AbstractAccessTokenGenerator implements AbstractTokenGener
 
     protected static final Logger log = LoggerFactory.getLogger(AbstractAccessTokenGenerator.class);
 
-    protected AuthorizationTokenParams params;
+    protected TokenRequestParams params;
 
-    public AbstractAccessTokenGenerator(AuthorizationTokenParams params) {
+    public AbstractAccessTokenGenerator(TokenRequestParams params) {
         this.params = params;
     }
 

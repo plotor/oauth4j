@@ -5,13 +5,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.zhenchao.passport.oauth.commons.ErrorCode;
+import static org.zhenchao.passport.oauth.commons.GlobalConstant.ALLOWED_RESPONSE_TYPE;
 import static org.zhenchao.passport.oauth.commons.GlobalConstant.ALLOWED_TOKEN_TYPE;
 import static org.zhenchao.passport.oauth.commons.GlobalConstant.GRANT_TYPE_CODE;
-import static org.zhenchao.passport.oauth.commons.GlobalConstant.RESPONSE_TYPE_CODE;
 import org.zhenchao.passport.oauth.domain.AuthorizationCode;
-import org.zhenchao.passport.oauth.domain.AuthorizationCodeParams;
-import org.zhenchao.passport.oauth.domain.AuthorizationTokenParams;
+import org.zhenchao.passport.oauth.domain.AuthorizeRequestParams;
 import org.zhenchao.passport.oauth.domain.RequestParams;
+import org.zhenchao.passport.oauth.domain.TokenRequestParams;
 import org.zhenchao.passport.oauth.model.OAuthAppInfo;
 import org.zhenchao.passport.oauth.service.AuthorizeService;
 import org.zhenchao.passport.oauth.service.OAuthAppInfoService;
@@ -38,20 +38,20 @@ public class ParamsValidateServiceImpl implements ParamsValidateService {
     private AuthorizeService authorizeService;
 
     @Override
-    public ErrorCode validateCodeRequestParams(RequestParams params) {
-        if (!(params instanceof AuthorizationCodeParams)) {
+    public ErrorCode validateAuthorizeRequestParams(RequestParams params) {
+        if (!(params instanceof AuthorizeRequestParams)) {
             return ErrorCode.INVALID_REQUEST;
         }
 
-        AuthorizationCodeParams codeParams = (AuthorizationCodeParams) params;
+        AuthorizeRequestParams requestParams = (AuthorizeRequestParams) params;
 
         // 校验response type
-        if (!RESPONSE_TYPE_CODE.equals(codeParams.getResponseType())) {
-            log.error("The response type [{}] is not expected, need [{}]!", codeParams.getResponseType(), RESPONSE_TYPE_CODE);
+        if (!ALLOWED_RESPONSE_TYPE.contains(requestParams.getResponseType())) {
+            log.error("The response type [{}] is not allowed!", requestParams.getResponseType());
             return ErrorCode.UNSUPPORTED_RESPONSE_TYPE;
         }
 
-        Optional<OAuthAppInfo> optAppInfo = appInfoService.getAppInfo(codeParams.getClientId());
+        Optional<OAuthAppInfo> optAppInfo = appInfoService.getAppInfo(requestParams.getClientId());
         if (optAppInfo.isPresent()) {
             /*
              * 客户端存在
@@ -60,34 +60,34 @@ public class ParamsValidateServiceImpl implements ParamsValidateService {
 
             // 回调地址校验
             // TODO 请求授权码时回调地址不是必须的
-            if (StringUtils.isBlank(codeParams.getRedirectUri()) || StringUtils.isBlank(appInfo.getRedirectUri())) {
+            if (StringUtils.isBlank(requestParams.getRedirectUri()) || StringUtils.isBlank(appInfo.getRedirectUri())) {
                 return ErrorCode.INVALID_REDIRECT_URI;
             }
-            if (!this.validateRedirectUri(appInfo.getRedirectUri(), codeParams.getRedirectUri())) {
-                log.error("The input redirect uri [{}] is illegal, app redirect uri [{}]", codeParams.getRedirectUri(), appInfo.getRedirectUri());
+            if (!this.validateRedirectUri(appInfo.getRedirectUri(), requestParams.getRedirectUri())) {
+                log.error("The input redirect uri [{}] is illegal, app redirect uri [{}]", requestParams.getRedirectUri(), appInfo.getRedirectUri());
                 return ErrorCode.INVALID_REDIRECT_URI;
             }
 
             // scope校验，如果没有传递则设置为当前允许的所有权限
-            if (StringUtils.isBlank(codeParams.getScope())) {
-                log.info("The app[{}] not set scope, use app default scope[{}].", codeParams.getClientId(), appInfo.getScope());
-                codeParams.setScope(appInfo.getScope());
+            if (StringUtils.isBlank(requestParams.getScope())) {
+                log.info("The app[{}] not set scope, use default scope[{}].", requestParams.getClientId(), appInfo.getScope());
+                requestParams.setScope(appInfo.getScope());
             } else {
                 // 校验传递的scope是否是许可scope的子集
-                return this.isSubScopes(appInfo.getScope(), codeParams.getScope()) ? ErrorCode.NO_ERROR : ErrorCode.INVALID_SCOPE;
+                return this.isSubScopes(appInfo.getScope(), requestParams.getScope()) ? ErrorCode.NO_ERROR : ErrorCode.INVALID_SCOPE;
             }
         }
-        log.error("Client[id={}] is not exist!", codeParams.getClientId());
+        log.error("Client[id={}] is not exist!", requestParams.getClientId());
         return ErrorCode.CLIENT_NOT_EXIST;
     }
 
     @Override
     public ErrorCode validateTokenRequestParams(RequestParams params) {
-        if (!(params instanceof AuthorizationTokenParams)) {
+        if (!(params instanceof TokenRequestParams)) {
             return ErrorCode.INVALID_REQUEST;
         }
 
-        AuthorizationTokenParams tokenParams = (AuthorizationTokenParams) params;
+        TokenRequestParams tokenParams = (TokenRequestParams) params;
 
         // 检测grant type
         if (!GRANT_TYPE_CODE.equals(tokenParams.getGrantType())) {

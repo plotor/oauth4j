@@ -11,7 +11,7 @@ import org.zhenchao.passport.oauth.token.AbstractAccessToken;
  * @author zhenchao.wang 2017-01-23 15:36
  * @version 1.0.0
  */
-public class AuthorizationTokenParams implements RequestParams {
+public class TokenRequestParams implements RequestParams {
 
     private String grantType;
 
@@ -32,17 +32,17 @@ public class AuthorizationTokenParams implements RequestParams {
 
     private UserAppAuthorization userAppAuthorization;
 
-    public AuthorizationTokenParams() {
+    public TokenRequestParams() {
     }
 
-    public AuthorizationTokenParams(String grantType, String code, String redirectUri, long clientId) {
+    public TokenRequestParams(String grantType, String code, String redirectUri, long clientId) {
         this.grantType = grantType;
         this.code = code;
         this.redirectUri = redirectUri;
         this.clientId = clientId;
     }
 
-    public AuthorizationTokenParams(
+    public TokenRequestParams(
             String grantType, String code, String redirectUri, long clientId, String tokenType, String clientSecret, boolean irt) {
         this.grantType = grantType;
         this.code = code;
@@ -62,7 +62,7 @@ public class AuthorizationTokenParams implements RequestParams {
         return grantType;
     }
 
-    public AuthorizationTokenParams setGrantType(String grantType) {
+    public TokenRequestParams setGrantType(String grantType) {
         this.grantType = grantType;
         return this;
     }
@@ -71,7 +71,7 @@ public class AuthorizationTokenParams implements RequestParams {
         return code;
     }
 
-    public AuthorizationTokenParams setCode(String code) {
+    public TokenRequestParams setCode(String code) {
         this.code = code;
         return this;
     }
@@ -80,7 +80,7 @@ public class AuthorizationTokenParams implements RequestParams {
         return redirectUri;
     }
 
-    public AuthorizationTokenParams setRedirectUri(String redirectUri) {
+    public TokenRequestParams setRedirectUri(String redirectUri) {
         this.redirectUri = redirectUri;
         return this;
     }
@@ -89,7 +89,7 @@ public class AuthorizationTokenParams implements RequestParams {
         return clientId;
     }
 
-    public AuthorizationTokenParams setClientId(long clientId) {
+    public TokenRequestParams setClientId(long clientId) {
         this.clientId = clientId;
         return this;
     }
@@ -98,7 +98,7 @@ public class AuthorizationTokenParams implements RequestParams {
         return tokenType;
     }
 
-    public AuthorizationTokenParams setTokenType(String tokenType) {
+    public TokenRequestParams setTokenType(String tokenType) {
         this.tokenType = tokenType;
         return this;
     }
@@ -107,7 +107,7 @@ public class AuthorizationTokenParams implements RequestParams {
         return clientSecret;
     }
 
-    public AuthorizationTokenParams setClientSecret(String clientSecret) {
+    public TokenRequestParams setClientSecret(String clientSecret) {
         this.clientSecret = clientSecret;
         return this;
     }
@@ -116,7 +116,7 @@ public class AuthorizationTokenParams implements RequestParams {
         return irt;
     }
 
-    public AuthorizationTokenParams setIrt(boolean irt) {
+    public TokenRequestParams setIrt(boolean irt) {
         this.irt = irt;
         return this;
     }
@@ -125,7 +125,7 @@ public class AuthorizationTokenParams implements RequestParams {
         return authorizationCode;
     }
 
-    public AuthorizationTokenParams setAuthorizationCode(AuthorizationCode authorizationCode) {
+    public TokenRequestParams setAuthorizationCode(AuthorizationCode authorizationCode) {
         this.authorizationCode = authorizationCode;
         return this;
     }
@@ -134,7 +134,7 @@ public class AuthorizationTokenParams implements RequestParams {
         return userAppAuthorization;
     }
 
-    public AuthorizationTokenParams setUserAppAuthorization(UserAppAuthorization userAppAuthorization) {
+    public TokenRequestParams setUserAppAuthorization(UserAppAuthorization userAppAuthorization) {
         this.userAppAuthorization = userAppAuthorization;
         return this;
     }

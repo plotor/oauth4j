@@ -1,7 +1,7 @@
 package org.zhenchao.passport.oauth.token.generator;
 
 import org.zhenchao.passport.oauth.domain.AuthorizationCode;
-import org.zhenchao.passport.oauth.domain.AuthorizationTokenParams;
+import org.zhenchao.passport.oauth.domain.TokenRequestParams;
 import org.zhenchao.passport.oauth.model.UserAppAuthorization;
 import org.zhenchao.passport.oauth.token.AbstractAccessToken;
 import org.zhenchao.passport.oauth.token.MacAccessToken;
@@ -17,7 +17,7 @@ import java.util.Optional;
  */
 public class MacAccessTokenGenerator extends AbstractAccessTokenGenerator {
 
-    public MacAccessTokenGenerator(AuthorizationTokenParams params) {
+    public MacAccessTokenGenerator(TokenRequestParams params) {
         super(params);
     }
 

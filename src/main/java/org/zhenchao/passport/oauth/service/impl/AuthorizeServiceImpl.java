@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 import org.zhenchao.passport.oauth.commons.ErrorCode;
 import static org.zhenchao.passport.oauth.commons.GlobalConstant.CACHE_NAMESPACE_AUTHORIZATION_CODE;
 import org.zhenchao.passport.oauth.domain.AuthorizationCode;
-import org.zhenchao.passport.oauth.domain.AuthorizationCodeParams;
+import org.zhenchao.passport.oauth.domain.AuthorizeRequestParams;
 import org.zhenchao.passport.oauth.exceptions.OAuthServiceException;
 import org.zhenchao.passport.oauth.model.OAuthAppInfo;
 import org.zhenchao.passport.oauth.model.UserAppAuthorization;
@@ -54,7 +54,7 @@ public class AuthorizeServiceImpl implements AuthorizeService {
     private OAuthAppInfoService appInfoService;
 
     @Override
-    public Optional<AuthorizationCode> generateAndCacheAuthorizationCode(UserAppAuthorization uaa, AuthorizationCodeParams codeParams)
+    public Optional<AuthorizationCode> generateAndCacheAuthorizationCode(UserAppAuthorization uaa, AuthorizeRequestParams codeParams)
             throws OAuthServiceException {
         if (null == uaa || null == codeParams) {
             log.error("Generate authorization code error, the input params is null!");

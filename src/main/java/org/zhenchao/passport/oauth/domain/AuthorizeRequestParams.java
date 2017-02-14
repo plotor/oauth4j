@@ -9,7 +9,7 @@ import org.apache.commons.lang3.builder.ToStringStyle;
  * @author zhenchao.wang 2017-01-20 17:24
  * @version 1.0.0
  */
-public class AuthorizationCodeParams implements RequestParams {
+public class AuthorizeRequestParams implements RequestParams {
 
     private String responseType;
 
@@ -21,16 +21,16 @@ public class AuthorizationCodeParams implements RequestParams {
 
     private String state;
 
-    public AuthorizationCodeParams() {
+    public AuthorizeRequestParams() {
     }
 
-    public AuthorizationCodeParams(String responseType, long clientId, String redirectUri) {
+    public AuthorizeRequestParams(String responseType, long clientId, String redirectUri) {
         this.responseType = responseType;
         this.clientId = clientId;
         this.redirectUri = redirectUri;
     }
 
-    public AuthorizationCodeParams(String responseType, long clientId, String redirectUri, String scope, String state) {
+    public AuthorizeRequestParams(String responseType, long clientId, String redirectUri, String scope, String state) {
         this.responseType = responseType;
         this.clientId = clientId;
         this.redirectUri = redirectUri;
@@ -47,7 +47,7 @@ public class AuthorizationCodeParams implements RequestParams {
         return responseType;
     }
 
-    public AuthorizationCodeParams setResponseType(String responseType) {
+    public AuthorizeRequestParams setResponseType(String responseType) {
         this.responseType = responseType;
         return this;
     }
@@ -56,7 +56,7 @@ public class AuthorizationCodeParams implements RequestParams {
         return clientId;
     }
 
-    public AuthorizationCodeParams setClientId(long clientId) {
+    public AuthorizeRequestParams setClientId(long clientId) {
         this.clientId = clientId;
         return this;
     }
@@ -65,7 +65,7 @@ public class AuthorizationCodeParams implements RequestParams {
         return redirectUri;
     }
 
-    public AuthorizationCodeParams setRedirectUri(String redirectUri) {
+    public AuthorizeRequestParams setRedirectUri(String redirectUri) {
         this.redirectUri = redirectUri;
         return this;
     }
@@ -74,7 +74,7 @@ public class AuthorizationCodeParams implements RequestParams {
         return scope;
     }
 
-    public AuthorizationCodeParams setScope(String scope) {
+    public AuthorizeRequestParams setScope(String scope) {
         this.scope = scope;
         return this;
     }
@@ -83,7 +83,7 @@ public class AuthorizationCodeParams implements RequestParams {
         return state;
     }
 
-    public AuthorizationCodeParams setState(String state) {
+    public AuthorizeRequestParams setState(String state) {
         this.state = state;
         return this;
     }

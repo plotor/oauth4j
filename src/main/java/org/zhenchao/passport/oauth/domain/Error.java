@@ -9,7 +9,7 @@ import org.zhenchao.passport.oauth.commons.ErrorCode;
  * @author zhenchao.wang 2017-01-23 13:52
  * @version 1.0.0
  */
-public class ErrorInformation {
+public class Error {
 
     private int code;
 
@@ -19,31 +19,31 @@ public class ErrorInformation {
 
     private String state;
 
-    public ErrorInformation() {
+    public Error() {
     }
 
-    public ErrorInformation(int code, String desc, String state) {
+    public Error(int code, String desc, String state) {
         this.code = code;
         this.desc = desc;
         this.uri = StringUtils.EMPTY;
         this.state = StringUtils.trimToEmpty(state);
     }
 
-    public ErrorInformation(int code, String desc, String uri, String state) {
+    public Error(int code, String desc, String uri, String state) {
         this.code = code;
         this.desc = desc;
         this.uri = uri;
         this.state = StringUtils.trimToEmpty(state);
     }
 
-    public ErrorInformation(ErrorCode errorCode, String state) {
+    public Error(ErrorCode errorCode, String state) {
         this.code = errorCode.getCode();
         this.desc = errorCode.getDesc();
         this.uri = StringUtils.EMPTY;
         this.state = StringUtils.trimToEmpty(state);
     }
 
-    public ErrorInformation(ErrorCode errorCode, String uri, String state) {
+    public Error(ErrorCode errorCode, String uri, String state) {
         this.code = errorCode.getCode();
         this.desc = errorCode.getDesc();
         this.uri = uri;

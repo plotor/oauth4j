@@ -29,7 +29,7 @@ public interface ParamsValidateService {
      * @param params
      * @return
      */
-    ErrorCode validateCodeRequestParams(RequestParams params);
+    ErrorCode validateAuthorizeRequestParams(RequestParams params);
 
     /**
      * 访问令牌请求参数验证
