@@ -1,7 +1,6 @@
 package org.zhenchao.passport.oauth.controllers;
 
 import net.sf.json.JSONObject;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,8 +21,8 @@ import static org.zhenchao.passport.oauth.commons.GlobalConstant.PATH_ROOT_LOGIN
 import static org.zhenchao.passport.oauth.commons.GlobalConstant.PATH_ROOT_OAUTH;
 import org.zhenchao.passport.oauth.domain.AuthorizationCode;
 import org.zhenchao.passport.oauth.domain.AuthorizeRequestParams;
-import org.zhenchao.passport.oauth.domain.TokenRequestParams;
 import org.zhenchao.passport.oauth.domain.Error;
+import org.zhenchao.passport.oauth.domain.TokenRequestParams;
 import org.zhenchao.passport.oauth.exceptions.OAuthServiceException;
 import org.zhenchao.passport.oauth.model.OAuthAppInfo;
 import org.zhenchao.passport.oauth.model.Scope;
@@ -46,7 +45,6 @@ import org.zhenchao.passport.oauth.utils.JsonView;
 import org.zhenchao.passport.oauth.utils.SessionUtils;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import javax.annotation.Resource;
@@ -70,7 +68,7 @@ public class AuthorizationCodeGrantController {
     private OAuthAppInfoService appInfoService;
 
     @Resource
-    private UserAppAuthorizationService authorizationService;
+    private UserAppAuthorizationService authorizeRelationService;
 
     @Resource
     private ScopeService scopeService;
@@ -87,17 +85,14 @@ public class AuthorizationCodeGrantController {
      * @return
      */
     @RequestMapping(value = PATH_OAUTH_AUTHORIZE_CODE, method = {GET, POST}, params = "response_type=code")
-    public ModelAndView authorize(
-            HttpServletRequest request,
-            HttpServletResponse response,
-            HttpSession session,
-            @RequestParam("response_type") String responseType,
-            @RequestParam("client_id") long clientId,
-            @RequestParam(value = "redirect_uri", required = false) String redirectUri,
-            @RequestParam(value = "scope", required = false) String scope,
-            @RequestParam(value = "state", required = false) String state,
-            @RequestParam(value = "skip_confirm", required = false, defaultValue = "false") boolean skipConfirm,
-            @RequestParam(value = "force_login", required = false, defaultValue = "false") boolean forceLogin) {
+    public ModelAndView authorize(HttpServletRequest request, HttpServletResponse response, HttpSession session,
+                                  @RequestParam("response_type") String responseType,
+                                  @RequestParam("client_id") long clientId,
+                                  @RequestParam(value = "redirect_uri", required = false) String redirectUri,
+                                  @RequestParam(value = "scope", required = false) String scope,
+                                  @RequestParam(value = "state", required = false) String state,
+                                  @RequestParam(value = "skip_confirm", required = false, defaultValue = "false") boolean skipConfirm,
+                                  @RequestParam(value = "force_login", required = false, defaultValue = "false") boolean forceLogin) {
 
         log.debug("Entering authorize code method...");
 
@@ -133,7 +128,7 @@ public class AuthorizationCodeGrantController {
         }
 
         Optional<UserAppAuthorization> authorization =
-                authorizationService.getUserAndAppAuthorizationInfo(
+                authorizeRelationService.getUserAndAppAuthorizationInfo(
                         user.getId(), requestParams.getClientId(), CommonUtils.genScopeSign(requestParams.getScope()));
 
         if (authorization.isPresent() && !skipConfirm) {
@@ -175,15 +170,14 @@ public class AuthorizationCodeGrantController {
      * @return
      */
     @RequestMapping(value = PATH_OAUTH_AUTHORIZE_TOKEN, method = {GET, POST}, params = "grant_type=authorization_code")
-    public ModelAndView issueAccessToken(
-            HttpServletResponse response,
-            @RequestParam("grant_type") String grantType,
-            @RequestParam("code") String code,
-            @RequestParam("redirect_uri") String redirectUri,
-            @RequestParam("client_id") long clientId,
-            @RequestParam(value = "client_secret", required = false) String clientSecret,
-            @RequestParam(value = "token_type", required = false) String tokenType,
-            @RequestParam(value = "issue_refresh_token", required = false, defaultValue = "true") boolean refresh) {
+    public ModelAndView issueAccessToken(HttpServletResponse response,
+                                         @RequestParam("grant_type") String grantType,
+                                         @RequestParam("code") String code,
+                                         @RequestParam("redirect_uri") String redirectUri,
+                                         @RequestParam("client_id") long clientId,
+                                         @RequestParam(value = "client_secret", required = false) String clientSecret,
+                                         @RequestParam(value = "token_type", required = false) String tokenType,
+                                         @RequestParam(value = "issue_refresh_token", required = false, defaultValue = "true") boolean refresh) {
 
         log.debug("Entering authorize code method...");
 
@@ -199,12 +193,12 @@ public class AuthorizationCodeGrantController {
         }
 
         // 校验用户与APP之间是否存在授权关系
-        AuthorizationCode ac = requestParams.getAuthorizationCode();
-        Optional<UserAppAuthorization> optuaa = authorizationService.getUserAndAppAuthorizationInfo(
-                ac.getUserId(), ac.getAppInfo().getAppId(), CommonUtils.genScopeSign(ac.getScopes()));
+        Optional<UserAppAuthorization> optuaa = authorizeRelationService.getUserAndAppAuthorizationInfo(
+                requestParams.getUserId(), requestParams.getAppInfo().getAppId(), CommonUtils.genScopeSign(requestParams.getScope()));
         if (!optuaa.isPresent()) {
             // 用户与APP之间不存在指定的授权关系
-            log.error("No authorization between user[{}] and app[{}] on scope[{}]!", ac.getUserId(), ac.getAppInfo().getAppId(), ac.getScopes());
+            log.error("No authorization between user[{}] and app[{}] on scope[{}]!",
+                    requestParams.getUserId(), requestParams.getAppInfo().getAppId(), requestParams.getScope());
             return JsonView.render(new Error(ErrorCode.UNAUTHORIZED_CLIENT, StringUtils.EMPTY), response, false);
         }
         requestParams.setUserAppAuthorization(optuaa.get());
@@ -243,52 +237,6 @@ public class AuthorizationCodeGrantController {
         }
 
         return JsonView.render(new Error(ErrorCode.SERVICE_ERROR, StringUtils.EMPTY), response, false);
-    }
-
-    /**
-     * user authorize on app
-     *
-     * @return
-     */
-    @RequestMapping(value = PATH_OAUTH_USER_AUTHORIZE, method = {POST})
-    public ModelAndView userAuthorize(
-            HttpServletResponse response,
-            @RequestParam("user_id") long userId,
-            @RequestParam("client_id") long clientId,
-            @RequestParam("scope") String scope,
-            @RequestParam(value = "state", required = false) String state,
-            @RequestParam("callback") String callback) {
-
-        log.debug("Entering user authorize method...");
-
-        ModelAndView mav = new ModelAndView();
-
-        if (userId < 0 || StringUtils.isBlank(callback)) {
-            log.error("User authorize request params error, userId[{}], callback[{}]", userId, callback);
-            UriComponentsBuilder builder = UriComponentsBuilder.newInstance();
-            builder.path(PATH_ROOT_LOGIN);
-            builder.queryParam("callback", callback);
-            mav.setViewName("redirect:" + builder.toUriString());
-            return mav;
-        }
-
-        // 添加用户授权关系
-        UserAppAuthorization authorization = new UserAppAuthorization();
-        authorization.setUserId(userId);
-        authorization.setAppId(clientId);
-        authorization.setScope(scope);
-        authorization.setScopeSign(CommonUtils.genScopeSign(scope));
-        authorization.setCreateTime(new Date());
-        authorization.setCreateTime(authorization.getCreateTime());
-        authorization.setTokenKey(RandomStringUtils.randomAlphanumeric(64));  // 随机生成key
-        authorization.setRefreshTokenKey(RandomStringUtils.randomAlphanumeric(64));  // FIXME 这里是不是应该考虑采用AES加密
-        authorization.setRefreshTokenExpirationTime(365 * 24 * 3600L);  // 设置刷新令牌有效期
-        if (authorizationService.replaceUserAndAppAuthorizationInfo(authorization)) {
-            // 更新用户授权关系成功
-            mav.setViewName("redirect:" + callback);
-            return mav;
-        }
-        return JsonView.render(new Error(ErrorCode.LOCAL_SERVICE_ERROR, state), response, false);
     }
 
 }

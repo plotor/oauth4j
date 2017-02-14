@@ -87,57 +87,58 @@ public class ParamsValidateServiceImpl implements ParamsValidateService {
             return ErrorCode.INVALID_REQUEST;
         }
 
-        TokenRequestParams tokenParams = (TokenRequestParams) params;
+        TokenRequestParams requestParams = (TokenRequestParams) params;
 
         // 检测grant type
-        if (!GRANT_TYPE_CODE.equals(tokenParams.getGrantType())) {
-            log.error("The grant type [{}] is not expected, need [{}]!", tokenParams.getGrantType(), GRANT_TYPE_CODE);
+        if (!GRANT_TYPE_CODE.equals(requestParams.getGrantType())) {
+            log.error("The grant type [{}] is not expected, need [{}]!", requestParams.getGrantType(), GRANT_TYPE_CODE);
             return ErrorCode.UNSUPPORTED_GRANT_TYPE;
         }
 
-        if (StringUtils.isBlank(tokenParams.getCode())) {
+        if (StringUtils.isBlank(requestParams.getCode())) {
             log.error("Authorization code is null or empty when request access token!");
             return ErrorCode.INVALID_AUTHORIZATION_CODE;
         }
 
         // 验证token类型
-        if (StringUtils.isNotBlank(tokenParams.getTokenType())) {
-            if (!ALLOWED_TOKEN_TYPE.contains(tokenParams.getTokenType())) {
+        if (StringUtils.isNotBlank(requestParams.getTokenType())) {
+            if (!ALLOWED_TOKEN_TYPE.contains(requestParams.getTokenType())) {
                 log.error("The token type [{}] is unsupported!");
                 return ErrorCode.UNSUPPORTED_TOKEN_TYPE;
             }
         }
 
-        Optional<AuthorizationCode> optCode = authorizeService.getAuthorizationCodeFromCache(tokenParams.getCode());
+        Optional<AuthorizationCode> optCode = authorizeService.getAuthorizationCodeFromCache(requestParams.getCode());
         if (optCode.isPresent()) {
 
             // 从缓存中删除授权码，一个授权码只能被使用一次
-            if (!authorizeService.deleteAuthorizationCodeFromCache(tokenParams.getCode())) {
-                log.error("Delete authorization code [{}] from cache error!", tokenParams.getCode());
+            if (!authorizeService.deleteAuthorizationCodeFromCache(requestParams.getCode())) {
+                log.error("Delete authorization code [{}] from cache error!", requestParams.getCode());
                 return ErrorCode.INVALID_AUTHORIZATION_CODE;
             }
 
             AuthorizationCode code = optCode.get();
-            tokenParams.setAuthorizationCode(code); // 记录一下，创建token时需要部分信息
+            //记录部分信息，创建token时需要
+            requestParams.setUserId(code.getUserId()).setScope(code.getScopes()).setAppInfo(code.getAppInfo());
             // 回调地址验证
             String redirectUri = code.getRedirectUri();
-            if (StringUtils.isNotBlank(redirectUri) && !redirectUri.equals(tokenParams.getRedirectUri())) {
+            if (StringUtils.isNotBlank(redirectUri) && !redirectUri.equals(requestParams.getRedirectUri())) {
                 // 如果请求code时带redirectUri参数，那么请求token时的redirectUri必须与之前一致
                 log.error("The redirect uri [{}] is not equals to code request [redirect uri = {}]",
-                        tokenParams.getRedirectUri(), redirectUri);
+                        requestParams.getRedirectUri(), redirectUri);
                 return ErrorCode.INVALID_GRANT;
             }
-            if (!this.validateRedirectUri(code.getAppInfo().getRedirectUri(), tokenParams.getRedirectUri())) {
+            if (!this.validateRedirectUri(code.getAppInfo().getRedirectUri(), requestParams.getRedirectUri())) {
                 log.error("The input redirect uri [{}] is illegal, app redirect uri [{}]",
-                        tokenParams.getRedirectUri(), code.getAppInfo().getRedirectUri());
+                        requestParams.getRedirectUri(), code.getAppInfo().getRedirectUri());
                 return ErrorCode.INVALID_REDIRECT_URI;
             }
 
             // 验证clientId
             // FIXME clientId的验证还需要进一步研究一下
-            if (tokenParams.getClientId() != code.getAppInfo().getAppId()) {
+            if (requestParams.getClientId() != code.getAppInfo().getAppId()) {
                 log.error("The input client id [{}] is not equals to code request [client id = {}]",
-                        tokenParams.getClientId(), code.getAppInfo().getAppId());
+                        requestParams.getClientId(), code.getAppInfo().getAppId());
                 return ErrorCode.UNAUTHORIZED_CLIENT;
             }
             // TODO client secret 验证

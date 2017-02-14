@@ -46,6 +46,16 @@ public abstract class AbstractAccessToken implements Token {
         public String getValue() {
             return value;
         }
+
+        /**
+         * tell whether {@param tokenType} is valid
+         *
+         * @param tokenType
+         * @return
+         */
+        public static boolean isValid(TokenType tokenType) {
+            return MAC.equals(tokenType) || BEARER.equals(tokenType);
+        }
     }
 
     protected TokenVersion version;

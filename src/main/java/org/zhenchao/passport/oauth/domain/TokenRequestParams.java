@@ -2,6 +2,7 @@ package org.zhenchao.passport.oauth.domain;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
+import org.zhenchao.passport.oauth.model.OAuthAppInfo;
 import org.zhenchao.passport.oauth.model.UserAppAuthorization;
 import org.zhenchao.passport.oauth.token.AbstractAccessToken;
 
@@ -12,6 +13,8 @@ import org.zhenchao.passport.oauth.token.AbstractAccessToken;
  * @version 1.0.0
  */
 public class TokenRequestParams implements RequestParams {
+
+    private String responseType;
 
     private String grantType;
 
@@ -28,7 +31,11 @@ public class TokenRequestParams implements RequestParams {
 
     private boolean irt;
 
-    private AuthorizationCode authorizationCode;
+    private long userId;
+
+    private String scope;
+
+    private OAuthAppInfo appInfo;
 
     private UserAppAuthorization userAppAuthorization;
 
@@ -121,12 +128,30 @@ public class TokenRequestParams implements RequestParams {
         return this;
     }
 
-    public AuthorizationCode getAuthorizationCode() {
-        return authorizationCode;
+    public long getUserId() {
+        return userId;
     }
 
-    public TokenRequestParams setAuthorizationCode(AuthorizationCode authorizationCode) {
-        this.authorizationCode = authorizationCode;
+    public TokenRequestParams setUserId(long userId) {
+        this.userId = userId;
+        return this;
+    }
+
+    public String getScope() {
+        return scope;
+    }
+
+    public TokenRequestParams setScope(String scope) {
+        this.scope = scope;
+        return this;
+    }
+
+    public OAuthAppInfo getAppInfo() {
+        return appInfo;
+    }
+
+    public TokenRequestParams setAppInfo(OAuthAppInfo appInfo) {
+        this.appInfo = appInfo;
         return this;
     }
 
