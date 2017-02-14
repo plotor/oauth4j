@@ -111,7 +111,6 @@ public abstract class AbstractAccessToken implements Token {
             byte[] encodeValue = this.encode();
             byte[] hmacValue = Base64.getEncoder().encode(HmacUtils.hmacSha1(this.key.getBytes(), encodeValue));
 
-            byte[] result;
             DataOutputStream dos = null;
             try {
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();

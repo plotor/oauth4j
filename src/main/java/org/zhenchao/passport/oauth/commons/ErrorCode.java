@@ -34,11 +34,13 @@ public enum ErrorCode {
 
     PBKDF2_ENCRYPT_ERROR(100302, "pbkdf2 encrypt error"),
 
-    DECRYPT_ERROR(100400, "decrypt error"),
+    IDEA_ENCRYPT_ERROR(100303, "idea encrypt error"),
 
     AES_DECRYPT_ERROR(100401, "aes decrypt error"),
 
     REDIRECT_TO_DEST_URI_ERROR(100402, "redirect to dest url error"),
+
+    IDEA_DECRYPT_ERROR(100403, "idea encrypt error"),
 
     /** OAuth相关错误 **/
 

@@ -17,77 +17,59 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
 
 /**
- * AES symmetrical encryption
+ * idea encipher
  *
- * @author zhenchao.wang 2017-02-13 17:20
+ * @author zhenchao.wang 2017-02-14 10:22
  * @version 1.0.0
  */
-public class AESEncipher extends SymmetricalEncipher {
+public class IDEAEncipher extends SymmetricalEncipher {
 
-    private static final String AES = "AES";
+    private static final String IDEA = "IDEA";
 
-    private static final String CIPHER = "AES/ECB/PKCS7Padding";
+    private static final String CIPHER = "IDEA/ECB/PKCS7Padding";
 
     private static final String BOUNCY_CASTLE = "BC";
 
     private static final int KEY_LENGTH = 128;
 
-    /**
-     * generate aes key
-     *
-     * @return
-     */
     @Override
     public byte[] generateKey() {
         try {
-            KeyGenerator kg = KeyGenerator.getInstance(AES);
+            Security.addProvider(new BouncyCastleProvider());
+            KeyGenerator kg = KeyGenerator.getInstance(IDEA);
             kg.init(KEY_LENGTH, new SecureRandom());
             return kg.generateKey().getEncoded();
         } catch (NoSuchAlgorithmException e) {
             // never happen
+            e.printStackTrace();
         }
         return new byte[0];
     }
 
-    /**
-     * aes encrypt
-     *
-     * @param key
-     * @param data
-     * @return
-     * @throws CryptException
-     */
     @Override
     public byte[] encrypt(byte[] key, byte[] data) throws CryptException {
+        Security.addProvider(new BouncyCastleProvider());
         try {
-            Security.addProvider(new BouncyCastleProvider());
             Cipher cipher = Cipher.getInstance(CIPHER, BOUNCY_CASTLE);
-            cipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(key, AES));
+            cipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(key, IDEA));
             return cipher.doFinal(data);
         } catch (NoSuchAlgorithmException | NoSuchProviderException | NoSuchPaddingException |
                 BadPaddingException | IllegalBlockSizeException | InvalidKeyException e) {
-            throw new CryptException(e, ErrorCode.AES_ENCRYPT_ERROR);
+            throw new CryptException(e, ErrorCode.IDEA_ENCRYPT_ERROR);
         }
     }
 
-    /**
-     * aes decrypt
-     *
-     * @param key
-     * @param data
-     * @return
-     * @throws CryptException
-     */
     @Override
     public byte[] decrypt(byte[] key, byte[] data) throws CryptException {
+        Security.addProvider(new BouncyCastleProvider());
         try {
-            Security.addProvider(new BouncyCastleProvider());
             Cipher cipher = Cipher.getInstance(CIPHER, BOUNCY_CASTLE);
-            cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(key, AES));
+            cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(key, IDEA));
             return cipher.doFinal(data);
         } catch (NoSuchAlgorithmException | NoSuchProviderException | NoSuchPaddingException |
-                InvalidKeyException | BadPaddingException | IllegalBlockSizeException e) {
-            throw new CryptException(e, ErrorCode.AES_DECRYPT_ERROR);
+                BadPaddingException | IllegalBlockSizeException | InvalidKeyException e) {
+            throw new CryptException(e, ErrorCode.IDEA_DECRYPT_ERROR);
         }
     }
+
 }
