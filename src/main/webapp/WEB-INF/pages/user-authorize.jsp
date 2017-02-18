@@ -46,7 +46,7 @@
             <input type="hidden" name="client_id" value="${app.appId}"/>
             <input type="hidden" id="scope" name="scope" value=""/>
             <input type="hidden" name="state" value="${state}"/>
-            <button type="submit" class="btn btn-success" style="width: 50%;">确&emsp;认&emsp;授&emsp;权</button>
+            <button type="submit" class="btn btn-info" style="width: 60%; margin-bottom: 10px; margin-top: 10px;">确&emsp;认&emsp;授&emsp;权</button>
         </form>
     </div>
 </div>

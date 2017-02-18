@@ -14,8 +14,8 @@ import org.zhenchao.passport.oauth.commons.ErrorCode;
 import org.zhenchao.passport.oauth.commons.GlobalConstant;
 import static org.zhenchao.passport.oauth.commons.GlobalConstant.COOKIE_KEY_USER_LOGIN_SIGN;
 import static org.zhenchao.passport.oauth.commons.GlobalConstant.PATH_ROOT_LOGIN;
-import org.zhenchao.passport.oauth.exceptions.CryptException;
 import org.zhenchao.passport.oauth.domain.Error;
+import org.zhenchao.passport.oauth.exceptions.CryptException;
 import org.zhenchao.passport.oauth.model.User;
 import org.zhenchao.passport.oauth.service.UserService;
 import org.zhenchao.passport.oauth.utils.JsonView;
@@ -47,9 +47,12 @@ public class LoginController {
      * @return
      */
     @RequestMapping(value = PATH_ROOT_LOGIN, method = RequestMethod.GET)
-    public ModelAndView login(@RequestParam(value = "callback", required = false) String callback) {
+    public ModelAndView login(
+            @RequestParam(value = "callback", required = false) String callback,
+            @RequestParam(value = "app_name", required = false) String appName) {
         ModelAndView mav = new ModelAndView();
-        mav.addObject(GlobalConstant.CALLBACK, StringUtils.isBlank(callback) ? StringUtils.EMPTY : callback);
+        mav.addObject(GlobalConstant.CALLBACK, StringUtils.trimToEmpty(callback));
+        mav.addObject("appName", StringUtils.trimToEmpty(appName));
         mav.setViewName("login");
         return mav;
     }

@@ -39,6 +39,8 @@ import org.zhenchao.passport.oauth.utils.JsonView;
 import org.zhenchao.passport.oauth.utils.SessionUtils;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -115,13 +117,17 @@ public class ImplicitGrantController {
         OAuthAppInfo appInfo = optAppInfo.get();
         User user = SessionUtils.getUser(session, CookieUtils.get(request, COOKIE_KEY_USER_LOGIN_SIGN));
         if (null == user || forceLogin) {
-            // 用户未登录或需要强制登录，跳转到登录页面
-            UriComponentsBuilder builder = UriComponentsBuilder.newInstance();
-            builder.path(PATH_ROOT_LOGIN)
-                    .queryParam(GlobalConstant.CALLBACK, HttpRequestUtils.getEncodeRequestUrl(request))
-                    .queryParam("app_name", appInfo.getAppName());
-            mav.setViewName("redirect:" + builder.toUriString());
-            return mav;
+            try {
+                // 用户未登录或需要强制登录，跳转到登录页面
+                UriComponentsBuilder builder = UriComponentsBuilder.newInstance();
+                builder.path(PATH_ROOT_LOGIN)
+                        .queryParam(GlobalConstant.CALLBACK, HttpRequestUtils.getEncodeRequestUrl(request))
+                        .queryParam("app_name", URLEncoder.encode(appInfo.getAppName(), "UTF-8"));
+                mav.setViewName("redirect:" + builder.toUriString());
+                return mav;
+            } catch (UnsupportedEncodingException e) {
+                // never happen
+            }
         }
 
         Optional<UserAppAuthorization> authorization =

@@ -1,4 +1,5 @@
 <%@ page language="java" pageEncoding="utf-8" %>
+<%@ taglib  uri="http://java.sun.com/jstl/core_rt" prefix="c"%>
 <%
     String path = request.getContextPath();
     String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + path + "/";
@@ -24,7 +25,10 @@
             用户登录
         </h3>
     </div>
-    <div class="panel-body">
+    <div class="panel-body" style="text-align: center;">
+        <c:if test="${appName != ''}">
+            <h3>正在使用您的账号登录&nbsp;<span style="color: darkorange;"><c:out value="${appName}"/></span></h3><hr/>
+        </c:if>
         <form role="form" action="/login" method="post" style="text-align: center;">
             <input type="hidden" name="callback" value="${callback}">
             <div class="form-group" style="text-align: left;">
@@ -34,10 +38,10 @@
             <div class="form-group" style="text-align: left;">
                 <label for="password">密码</label>
                 <input type="password" class="form-control" name="password" placeholder="请输入密码">
-            </div>
-            <button type="submit" class="btn btn-info" style="width:50%;">登&emsp;录</button>
+            </div><br/>
+            <button type="submit" class="btn btn-info" style="width:60%; margin-bottom: 10px;">登&emsp;录</button>
         </form>
-    </div>
+    </h2>
 </div>
 </body>
 </html>
