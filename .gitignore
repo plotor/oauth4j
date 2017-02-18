@@ -8,6 +8,8 @@
 *.iws
 *.class
 
+/mybatis-generator/output/*
+
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
 
