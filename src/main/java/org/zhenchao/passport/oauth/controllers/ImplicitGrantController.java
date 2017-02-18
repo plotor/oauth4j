@@ -73,7 +73,10 @@ public class ImplicitGrantController {
 
     /**
      * implicit grant
-     * m     *
+     *
+     * must not automatically redirect the user-agent to the invalid redirect uri :
+     * 1. missing, invalid, or mismatching redirect uri
+     * 2. client id is missing or invalid
      *
      * @return
      */
@@ -134,14 +137,14 @@ public class ImplicitGrantController {
             Optional<AbstractTokenGenerator> optTokenGenerator = TokenGeneratorFactory.getGenerator(trp);
             if (!optTokenGenerator.isPresent()) {
                 log.error("Generate implicit access token failed, unknown tokenType[{}]", trp.getTokenType());
-                return JsonView.render(new Error(ErrorCode.UNSUPPORTED_GRANT_TYPE, StringUtils.EMPTY), response, false);
+                return this.buildErrorInfo(mav, redirectUri, appInfo, ErrorCode.UNSUPPORTED_GRANT_TYPE, state);
             }
 
             AbstractAccessTokenGenerator accessTokenGenerator = (AbstractAccessTokenGenerator) optTokenGenerator.get();
             Optional<AbstractAccessToken> optAccessToken = accessTokenGenerator.create();
             if (!optAccessToken.isPresent()) {
                 log.error("Generate access token failed, params[{}]", requestParams);
-                return JsonView.render(new Error(ErrorCode.INVALID_REQUEST, StringUtils.EMPTY), response, false);
+                return this.buildErrorInfo(mav, redirectUri, appInfo, ErrorCode.INVALID_REQUEST, state);
             }
 
             // no cache
@@ -166,20 +169,11 @@ public class ImplicitGrantController {
                 if (StringUtils.isNotBlank(state)) {
                     params.add(String.format("state=%s", state));
                 }
-                String rUri = redirectUri;
-                if (StringUtils.isBlank(rUri)) {
-                    // 用户未传递redirectUri，选择APP配置的第一个代替
-                    rUri = appInfo.getRedirectUri().split(GlobalConstant.SEPARATOR_REDIRECT_URI)[0];
-                }
-                String returnParams = StringUtils.join(params, "&");
-                String url = String.format("%s#%s", rUri, returnParams);
-                log.info("redirect to [{}]", url);
-                mav.setViewName("redirect:" + url);
+                mav.setViewName("redirect:" + this.buildRedirectUri(redirectUri, appInfo, params));
                 return mav;
             } catch (IOException e) {
                 log.error("Get string access token error by [{}]!", accessToken, e);
-                // FIXME 错误响应
-                mav.setViewName("redirect:error");
+                return this.buildErrorInfo(mav, redirectUri, appInfo, ErrorCode.SERVICE_TEMPORARILY_UNAVAILABLE, state);
             }
         } else {
             // 用户未授权该APP，跳转到授权页面
@@ -189,7 +183,46 @@ public class ImplicitGrantController {
                     .addObject("user", user).addObject("app", appInfo).addObject("state", StringUtils.trimToEmpty(state));
             return mav;
         }
+    }
+
+    /**
+     * build error information and return
+     *
+     * @param mav
+     * @param redirectUri
+     * @param appInfo
+     * @param errorCode
+     * @param state
+     * @return
+     */
+    private ModelAndView buildErrorInfo(
+            ModelAndView mav, String redirectUri, OAuthAppInfo appInfo, ErrorCode errorCode, String state) {
+        List<String> params = new ArrayList<>();
+        params.add(String.format("error=%s", errorCode.getCode()));
+        params.add(String.format("error_description=%s", errorCode.getDesc()));
+        if (StringUtils.isNotBlank(state)) {
+            params.add(String.format("state=%s", state));
+        }
+        mav.setViewName("redirect:" + this.buildRedirectUri(redirectUri, appInfo, params));
         return mav;
+    }
+
+    /**
+     * generate redirect uri
+     *
+     * @param redirectUri
+     * @param appInfo
+     * @param params
+     * @return
+     */
+    private String buildRedirectUri(final String redirectUri, OAuthAppInfo appInfo, List<String> params) {
+        String rUri = redirectUri;
+        if (StringUtils.isBlank(rUri)) {
+            // 用户未传递redirectUri，选择APP配置的第一个代替
+            rUri = appInfo.getRedirectUri().split(GlobalConstant.SEPARATOR_REDIRECT_URI)[0];
+        }
+        String returnParams = StringUtils.join(params, "&");
+        return String.format("%s#%s", rUri, returnParams);
     }
 
 }
