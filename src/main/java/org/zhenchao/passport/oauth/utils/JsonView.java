@@ -32,8 +32,8 @@ public class JsonView {
     public static ModelAndView render(Object model, HttpServletResponse response, boolean jsonSafe) {
         MappingJackson2HttpMessageConverter jsonConverter = new MappingJackson2HttpMessageConverter();
         try {
-            String safeJsonStr = jsonSafe ? StringUtils.join(GlobalConstant.JSON_SAFE_PREFIX, model) : String.valueOf(model);
-            jsonConverter.write(safeJsonStr, MediaType.APPLICATION_JSON, new ServletServerHttpResponse(response));
+            Object json = jsonSafe ? StringUtils.join(GlobalConstant.JSON_SAFE_PREFIX, model) : model;
+            jsonConverter.write(json, MediaType.APPLICATION_JSON, new ServletServerHttpResponse(response));
         } catch (IOException e) {
             log.error("Write response data [{}] as json view error!", model, e);
         }

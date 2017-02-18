@@ -14,7 +14,6 @@ import org.zhenchao.passport.oauth.commons.ErrorCode;
 import org.zhenchao.passport.oauth.commons.GlobalConstant;
 import static org.zhenchao.passport.oauth.commons.GlobalConstant.COOKIE_KEY_USER_LOGIN_SIGN;
 import static org.zhenchao.passport.oauth.commons.GlobalConstant.PATH_OAUTH_IMPLICIT_TOKEN;
-import static org.zhenchao.passport.oauth.commons.GlobalConstant.PATH_OAUTH_USER_AUTHORIZE;
 import static org.zhenchao.passport.oauth.commons.GlobalConstant.PATH_ROOT_LOGIN;
 import static org.zhenchao.passport.oauth.commons.GlobalConstant.PATH_ROOT_OAUTH;
 import org.zhenchao.passport.oauth.domain.AuthorizeRequestParams;
@@ -40,7 +39,6 @@ import org.zhenchao.passport.oauth.utils.JsonView;
 import org.zhenchao.passport.oauth.utils.SessionUtils;
 
 import java.io.IOException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -73,6 +71,12 @@ public class ImplicitGrantController {
     @Resource
     private ScopeService scopeService;
 
+    /**
+     * implicit grant
+     * m     *
+     *
+     * @return
+     */
     @RequestMapping(value = PATH_OAUTH_IMPLICIT_TOKEN, method = {GET, POST}, params = "response_type=token")
     public ModelAndView authorize(HttpServletRequest request, HttpServletResponse response, HttpSession session,
                                   @RequestParam("response_type") String responseType,
@@ -120,7 +124,7 @@ public class ImplicitGrantController {
         Optional<UserAppAuthorization> authorization =
                 authorizeRelationService.getUserAndAppAuthorizationInfo(
                         user.getId(), requestParams.getClientId(), CommonUtils.genScopeSign(requestParams.getScope()));
-        if (authorization.isPresent() && !skipConfirm) {
+        if (authorization.isPresent() && skipConfirm) {
             // 用户已授权，下发token
             UserAppAuthorization uaa = authorization.get();
             TokenRequestParams trp = new TokenRequestParams();
@@ -151,7 +155,7 @@ public class ImplicitGrantController {
                 params.add(String.format("token_type=%s", accessToken.getType().getValue()));
                 if (AbstractAccessToken.TokenType.MAC.equals(accessToken.getType())) {
                     // mac类型token
-                    params.add(String.format("mac_kek=%s", accessToken.getKey()));
+                    params.add(String.format("mac_key=%s", accessToken.getKey()));
                     params.add(String.format("mac_algorithm=%s", ((MacAccessToken) accessToken).getAlgorithm().getValue()));
                 }
                 params.add(String.format("expires_in=%d", accessToken.getExpirationTime()));
@@ -168,7 +172,10 @@ public class ImplicitGrantController {
                     rUri = appInfo.getRedirectUri().split(GlobalConstant.SEPARATOR_REDIRECT_URI)[0];
                 }
                 String returnParams = StringUtils.join(params, "&");
-                response.sendRedirect(URLEncoder.encode(String.format("%s#%s", rUri, returnParams), "UTF-8"));
+                String url = String.format("%s#%s", rUri, returnParams);
+                log.info("redirect to [{}]", url);
+                mav.setViewName("redirect:" + url);
+                return mav;
             } catch (IOException e) {
                 log.error("Get string access token error by [{}]!", accessToken, e);
                 // FIXME 错误响应
@@ -177,11 +184,9 @@ public class ImplicitGrantController {
         } else {
             // 用户未授权该APP，跳转到授权页面
             List<Scope> scopes = scopeService.getScopes(requestParams.getScope());
-            UriComponentsBuilder builder = UriComponentsBuilder.newInstance();
-            builder.path(PATH_ROOT_OAUTH + PATH_OAUTH_USER_AUTHORIZE).queryParam(GlobalConstant.CALLBACK, HttpRequestUtils.getEncodeRequestUrl(request));
             mav.setViewName("user-authorize");
-            mav.addObject(GlobalConstant.CALLBACK, builder.build(true))
-                    .addObject("scopes", scopes).addObject("user", user).addObject("app", appInfo).addObject("state", StringUtils.trimToEmpty(state));
+            mav.addObject(GlobalConstant.CALLBACK, HttpRequestUtils.getEncodeRequestUrl(request)).addObject("scopes", scopes)
+                    .addObject("user", user).addObject("app", appInfo).addObject("state", StringUtils.trimToEmpty(state));
             return mav;
         }
         return mav;

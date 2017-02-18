@@ -16,7 +16,6 @@ import org.zhenchao.passport.oauth.commons.GlobalConstant;
 import static org.zhenchao.passport.oauth.commons.GlobalConstant.COOKIE_KEY_USER_LOGIN_SIGN;
 import static org.zhenchao.passport.oauth.commons.GlobalConstant.PATH_OAUTH_AUTHORIZE_CODE;
 import static org.zhenchao.passport.oauth.commons.GlobalConstant.PATH_OAUTH_AUTHORIZE_TOKEN;
-import static org.zhenchao.passport.oauth.commons.GlobalConstant.PATH_OAUTH_USER_AUTHORIZE;
 import static org.zhenchao.passport.oauth.commons.GlobalConstant.PATH_ROOT_LOGIN;
 import static org.zhenchao.passport.oauth.commons.GlobalConstant.PATH_ROOT_OAUTH;
 import org.zhenchao.passport.oauth.commons.ResponseType;
@@ -132,7 +131,7 @@ public class AuthorizationCodeGrantController {
                 authorizeRelationService.getUserAndAppAuthorizationInfo(
                         user.getId(), requestParams.getClientId(), CommonUtils.genScopeSign(requestParams.getScope()));
 
-        if (authorization.isPresent() && !skipConfirm) {
+        if (authorization.isPresent() && skipConfirm) {
             // 用户已授权该APP，下发授权码
             try {
                 Optional<AuthorizationCode> optCode = authorizeService.generateAndCacheAuthorizationCode(authorization.get(), requestParams);
@@ -155,10 +154,8 @@ public class AuthorizationCodeGrantController {
         } else {
             // 用户未授权该APP，跳转到授权页面
             List<Scope> scopes = scopeService.getScopes(requestParams.getScope());
-            UriComponentsBuilder builder = UriComponentsBuilder.newInstance();
-            builder.path(PATH_ROOT_OAUTH + PATH_OAUTH_USER_AUTHORIZE).queryParam(GlobalConstant.CALLBACK, HttpRequestUtils.getEncodeRequestUrl(request));
             mav.setViewName("user-authorize");
-            mav.addObject(GlobalConstant.CALLBACK, builder.build(true))
+            mav.addObject(GlobalConstant.CALLBACK, HttpRequestUtils.getEncodeRequestUrl(request))
                     .addObject("scopes", scopes).addObject("user", user).addObject("app", appInfo).addObject("state", StringUtils.trimToEmpty(state));
             return mav;
         }

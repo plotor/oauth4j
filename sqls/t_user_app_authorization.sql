@@ -11,10 +11,9 @@ CREATE TABLE `t_user_app_authorization` (
   `scope_sign` char(32) NOT NULL,
   `token_key` varchar(128) NOT NULL,
   `refresh_token_key` varchar(128) DEFAULT NULL,
-  `refresh_token_expiration_time` bigint(20) COMMENT 'milli seconds',
+  `refresh_token_expiration_time` bigint(20) DEFAULT NULL COMMENT 'milli seconds',
   `create_time` datetime NOT NULL,
   `update_time` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`app_id`),
   UNIQUE KEY `index_app_user_scope` (`app_id`,`user_id`,`scope_sign`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 SET FOREIGN_KEY_CHECKS=1;

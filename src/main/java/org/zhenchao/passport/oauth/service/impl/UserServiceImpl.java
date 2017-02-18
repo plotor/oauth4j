@@ -49,7 +49,7 @@ public class UserServiceImpl implements UserService {
 
         String encryptPassword = CryptUtils.pbkdf2(password, GlobalConstant.SALT);
         User user = users.get(0);
-        log.debug("Password validate[current={}, expected={}]", encryptPassword, user.getPassword());
+        log.debug("Validate password[current={}, expected={}]", encryptPassword, user.getPassword());
         return StringUtils.equals(encryptPassword, user.getPassword()) ? Optional.of(user) : Optional.empty();
     }
 

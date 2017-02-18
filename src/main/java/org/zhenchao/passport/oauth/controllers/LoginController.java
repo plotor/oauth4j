@@ -100,6 +100,7 @@ public class LoginController {
         } catch (CryptException e) {
             log.error("Validate user[{}] error!", username, e);
         }
+        log.error("User login failed, username or password error!");
         return JsonView.render(new Error(ErrorCode.VALIDATE_USER_ERROR, StringUtils.EMPTY), response, false);
     }
 

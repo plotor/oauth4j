@@ -64,8 +64,8 @@ public class UserAppAuthorizationServiceImpl implements UserAppAuthorizationServ
         }
         UserAppAuthorizationExample example = new UserAppAuthorizationExample();
         UserAppAuthorizationExample.Criteria criteria = example.createCriteria();
-        criteria.andUserIdEqualTo(authorization.getUserId()).andAppIdEqualTo(
-                authorization.getUserId()).andScopeSignEqualTo(authorization.getScopeSign());
+        criteria.andUserIdEqualTo(
+                authorization.getUserId()).andAppIdEqualTo(authorization.getAppId()).andScopeSignEqualTo(authorization.getScopeSign());
         List<UserAppAuthorization> authorizations = userAppAuthorizationMapper.selectByExample(example);
 
         if (CollectionUtils.isEmpty(authorizations)) {
@@ -81,7 +81,7 @@ public class UserAppAuthorizationServiceImpl implements UserAppAuthorizationServ
             example = new UserAppAuthorizationExample();
             criteria = example.createCriteria();
             criteria.andUserIdEqualTo(uaa.getUserId()).andAppIdEqualTo(uaa.getAppId()).andScopeSignEqualTo(authorization.getScopeSign());
-            return userAppAuthorizationMapper.updateByExample(uaa, example) == 1;
+            return userAppAuthorizationMapper.updateByExampleSelective(uaa, example) == 1;
         }
     }
 

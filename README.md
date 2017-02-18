@@ -30,4 +30,8 @@ http://localhost:8080/oauth/authorize/token?grant_type=authorization_code&client
 
 #### Implicit Pattern
 
-TODO
+- request implicit access token
+
+```
+http://localhost:8080/oauth/implicit/token?response_type=token&client_id=2882303761517520186&redirect_uri=http://www.zhenchao.com&scope=1%204&state=emhlbmNoYW8gcGFzc3BvcnQgb2F1dGg=
+```

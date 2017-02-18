@@ -20,6 +20,8 @@ import org.zhenchao.passport.oauth.service.UserAppAuthorizationService;
 import org.zhenchao.passport.oauth.utils.CommonUtils;
 import org.zhenchao.passport.oauth.utils.JsonView;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.Date;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
@@ -78,8 +80,12 @@ public class UserAuthorizeController {
         authorization.setRefreshTokenExpirationTime(365 * 24 * 3600L);  // 设置刷新令牌有效期
         if (authorizeRelationService.replaceUserAndAppAuthorizationInfo(authorization)) {
             // 更新用户授权关系成功
-            mav.setViewName("redirect:" + callback);
-            return mav;
+            try {
+                mav.setViewName(String.format("redirect:%s&skip_confirm=true", URLDecoder.decode(callback, "UTF-8")));
+                return mav;
+            } catch (UnsupportedEncodingException e) {
+                // never happen
+            }
         }
         return JsonView.render(new Error(ErrorCode.LOCAL_SERVICE_ERROR, state), response, false);
     }

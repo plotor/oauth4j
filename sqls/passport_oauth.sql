@@ -23,7 +23,7 @@ CREATE TABLE `t_oauth_app_info` (
 -- ----------------------------
 -- Records of t_oauth_app_info
 -- ----------------------------
-INSERT INTO `t_oauth_app_info` VALUES ('2882303761517520186', '指间生活', 'https://github.com/ZhenchaoWang/zhenchaowang.github.io/blob/master/img/milogo@2x.png?raw=true', '0', 'http://www.zhenchao.com', '1 4', '7776000', 'empty', '1', '888888', '2017-01-21 15:53:37', '2017-01-21 18:19:42');
+INSERT INTO `t_oauth_app_info` VALUES ('2882303761517520186', '指间生活', 'https://github.com/ZhenchaoWang/zhenchaowang.github.io/blob/master/img/milogo@2x.png?raw=true', '0', 'http://www.zhenchao.com', '1 4', '7776000', 'empty', '1', '888888', '2017-01-21 15:53:37', '2017-02-11 18:17:19');
 
 -- ----------------------------
 -- Table structure for t_scope
@@ -83,13 +83,13 @@ CREATE TABLE `t_user_app_authorization` (
   `refresh_token_expiration_time` bigint(20) DEFAULT NULL COMMENT 'milli seconds',
   `create_time` datetime NOT NULL,
   `update_time` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`app_id`),
   UNIQUE KEY `index_app_user_scope` (`app_id`,`user_id`,`scope_sign`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of t_user_app_authorization
 -- ----------------------------
+INSERT INTO `t_user_app_authorization` VALUES ('2882303761517520186', '100000', '1 4', '024c64526d52b0cfdf038dfa', 'pCR3KsGY0H63AUhhwRMBJ6ZAcdJo5w7IdOB9w1cAyvEoJWPdyzVvaQIglIn7Aetk', 'ZhSPpZJMj1pz342ppi2LuoEOJsH91VkIWTlb4krRpE3Xpn3nsymjIekhjTtwhtct', '31536000', '2017-02-11 18:25:02', null);
 
 -- ----------------------------
 -- Table structure for t_user_id
