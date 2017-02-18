@@ -65,6 +65,15 @@ public class TokenRequestParams implements RequestParams {
         return ToStringBuilder.reflectionToString(this, ToStringStyle.JSON_STYLE);
     }
 
+    public String getResponseType() {
+        return responseType;
+    }
+
+    public TokenRequestParams setResponseType(String responseType) {
+        this.responseType = responseType;
+        return this;
+    }
+
     public String getGrantType() {
         return grantType;
     }

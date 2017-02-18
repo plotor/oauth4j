@@ -1,5 +1,7 @@
 package org.zhenchao.passport.oauth.commons;
 
+import java.util.Optional;
+
 /**
  * response type
  *
@@ -28,8 +30,23 @@ public enum ResponseType {
      * @param responseType
      * @return
      */
-    public static boolean isValid(ResponseType responseType) {
-        return AUTHORIZATION_CODE.equals(responseType) || IMPLICIT.equals(responseType);
+    public static boolean isValid(String responseType) {
+        return AUTHORIZATION_CODE.getType().equals(responseType) || IMPLICIT.getType().equals(responseType);
+    }
+
+    /**
+     * change string param to {@code ResponseType} object
+     *
+     * @param responseType
+     * @return
+     */
+    public static Optional<ResponseType> toResponseType(String responseType) {
+        for (final ResponseType type : ResponseType.values()) {
+            if (type.getType().equals(responseType)) {
+                return Optional.of(type);
+            }
+        }
+        return Optional.empty();
     }
 
 }

@@ -19,6 +19,7 @@ import static org.zhenchao.passport.oauth.commons.GlobalConstant.PATH_OAUTH_AUTH
 import static org.zhenchao.passport.oauth.commons.GlobalConstant.PATH_OAUTH_USER_AUTHORIZE;
 import static org.zhenchao.passport.oauth.commons.GlobalConstant.PATH_ROOT_LOGIN;
 import static org.zhenchao.passport.oauth.commons.GlobalConstant.PATH_ROOT_OAUTH;
+import org.zhenchao.passport.oauth.commons.ResponseType;
 import org.zhenchao.passport.oauth.domain.AuthorizationCode;
 import org.zhenchao.passport.oauth.domain.AuthorizeRequestParams;
 import org.zhenchao.passport.oauth.domain.Error;
@@ -182,8 +183,8 @@ public class AuthorizationCodeGrantController {
         log.debug("Entering authorize code method...");
 
         TokenRequestParams requestParams = new TokenRequestParams();
-        requestParams.setGrantType(grantType).setCode(code).setRedirectUri(redirectUri).setClientId(clientId)
-                .setTokenType(StringUtils.defaultString(tokenType, AbstractAccessToken.TokenType.MAC.getValue()))
+        requestParams.setResponseType(ResponseType.AUTHORIZATION_CODE.getType()).setGrantType(grantType).setCode(code)
+                .setRedirectUri(redirectUri).setClientId(clientId).setTokenType(StringUtils.defaultString(tokenType, AbstractAccessToken.TokenType.MAC.getValue()))
                 .setClientSecret(clientSecret).setIrt(refresh);
 
         ErrorCode validateResult = paramsValidateService.validateTokenRequestParams(requestParams);
@@ -193,15 +194,15 @@ public class AuthorizationCodeGrantController {
         }
 
         // 校验用户与APP之间是否存在授权关系
-        Optional<UserAppAuthorization> optuaa = authorizeRelationService.getUserAndAppAuthorizationInfo(
+        Optional<UserAppAuthorization> opt = authorizeRelationService.getUserAndAppAuthorizationInfo(
                 requestParams.getUserId(), requestParams.getAppInfo().getAppId(), CommonUtils.genScopeSign(requestParams.getScope()));
-        if (!optuaa.isPresent()) {
+        if (!opt.isPresent()) {
             // 用户与APP之间不存在指定的授权关系
             log.error("No authorization between user[{}] and app[{}] on scope[{}]!",
                     requestParams.getUserId(), requestParams.getAppInfo().getAppId(), requestParams.getScope());
             return JsonView.render(new Error(ErrorCode.UNAUTHORIZED_CLIENT, StringUtils.EMPTY), response, false);
         }
-        requestParams.setUserAppAuthorization(optuaa.get());
+        requestParams.setUserAppAuthorization(opt.get());
 
         // 验证通过，下发accessToken
         Optional<AbstractTokenGenerator> optTokenGenerator = TokenGeneratorFactory.getGenerator(requestParams);
@@ -227,13 +228,13 @@ public class AuthorizationCodeGrantController {
             result.put("access_token", accessToken.getValue());
             result.put("expires_in", accessToken.getExpirationTime());
             result.put("refresh_token", refresh ? accessToken.getRefreshToken() : StringUtils.EMPTY);
-            if (accessToken instanceof MacAccessToken) {
+            if (AbstractAccessToken.TokenType.MAC.equals(accessToken.getType())) {
                 result.put("mac_key", accessToken.getKey());
                 result.put("mac_algorithm", ((MacAccessToken) accessToken).getAlgorithm().getValue());
             }
             return JsonView.render(result, response, true);
         } catch (IOException e) {
-            log.error("Get string access token error by [{}]!", accessToken);
+            log.error("Get string access token error by [{}]!", accessToken, e);
         }
 
         return JsonView.render(new Error(ErrorCode.SERVICE_ERROR, StringUtils.EMPTY), response, false);

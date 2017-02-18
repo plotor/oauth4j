@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import org.zhenchao.passport.oauth.commons.ErrorCode;
 import static org.zhenchao.passport.oauth.commons.GlobalConstant.ALLOWED_RESPONSE_TYPE;
 import static org.zhenchao.passport.oauth.commons.GlobalConstant.ALLOWED_TOKEN_TYPE;
-import static org.zhenchao.passport.oauth.commons.GlobalConstant.GRANT_TYPE_CODE;
+import org.zhenchao.passport.oauth.commons.GrantType;
 import org.zhenchao.passport.oauth.domain.AuthorizationCode;
 import org.zhenchao.passport.oauth.domain.AuthorizeRequestParams;
 import org.zhenchao.passport.oauth.domain.RequestParams;
@@ -90,8 +90,8 @@ public class ParamsValidateServiceImpl implements ParamsValidateService {
         TokenRequestParams requestParams = (TokenRequestParams) params;
 
         // 检测grant type
-        if (!GRANT_TYPE_CODE.equals(requestParams.getGrantType())) {
-            log.error("The grant type [{}] is not expected, need [{}]!", requestParams.getGrantType(), GRANT_TYPE_CODE);
+        if (!GrantType.AUTHORIZATION_CODE.getType().equals(requestParams.getGrantType())) {
+            log.error("The grant type [{}] is not expected, need [{}]!", requestParams.getGrantType(), GrantType.AUTHORIZATION_CODE);
             return ErrorCode.UNSUPPORTED_GRANT_TYPE;
         }
 

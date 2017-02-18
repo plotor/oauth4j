@@ -1,6 +1,5 @@
 package org.zhenchao.passport.oauth.controllers;
 
-import net.sf.json.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,6 +40,8 @@ import org.zhenchao.passport.oauth.utils.JsonView;
 import org.zhenchao.passport.oauth.utils.SessionUtils;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import javax.annotation.Resource;
@@ -124,11 +125,11 @@ public class ImplicitGrantController {
             UserAppAuthorization uaa = authorization.get();
             TokenRequestParams trp = new TokenRequestParams();
             trp.setRedirectUri(redirectUri).setClientId(clientId).setTokenType(StringUtils.defaultString(tokenType, AbstractAccessToken.TokenType.MAC.getValue()));
-            trp.setIrt(false).setUserId(user.getId()).setScope(requestParams.getScope()).setAppInfo(appInfo).setUserAppAuthorization(uaa);
+            trp.setResponseType(responseType).setIrt(false).setUserId(user.getId()).setScope(requestParams.getScope()).setAppInfo(appInfo).setUserAppAuthorization(uaa);
             // 验证通过，下发accessToken
             Optional<AbstractTokenGenerator> optTokenGenerator = TokenGeneratorFactory.getGenerator(trp);
             if (!optTokenGenerator.isPresent()) {
-                log.error("Unknown grantType[{}] or tokenType[{}]", requestParams.getGrantType(), requestParams.getTokenType());
+                log.error("Generate implicit access token failed, unknown tokenType[{}]", trp.getTokenType());
                 return JsonView.render(new Error(ErrorCode.UNSUPPORTED_GRANT_TYPE, StringUtils.EMPTY), response, false);
             }
 
@@ -143,19 +144,35 @@ public class ImplicitGrantController {
             response.setHeader("Cache-Control", "no-store");
             response.setHeader("Pragma", "no-cache");
 
+            List<String> params = new ArrayList<>();
             AbstractAccessToken accessToken = optAccessToken.get();
             try {
-                JSONObject result = new JSONObject();
-                result.put("access_token", accessToken.getValue());
-                result.put("expires_in", accessToken.getExpirationTime());
-                result.put("refresh_token", refresh ? accessToken.getRefreshToken() : StringUtils.EMPTY);
-                if (accessToken instanceof MacAccessToken) {
-                    result.put("mac_key", accessToken.getKey());
-                    result.put("mac_algorithm", ((MacAccessToken) accessToken).getAlgorithm().getValue());
+                params.add(String.format("access_token=%s", accessToken.getValue()));
+                params.add(String.format("token_type=%s", accessToken.getType().getValue()));
+                if (AbstractAccessToken.TokenType.MAC.equals(accessToken.getType())) {
+                    // mac类型token
+                    params.add(String.format("mac_kek=%s", accessToken.getKey()));
+                    params.add(String.format("mac_algorithm=%s", ((MacAccessToken) accessToken).getAlgorithm().getValue()));
                 }
-                return JsonView.render(result, response, true);
+                params.add(String.format("expires_in=%d", accessToken.getExpirationTime()));
+                if (!CommonUtils.checkScope(scope, accessToken.getScope())) {
+                    // 最终授权的scope与请求的scope不一致，返回
+                    params.add(String.format("scope=%s", accessToken.getScope()));
+                }
+                if (StringUtils.isNotBlank(state)) {
+                    params.add(String.format("state=%s", state));
+                }
+                String rUri = redirectUri;
+                if (StringUtils.isBlank(rUri)) {
+                    // 用户未传递redirectUri，选择APP配置的第一个代替
+                    rUri = appInfo.getRedirectUri().split(GlobalConstant.SEPARATOR_REDIRECT_URI)[0];
+                }
+                String returnParams = StringUtils.join(params, "&");
+                response.sendRedirect(URLEncoder.encode(String.format("%s#%s", rUri, returnParams), "UTF-8"));
             } catch (IOException e) {
-                log.error("Get string access token error by [{}]!", accessToken);
+                log.error("Get string access token error by [{}]!", accessToken, e);
+                // FIXME 错误响应
+                mav.setViewName("redirect:error");
             }
         } else {
             // 用户未授权该APP，跳转到授权页面

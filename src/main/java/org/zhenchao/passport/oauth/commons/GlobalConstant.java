@@ -44,14 +44,6 @@ public interface GlobalConstant {
 
     String SEPARATOR_REDIRECT_SCOPE = " ";
 
-    /** 授权码模式 */
-    String RESPONSE_TYPE_CODE = "code";
-
-    /** 隐式授权模式 */
-    String RESPONSE_TYPE_TOKEN = "token";
-
-    String GRANT_TYPE_CODE = "authorization_code";
-
     String JSON_SAFE_PREFIX = "&&&START&&&";
 
     /** allowed response type */
@@ -59,8 +51,8 @@ public interface GlobalConstant {
         private static final long serialVersionUID = -7941095619455398619L;
 
         {
-            add(RESPONSE_TYPE_CODE); // Authorization Code
-            add(RESPONSE_TYPE_TOKEN); // implicit
+            add(ResponseType.AUTHORIZATION_CODE.getType()); // Authorization Code
+            add(ResponseType.IMPLICIT.getType()); // implicit
         }
     };
 

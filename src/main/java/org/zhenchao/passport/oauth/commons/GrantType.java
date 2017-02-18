@@ -1,5 +1,7 @@
 package org.zhenchao.passport.oauth.commons;
 
+import java.util.Optional;
+
 /**
  * grant type
  *
@@ -30,7 +32,23 @@ public enum GrantType {
      * @param grantType
      * @return
      */
-    public static boolean isValid(GrantType grantType) {
-        return AUTHORIZATION_CODE.equals(grantType) || PASSWORD_CREDENTIALS.equals(grantType) || CLIENT_CREDENTIALS.equals(grantType);
+    public static boolean isValid(String grantType) {
+        return AUTHORIZATION_CODE.getType().equals(grantType) ||
+                PASSWORD_CREDENTIALS.getType().equals(grantType) || CLIENT_CREDENTIALS.getType().equals(grantType);
+    }
+
+    /**
+     * change string param to {@code GrantType} object
+     *
+     * @param grantType
+     * @return
+     */
+    public static Optional<GrantType> toGrantType(String grantType) {
+        for (final GrantType type : GrantType.values()) {
+            if (type.getType().equals(grantType)) {
+                return Optional.of(type);
+            }
+        }
+        return Optional.empty();
     }
 }
