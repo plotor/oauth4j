@@ -38,6 +38,7 @@ public class LoginInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 
+        System.out.println(request.getRequestURI());
         String userId = request.getParameter("user_id");
         String key = StringUtils.isBlank(userId) ? CookieUtils.get(request, COOKIE_KEY_USER_LOGIN_SIGN) : DigestUtils.md5Hex(userId);
 

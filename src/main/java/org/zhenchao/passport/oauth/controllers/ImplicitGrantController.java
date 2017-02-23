@@ -17,7 +17,7 @@ import static org.zhenchao.passport.oauth.commons.GlobalConstant.PATH_OAUTH_IMPL
 import static org.zhenchao.passport.oauth.commons.GlobalConstant.PATH_ROOT_LOGIN;
 import static org.zhenchao.passport.oauth.commons.GlobalConstant.PATH_ROOT_OAUTH;
 import org.zhenchao.passport.oauth.domain.AuthorizeRequestParams;
-import org.zhenchao.passport.oauth.domain.Error;
+import org.zhenchao.passport.oauth.domain.ResultInfo;
 import org.zhenchao.passport.oauth.domain.TokenRequestParams;
 import org.zhenchao.passport.oauth.model.OAuthAppInfo;
 import org.zhenchao.passport.oauth.model.Scope;
@@ -82,11 +82,11 @@ public class ImplicitGrantController {
      *
      * @return
      */
-    @RequestMapping(value = PATH_OAUTH_IMPLICIT_TOKEN, method = {GET, POST}, params = "response_type=token")
+    @RequestMapping(value = PATH_OAUTH_IMPLICIT_TOKEN, method = {GET, POST})
     public ModelAndView authorize(HttpServletRequest request, HttpServletResponse response, HttpSession session,
                                   @RequestParam("response_type") String responseType,
                                   @RequestParam("client_id") long clientId,
-                                  @RequestParam(value = "redirect_uri", required = false) String redirectUri,
+                                  @RequestParam("redirect_uri") String redirectUri,
                                   @RequestParam(value = "scope", required = false) String scope,
                                   @RequestParam(value = "state", required = false) String state,
                                   @RequestParam(value = "token_type", required = false) String tokenType,
@@ -104,14 +104,14 @@ public class ImplicitGrantController {
         if (ErrorCode.NO_ERROR != validateResult) {
             // 请求参数有误
             log.error("Request authorize params error, params[{}], errorCode[{}]", requestParams, validateResult);
-            return JsonView.render(new Error(validateResult, state), response, false);
+            return JsonView.render(new ResultInfo(validateResult, state), response, false);
         }
 
         // 获取APP信息
         Optional<OAuthAppInfo> optAppInfo = appInfoService.getAppInfo(clientId);
         if (!optAppInfo.isPresent()) {
             log.error("Client[id={}] is not exist!", clientId);
-            return JsonView.render(new Error(ErrorCode.CLIENT_NOT_EXIST, state), response, false);
+            return JsonView.render(new ResultInfo(ErrorCode.CLIENT_NOT_EXIST, state), response, false);
         }
 
         OAuthAppInfo appInfo = optAppInfo.get();
@@ -143,14 +143,14 @@ public class ImplicitGrantController {
             Optional<AbstractTokenGenerator> optTokenGenerator = TokenGeneratorFactory.getGenerator(trp);
             if (!optTokenGenerator.isPresent()) {
                 log.error("Generate implicit access token failed, unknown tokenType[{}]", trp.getTokenType());
-                return this.buildErrorInfo(mav, redirectUri, appInfo, ErrorCode.UNSUPPORTED_GRANT_TYPE, state);
+                return CommonUtils.buildErrorResponse(mav, redirectUri, ErrorCode.UNSUPPORTED_GRANT_TYPE, state);
             }
 
             AbstractAccessTokenGenerator accessTokenGenerator = (AbstractAccessTokenGenerator) optTokenGenerator.get();
             Optional<AbstractAccessToken> optAccessToken = accessTokenGenerator.create();
             if (!optAccessToken.isPresent()) {
                 log.error("Generate access token failed, params[{}]", requestParams);
-                return this.buildErrorInfo(mav, redirectUri, appInfo, ErrorCode.INVALID_REQUEST, state);
+                return CommonUtils.buildErrorResponse(mav, redirectUri, ErrorCode.INVALID_REQUEST, state);
             }
 
             // no cache
@@ -175,11 +175,11 @@ public class ImplicitGrantController {
                 if (StringUtils.isNotBlank(state)) {
                     params.add(String.format("state=%s", state));
                 }
-                mav.setViewName("redirect:" + this.buildRedirectUri(redirectUri, appInfo, params));
+                mav.setViewName("redirect:" + String.format("%s#%s", redirectUri, StringUtils.join(params, "&")));
                 return mav;
             } catch (IOException e) {
                 log.error("Get string access token error by [{}]!", accessToken, e);
-                return this.buildErrorInfo(mav, redirectUri, appInfo, ErrorCode.SERVICE_TEMPORARILY_UNAVAILABLE, state);
+                return CommonUtils.buildErrorResponse(mav, redirectUri, ErrorCode.SERVICE_TEMPORARILY_UNAVAILABLE, state);
             }
         } else {
             // 用户未授权该APP，跳转到授权页面
@@ -189,46 +189,6 @@ public class ImplicitGrantController {
                     .addObject("user", user).addObject("app", appInfo).addObject("state", StringUtils.trimToEmpty(state));
             return mav;
         }
-    }
-
-    /**
-     * build error information and return
-     *
-     * @param mav
-     * @param redirectUri
-     * @param appInfo
-     * @param errorCode
-     * @param state
-     * @return
-     */
-    private ModelAndView buildErrorInfo(
-            ModelAndView mav, String redirectUri, OAuthAppInfo appInfo, ErrorCode errorCode, String state) {
-        List<String> params = new ArrayList<>();
-        params.add(String.format("error=%s", errorCode.getCode()));
-        params.add(String.format("error_description=%s", errorCode.getDesc()));
-        if (StringUtils.isNotBlank(state)) {
-            params.add(String.format("state=%s", state));
-        }
-        mav.setViewName("redirect:" + this.buildRedirectUri(redirectUri, appInfo, params));
-        return mav;
-    }
-
-    /**
-     * generate redirect uri
-     *
-     * @param redirectUri
-     * @param appInfo
-     * @param params
-     * @return
-     */
-    private String buildRedirectUri(final String redirectUri, OAuthAppInfo appInfo, List<String> params) {
-        String rUri = redirectUri;
-        if (StringUtils.isBlank(rUri)) {
-            // 用户未传递redirectUri，选择APP配置的第一个代替
-            rUri = appInfo.getRedirectUri().split(GlobalConstant.SEPARATOR_REDIRECT_URI)[0];
-        }
-        String returnParams = StringUtils.join(params, "&");
-        return String.format("%s#%s", rUri, returnParams);
     }
 
 }

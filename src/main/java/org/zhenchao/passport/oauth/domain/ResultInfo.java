@@ -4,12 +4,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.zhenchao.passport.oauth.commons.ErrorCode;
 
 /**
- * 错误信息
+ * 返回信息
  *
  * @author zhenchao.wang 2017-01-23 13:52
  * @version 1.0.0
  */
-public class Error {
+public class ResultInfo {
 
     private int code;
 
@@ -19,31 +19,45 @@ public class Error {
 
     private String state;
 
-    public Error() {
+    public ResultInfo() {
     }
 
-    public Error(int code, String desc, String state) {
+    public ResultInfo(String desc) {
+        this.code = 200;
+        this.desc = desc;
+        this.uri = StringUtils.EMPTY;
+        this.state = StringUtils.EMPTY;
+    }
+
+    public ResultInfo(String desc, String state) {
+        this.code = 200;
+        this.desc = desc;
+        this.uri = StringUtils.EMPTY;
+        this.state = state;
+    }
+
+    public ResultInfo(int code, String desc, String state) {
         this.code = code;
         this.desc = desc;
         this.uri = StringUtils.EMPTY;
         this.state = StringUtils.trimToEmpty(state);
     }
 
-    public Error(int code, String desc, String uri, String state) {
+    public ResultInfo(int code, String desc, String uri, String state) {
         this.code = code;
         this.desc = desc;
         this.uri = uri;
         this.state = StringUtils.trimToEmpty(state);
     }
 
-    public Error(ErrorCode errorCode, String state) {
+    public ResultInfo(ErrorCode errorCode, String state) {
         this.code = errorCode.getCode();
         this.desc = errorCode.getDesc();
         this.uri = StringUtils.EMPTY;
         this.state = StringUtils.trimToEmpty(state);
     }
 
-    public Error(ErrorCode errorCode, String uri, String state) {
+    public ResultInfo(ErrorCode errorCode, String uri, String state) {
         this.code = errorCode.getCode();
         this.desc = errorCode.getDesc();
         this.uri = uri;

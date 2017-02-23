@@ -14,7 +14,7 @@ import org.zhenchao.passport.oauth.commons.ErrorCode;
 import static org.zhenchao.passport.oauth.commons.GlobalConstant.PATH_OAUTH_USER_AUTHORIZE;
 import static org.zhenchao.passport.oauth.commons.GlobalConstant.PATH_ROOT_LOGIN;
 import static org.zhenchao.passport.oauth.commons.GlobalConstant.PATH_ROOT_OAUTH;
-import org.zhenchao.passport.oauth.domain.Error;
+import org.zhenchao.passport.oauth.domain.ResultInfo;
 import org.zhenchao.passport.oauth.model.UserAppAuthorization;
 import org.zhenchao.passport.oauth.service.UserAppAuthorizationService;
 import org.zhenchao.passport.oauth.utils.CommonUtils;
@@ -87,7 +87,7 @@ public class UserAuthorizeController {
                 // never happen
             }
         }
-        return JsonView.render(new Error(ErrorCode.LOCAL_SERVICE_ERROR, state), response, false);
+        return JsonView.render(new ResultInfo(ErrorCode.LOCAL_SERVICE_ERROR, state), response, false);
     }
 
 }

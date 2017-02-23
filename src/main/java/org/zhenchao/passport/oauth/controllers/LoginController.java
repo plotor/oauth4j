@@ -14,7 +14,7 @@ import org.zhenchao.passport.oauth.commons.ErrorCode;
 import org.zhenchao.passport.oauth.commons.GlobalConstant;
 import static org.zhenchao.passport.oauth.commons.GlobalConstant.COOKIE_KEY_USER_LOGIN_SIGN;
 import static org.zhenchao.passport.oauth.commons.GlobalConstant.PATH_ROOT_LOGIN;
-import org.zhenchao.passport.oauth.domain.Error;
+import org.zhenchao.passport.oauth.domain.ResultInfo;
 import org.zhenchao.passport.oauth.exceptions.CryptException;
 import org.zhenchao.passport.oauth.model.User;
 import org.zhenchao.passport.oauth.service.UserService;
@@ -81,7 +81,7 @@ public class LoginController {
 
         if (StringUtils.isBlank(username) || StringUtils.isBlank(password)) {
             log.error("Login params error, username or password is null or empty!");
-            return JsonView.render(new Error(ErrorCode.PARAMETER_ERROR, StringUtils.EMPTY), response, false);
+            return JsonView.render(new ResultInfo(ErrorCode.PARAMETER_ERROR, StringUtils.EMPTY), response, false);
         }
 
         try {
@@ -97,14 +97,17 @@ public class LoginController {
                 cookie.setHttpOnly(true);
                 cookie.setMaxAge(24 * 3600);
                 response.addCookie(cookie);
-                mav.setViewName("redirect:" + callback);
-                return mav;
+                if(StringUtils.isNotBlank(callback)) {
+                    mav.setViewName("redirect:" + callback);
+                    return mav;
+                }
+                return JsonView.render(new ResultInfo("login success"), response, false);
             }
         } catch (CryptException e) {
             log.error("Validate user[{}] error!", username, e);
         }
         log.error("User login failed, username or password error!");
-        return JsonView.render(new Error(ErrorCode.VALIDATE_USER_ERROR, StringUtils.EMPTY), response, false);
+        return JsonView.render(new ResultInfo(ErrorCode.VALIDATE_USER_ERROR, StringUtils.EMPTY), response, false);
     }
 
 }
