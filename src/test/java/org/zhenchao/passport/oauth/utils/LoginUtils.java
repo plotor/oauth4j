@@ -10,10 +10,10 @@ import org.junit.Assert;
  */
 public class LoginUtils {
 
-    public static void login() {
+    public static Response login() {
         Response response =
                 RestAssured.with().param("username", "zhenchao").param("password", "123456").post("http://localhost:8080/login");
-        System.out.println(response.asString());
         Assert.assertEquals(200, response.jsonPath().getInt("code"));
+        return response;
     }
 }

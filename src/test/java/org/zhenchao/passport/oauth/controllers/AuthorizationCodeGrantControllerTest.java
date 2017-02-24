@@ -2,7 +2,8 @@ package org.zhenchao.passport.oauth.controllers;
 
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
-import org.junit.BeforeClass;
+import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import static org.zhenchao.passport.oauth.commons.GlobalConstant.PATH_OAUTH_AUTHORIZE_CODE;
 import static org.zhenchao.passport.oauth.commons.GlobalConstant.PATH_ROOT_OAUTH;
@@ -22,17 +23,17 @@ public class AuthorizationCodeGrantControllerTest {
 
     private static final String SCOPE = "1 4";
 
-    @BeforeClass
+    @Before
     public void setUp() throws Exception {
-        LoginUtils.login(); // FIXME 2017-2-23 23:48:53
         RestAssured.baseURI = "http://localhost:8080" + PATH_ROOT_OAUTH;
     }
 
     @Test
     public void authorizeTest() throws Exception {
+        Response resp4Login = LoginUtils.login();
         // 不指定response_type
-        Response response = RestAssured.get(PATH_OAUTH_AUTHORIZE_CODE);
-        // Assert.assertEquals(400, response.getStatusCode());
+        Response response = RestAssured.with().cookies(resp4Login.getCookies()).get(PATH_OAUTH_AUTHORIZE_CODE);
+        Assert.assertEquals(400, response.getStatusCode());
         System.out.println(response.asString());
     }
 

@@ -37,4 +37,7 @@ public class CryptException extends Exception {
         this.errorCode = errorCode;
     }
 
+    public ErrorCode getErrorCode() {
+        return errorCode;
+    }
 }
