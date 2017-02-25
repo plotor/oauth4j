@@ -50,7 +50,7 @@ public class AuthorizationCodeGrantControllerTest {
     }
 
     @Test
-    public void authorizeWithErrorRequestParamsTest() throws Exception {
+    public void authorizeWithErrorParamsTest() throws Exception {
         // 必要参数缺失
         Map<String, Object> params = new HashMap<>();
         Response response = RestAssured.with().params(params).cookies(resp4Login.getCookies()).get(PATH_OAUTH_AUTHORIZE_CODE);
@@ -117,7 +117,7 @@ public class AuthorizationCodeGrantControllerTest {
     }
 
     @Test
-    public void requestAccessTokenTest() throws Exception {
+    public void requestAccessTokenWithMissingParamsTest() throws Exception {
         // 获取授权码
         Map<String, Object> params = new HashMap<>();
         params.put("response_type", ResponseType.AUTHORIZATION_CODE.getType());
@@ -302,7 +302,7 @@ public class AuthorizationCodeGrantControllerTest {
     }
 
     @Test
-    public void requestAcessTokenTest() throws Exception {
+    public void requestAccessTokenTest() throws Exception {
         // 获取授权码
         Map<String, Object> params = new HashMap<>();
         params.put("response_type", ResponseType.AUTHORIZATION_CODE.getType());
