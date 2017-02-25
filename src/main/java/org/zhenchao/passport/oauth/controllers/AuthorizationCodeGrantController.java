@@ -243,7 +243,7 @@ public class AuthorizationCodeGrantController {
             return JsonView.render(new ResultInfo(ErrorCode.INVALID_REQUEST, StringUtils.EMPTY), response, false);
         }
 
-        // no cache
+        // not cache
         response.setHeader("Cache-Control", "no-store");
         response.setHeader("Pragma", "no-cache");
 
@@ -252,8 +252,16 @@ public class AuthorizationCodeGrantController {
             JSONObject result = new JSONObject();
             result.put("access_token", accessToken.getValue());
             result.put("expires_in", accessToken.getExpirationTime());
-            result.put("refresh_token", refresh ? accessToken.getRefreshToken() : StringUtils.EMPTY);
+            if (refresh) {
+                // 客户端指定下发refreshToken
+                result.put("refresh_token", accessToken.getRefreshToken());
+            }
+            if (!CommonUtils.checkScopeIsSame(requestParams.getScope(), accessToken.getScope())) {
+                // 如果最终下发的scope与请求时不一致，需要说明
+                result.put("scope", accessToken.getScope());
+            }
             if (AbstractAccessToken.TokenType.MAC.equals(accessToken.getType())) {
+                // MAC类型token需要指定key和algorithm
                 result.put("mac_key", accessToken.getKey());
                 result.put("mac_algorithm", ((MacAccessToken) accessToken).getAlgorithm().getValue());
             }

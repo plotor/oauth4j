@@ -160,7 +160,7 @@ public class ImplicitGrantController {
                 return this.buildErrorResponse(mav, redirectUri, ErrorCode.INVALID_REQUEST, state);
             }
 
-            // no cache
+            // not cache
             response.setHeader("Cache-Control", "no-store");
             response.setHeader("Pragma", "no-cache");
 
@@ -175,9 +175,9 @@ public class ImplicitGrantController {
                     params.add(String.format("mac_algorithm=%s", ((MacAccessToken) accessToken).getAlgorithm().getValue()));
                 }
                 params.add(String.format("expires_in=%d", accessToken.getExpirationTime()));
-                if (!CommonUtils.checkScope(scope, accessToken.getScope())) {
-                    // 最终授权的scope与请求的scope不一致，返回
-                    params.add(String.format("scope=%s", accessToken.getScope()));
+                if (!CommonUtils.checkScopeIsSame(scope, accessToken.getScope())) {
+                    // 最终授权的scope与请求的scope不一致，返回说明
+                    params.add(String.format("scope=%s", URLEncoder.encode(accessToken.getScope(), "UTF-8")));
                 }
                 if (StringUtils.isNotBlank(state)) {
                     params.add(String.format("state=%s", state));

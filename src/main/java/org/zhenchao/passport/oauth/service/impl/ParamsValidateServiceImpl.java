@@ -145,7 +145,17 @@ public class ParamsValidateServiceImpl implements ParamsValidateService {
                         requestParams.getClientId(), code.getAppInfo().getAppId());
                 return ErrorCode.UNAUTHORIZED_CLIENT;
             }
-            // TODO client secret 验证
+
+            /*
+             * TODO client secret 验证
+             *
+             * client_secret属于创建APP时下发，这一块可以调用开放平台接口进行验证
+             * client_secret由APP自己保管，这个主要用来验证当前请求授权的APP是持有对应ID的APP自己
+             * 如果client_secret遭到泄露，那么相关责任应该由APP自己承担
+             * 这一块的实现可以基于AES加密，client_secret是加密后的秘闻，然后每个APP持有一个aes key，这个存储在我们这，
+             * 当APP请求授权的时候，我们利用它的key去解密对应的client_secret，得到APP_ID，与传递而来的ID进行比对
+             */
+
             return ErrorCode.NO_ERROR;
         }
         return ErrorCode.INVALID_AUTHORIZATION_CODE;

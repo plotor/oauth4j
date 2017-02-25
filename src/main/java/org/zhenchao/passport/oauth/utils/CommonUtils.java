@@ -39,7 +39,7 @@ public class CommonUtils {
      * @param scope2
      * @return
      */
-    public static boolean checkScope(String scope1, String scope2) {
+    public static boolean checkScopeIsSame(String scope1, String scope2) {
         if (StringUtils.isBlank(scope1) || StringUtils.isBlank(scope2)) {
             return false;
         }

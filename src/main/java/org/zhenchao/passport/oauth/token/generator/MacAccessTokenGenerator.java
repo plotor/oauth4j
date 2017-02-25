@@ -5,7 +5,6 @@ import org.zhenchao.passport.oauth.model.OAuthAppInfo;
 import org.zhenchao.passport.oauth.model.UserAppAuthorization;
 import org.zhenchao.passport.oauth.token.AbstractAccessToken;
 import org.zhenchao.passport.oauth.token.MacAccessToken;
-import org.zhenchao.passport.oauth.token.RefreshToken;
 
 import java.util.Optional;
 
@@ -43,13 +42,12 @@ public class MacAccessTokenGenerator extends AbstractAccessTokenGenerator {
         long currentTime = System.currentTimeMillis();
         accessToken.setVersion(AbstractAccessToken.TokenVersion.V_1_0_0)
                 .setUserId(params.getUserId()).setClientId(params.getClientId()).setScope(params.getScope())
-                .setIssueTime(currentTime).setExpirationTime(currentTime + appInfo.getTokenValidity() * 1000L)  // 时间单位保持一致
+                .setIssueTime(currentTime).setExpirationTime((currentTime + appInfo.getTokenValidity() * 1000L) / 1000L)  // 时间单位保持一致（过期时间以秒为单位）
                 .setType(MacAccessToken.TYPE).setKey(uaa.getTokenKey());
         if (params.isIrt()) {
             // 生成刷新令牌
-            RefreshToken refreshToken = new RefreshToken();
             // TODO 生成刷新令牌
-            accessToken.setRefreshToken("");
+            accessToken.setRefreshToken("refresh token");
         }
 
         return Optional.of(accessToken);

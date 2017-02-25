@@ -76,7 +76,7 @@ public class UserAuthorizeController {
         authorization.setCreateTime(new Date());
         authorization.setCreateTime(authorization.getCreateTime());
         authorization.setTokenKey(RandomStringUtils.randomAlphanumeric(64));  // 随机生成key
-        authorization.setRefreshTokenKey(RandomStringUtils.randomAlphanumeric(64));  // FIXME 这里是不是应该考虑采用AES加密
+        authorization.setRefreshTokenKey(RandomStringUtils.randomAlphanumeric(64));  // 随机生成刷新令牌key
         authorization.setRefreshTokenExpirationTime(365 * 24 * 3600L);  // 设置刷新令牌有效期
         if (authorizeRelationService.replaceUserAndAppAuthorizationInfo(authorization)) {
             // 更新用户授权关系成功
