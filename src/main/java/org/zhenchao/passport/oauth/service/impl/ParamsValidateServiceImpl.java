@@ -112,8 +112,8 @@ public class ParamsValidateServiceImpl implements ParamsValidateService {
             }
         }
 
-        Optional<AuthorizationCode> optCode = authorizeService.getAuthorizationCodeFromCache(requestParams.getCode());
-        if (optCode.isPresent()) {
+        Optional<AuthorizationCode> opt = authorizeService.getAuthorizationCodeFromCache(requestParams.getCode());
+        if (opt.isPresent()) {
 
             // 从缓存中删除授权码，一个授权码只能被使用一次
             if (!authorizeService.deleteAuthorizationCodeFromCache(requestParams.getCode())) {
@@ -121,7 +121,7 @@ public class ParamsValidateServiceImpl implements ParamsValidateService {
                 return ErrorCode.INVALID_AUTHORIZATION_CODE;
             }
 
-            AuthorizationCode code = optCode.get();
+            AuthorizationCode code = opt.get();
             //记录部分信息，创建token时需要
             requestParams.setUserId(code.getUserId()).setScope(code.getScopes()).setAppInfo(code.getAppInfo());
             // 回调地址验证

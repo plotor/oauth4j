@@ -46,6 +46,7 @@ import org.zhenchao.passport.oauth.utils.SessionUtils;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
@@ -100,6 +101,12 @@ public class AuthorizationCodeGrantController {
         log.debug("Entering authorize code method...");
 
         ModelAndView mav = new ModelAndView();
+
+        try {
+            redirectUri = URLDecoder.decode(redirectUri, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            // never happen
+        }
 
         AuthorizeRequestParams requestParams = new AuthorizeRequestParams();
         requestParams.setResponseType(responseType).setClientId(clientId).setRedirectUri(redirectUri).setScope(scope).setState(StringUtils.trimToEmpty(state));
@@ -182,17 +189,23 @@ public class AuthorizationCodeGrantController {
      *
      * @return
      */
-    @RequestMapping(value = PATH_OAUTH_AUTHORIZE_TOKEN, method = {GET, POST}, params = "grant_type=authorization_code")
-    public ModelAndView issueAccessToken(HttpServletResponse response,
-                                         @RequestParam("grant_type") String grantType,
-                                         @RequestParam("code") String code,
-                                         @RequestParam("redirect_uri") String redirectUri,
-                                         @RequestParam("client_id") long clientId,
-                                         @RequestParam(value = "client_secret", required = false) String clientSecret,
-                                         @RequestParam(value = "token_type", required = false) String tokenType,
-                                         @RequestParam(value = "issue_refresh_token", required = false, defaultValue = "true") boolean refresh) {
+    @RequestMapping(value = PATH_OAUTH_AUTHORIZE_TOKEN, method = {GET, POST})
+    public ModelAndView issueToken(HttpServletResponse response,
+                                   @RequestParam("grant_type") String grantType,
+                                   @RequestParam("code") String code,
+                                   @RequestParam("redirect_uri") String redirectUri,
+                                   @RequestParam("client_id") long clientId,
+                                   @RequestParam(value = "client_secret", required = false) String clientSecret,
+                                   @RequestParam(value = "token_type", required = false) String tokenType,
+                                   @RequestParam(value = "issue_refresh_token", required = false, defaultValue = "true") boolean refresh) {
 
         log.debug("Entering authorize code method...");
+
+        try {
+            redirectUri = URLDecoder.decode(redirectUri, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            // never happen
+        }
 
         TokenRequestParams requestParams = new TokenRequestParams();
         requestParams.setResponseType(ResponseType.AUTHORIZATION_CODE.getType()).setGrantType(grantType).setCode(code)

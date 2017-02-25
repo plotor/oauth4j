@@ -26,7 +26,8 @@
     <mvc:interceptors>
         <mvc:interceptor>
             <!--所有的oauth请求都走登录验证-->
-            <mvc:mapping path="/oauth/**"/>
+            <mvc:mapping path="/oauth/authorize/code"/>
+            <mvc:mapping path="/oauth/implicit/token"/>
             <bean class="org.zhenchao.passport.oauth.interceptors.LoginInterceptor"/>
         </mvc:interceptor>
     </mvc:interceptors>
