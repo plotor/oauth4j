@@ -143,14 +143,14 @@ public class ImplicitGrantController {
             Optional<AbstractTokenGenerator> optTokenGenerator = TokenGeneratorFactory.getGenerator(trp);
             if (!optTokenGenerator.isPresent()) {
                 log.error("Generate implicit access token failed, unknown tokenType[{}]", trp.getTokenType());
-                return CommonUtils.buildErrorResponse(mav, redirectUri, ErrorCode.UNSUPPORTED_GRANT_TYPE, state);
+                return this.buildErrorResponse(mav, redirectUri, ErrorCode.UNSUPPORTED_GRANT_TYPE, state);
             }
 
             AbstractAccessTokenGenerator accessTokenGenerator = (AbstractAccessTokenGenerator) optTokenGenerator.get();
             Optional<AbstractAccessToken> optAccessToken = accessTokenGenerator.create();
             if (!optAccessToken.isPresent()) {
                 log.error("Generate access token failed, params[{}]", requestParams);
-                return CommonUtils.buildErrorResponse(mav, redirectUri, ErrorCode.INVALID_REQUEST, state);
+                return this.buildErrorResponse(mav, redirectUri, ErrorCode.INVALID_REQUEST, state);
             }
 
             // no cache
@@ -179,7 +179,7 @@ public class ImplicitGrantController {
                 return mav;
             } catch (IOException e) {
                 log.error("Get string access token error by [{}]!", accessToken, e);
-                return CommonUtils.buildErrorResponse(mav, redirectUri, ErrorCode.SERVICE_TEMPORARILY_UNAVAILABLE, state);
+                return this.buildErrorResponse(mav, redirectUri, ErrorCode.SERVICE_TEMPORARILY_UNAVAILABLE, state);
             }
         } else {
             // 用户未授权该APP，跳转到授权页面
@@ -189,6 +189,32 @@ public class ImplicitGrantController {
                     .addObject("user", user).addObject("app", appInfo).addObject("state", StringUtils.trimToEmpty(state));
             return mav;
         }
+    }
+
+    /**
+     * build error response
+     *
+     * @param mav
+     * @param redirectUri
+     * @param errorCode
+     * @param state
+     * @return
+     */
+    public ModelAndView buildErrorResponse(ModelAndView mav, String redirectUri, ErrorCode errorCode, String state) {
+        List<String> params = new ArrayList<>();
+        params.add(String.format("error=%s", errorCode.getCode()));
+        if (StringUtils.isNotBlank(errorCode.getDesc())) {
+            try {
+                params.add(String.format("error_description=%s", URLEncoder.encode(errorCode.getDesc(), "UTF-8")));
+            } catch (UnsupportedEncodingException e) {
+                // never happen
+            }
+        }
+        if (StringUtils.isNotBlank(state)) {
+            params.add(String.format("state=%s", state));
+        }
+        mav.setViewName("redirect:" + String.format("%s#%s", redirectUri, StringUtils.join(params, "&")));
+        return mav;
     }
 
 }

@@ -59,7 +59,7 @@ public class ParamsValidateServiceImpl implements ParamsValidateService {
             OAuthAppInfo appInfo = optAppInfo.get();
 
             // 回调地址校验
-            // TODO 请求授权码时回调地址不是必须的
+            // FIXME 请求授权码时回调地址不是必须的
             if (StringUtils.isBlank(requestParams.getRedirectUri()) || StringUtils.isBlank(appInfo.getRedirectUri())) {
                 return ErrorCode.INVALID_REDIRECT_URI;
             }
@@ -68,11 +68,14 @@ public class ParamsValidateServiceImpl implements ParamsValidateService {
                 return ErrorCode.INVALID_REDIRECT_URI;
             }
 
-            // TODO 如果授权的scope与客户端请求的scope不一致，那么需要在下发token的时候说明真实下发的scope列表，参见3.3
-            // scope校验，如果没有传递则设置为当前允许的所有权限
+            /*
+             * scope校验，如果没有传递则设置为当前允许的所有权限
+             * 如果授权的scope与客户端请求的scope不一致，那么需要在下发token的时候说明真实下发的scope列表
+             */
             if (StringUtils.isBlank(requestParams.getScope())) {
                 log.info("The app[{}] not set scope, use default scope[{}].", requestParams.getClientId(), appInfo.getScope());
                 requestParams.setScope(appInfo.getScope());
+                return ErrorCode.NO_ERROR;
             } else {
                 // 校验传递的scope是否是许可scope的子集
                 return this.isSubScopes(appInfo.getScope(), requestParams.getScope()) ? ErrorCode.NO_ERROR : ErrorCode.INVALID_SCOPE;

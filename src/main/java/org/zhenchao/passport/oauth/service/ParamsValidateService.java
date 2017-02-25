@@ -2,6 +2,7 @@ package org.zhenchao.passport.oauth.service;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.validator.routines.UrlValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zhenchao.passport.oauth.commons.ErrorCode;
@@ -50,6 +51,12 @@ public interface ParamsValidateService {
         if (StringUtils.isBlank(redirectUriStr) || StringUtils.isBlank(input)) {
             return false;
         }
+
+        if (!UrlValidator.getInstance().isValid(input)) {
+            log.error("The input url [{}] is not a legal url!", input);
+            return false;
+        }
+
         String[] redirectUris = StringUtils.trim(redirectUriStr).split(SEPARATOR_REDIRECT_URI);
         try {
             URI inputUri = new URI(input);

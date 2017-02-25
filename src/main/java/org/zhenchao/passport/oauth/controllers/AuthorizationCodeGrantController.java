@@ -47,6 +47,7 @@ import org.zhenchao.passport.oauth.utils.SessionUtils;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import javax.annotation.Resource;
@@ -115,17 +116,17 @@ public class AuthorizationCodeGrantController {
                  */
                 return JsonView.render(new ResultInfo(validateResult, state), response, false);
             }
-            return CommonUtils.buildErrorResponse(mav, redirectUri, validateResult, state);
+            return this.buildErrorResponse(mav, redirectUri, validateResult, state);
         }
 
         // 获取APP信息
-        Optional<OAuthAppInfo> optAppInfo = appInfoService.getAppInfo(clientId);
-        if (!optAppInfo.isPresent()) {
+        Optional<OAuthAppInfo> opt = appInfoService.getAppInfo(clientId);
+        if (!opt.isPresent()) {
             log.error("Client[id={}] is not exist!", clientId);
             return JsonView.render(new ResultInfo(ErrorCode.CLIENT_NOT_EXIST, state), response, false);
         }
 
-        OAuthAppInfo appInfo = optAppInfo.get();
+        OAuthAppInfo appInfo = opt.get();
         User user = SessionUtils.getUser(session, CookieUtils.get(request, COOKIE_KEY_USER_LOGIN_SIGN));
         if (null == user || forceLogin) {
             try {
@@ -160,7 +161,7 @@ public class AuthorizationCodeGrantController {
                     mav.setViewName("redirect:" + builder.toUriString());
                     return mav;
                 }
-                return CommonUtils.buildErrorResponse(mav, redirectUri, ErrorCode.GENERATE_CODE_ERROR, state);
+                return this.buildErrorResponse(mav, redirectUri, ErrorCode.GENERATE_CODE_ERROR, state);
             } catch (OAuthServiceException e) {
                 log.error("Generate authorization code error!", e);
                 return JsonView.render(new ResultInfo(e.getErrorCode(), state), response, false);
@@ -249,6 +250,32 @@ public class AuthorizationCodeGrantController {
         }
 
         return JsonView.render(new ResultInfo(ErrorCode.SERVICE_ERROR, StringUtils.EMPTY), response, false);
+    }
+
+    /**
+     * build error response
+     *
+     * @param mav
+     * @param redirectUri
+     * @param errorCode
+     * @param state
+     * @return
+     */
+    public ModelAndView buildErrorResponse(ModelAndView mav, String redirectUri, ErrorCode errorCode, String state) {
+        List<String> params = new ArrayList<>();
+        params.add(String.format("error=%s", errorCode.getCode()));
+        if (StringUtils.isNotBlank(errorCode.getDesc())) {
+            try {
+                params.add(String.format("error_description=%s", URLEncoder.encode(errorCode.getDesc(), "UTF-8")));
+            } catch (UnsupportedEncodingException e) {
+                // never happen
+            }
+        }
+        if (StringUtils.isNotBlank(state)) {
+            params.add(String.format("state=%s", state));
+        }
+        mav.setViewName("redirect:" + String.format("%s?%s", redirectUri, StringUtils.join(params, "&")));
+        return mav;
     }
 
 }
