@@ -263,7 +263,7 @@ public class AuthorizationCodeGrantControllerTest {
         params.put("redirect_uri", errorRedirectUrl);
         response = RestAssured.with().params(params).get(PATH_OAUTH_AUTHORIZE_TOKEN);
         JSONObject json = JSONObject.fromObject(response.asString());
-        Assert.assertEquals(ErrorCode.INVALID_REDIRECT_URI.getCode(), json.getInt("code"));
+        Assert.assertEquals(ErrorCode.INVALID_GRANT.getCode(), json.getInt("code"));
     }
 
     @Test
@@ -294,15 +294,15 @@ public class AuthorizationCodeGrantControllerTest {
         params.put("client_id", CLIENT_ID);
 
         // 错误的client id
-        String errorClientId = RandomStringUtils.randomAlphanumeric(8);
+        long errorClientId = org.apache.commons.lang.math.RandomUtils.nextLong();
         params.put("client_id", errorClientId);
         response = RestAssured.with().params(params).get(PATH_OAUTH_AUTHORIZE_TOKEN);
         JSONObject json = JSONObject.fromObject(response.asString());
-        Assert.assertEquals(ErrorCode.INVALID_CLIENT.getCode(), json.getInt("code"));
+        Assert.assertEquals(ErrorCode.UNAUTHORIZED_CLIENT.getCode(), json.getInt("code"));
     }
 
     @Test
-    public void issueTokenTest() throws Exception {
+    public void requestAcessTokenTest() throws Exception {
         // 获取授权码
         Map<String, Object> params = new HashMap<>();
         params.put("response_type", ResponseType.AUTHORIZATION_CODE.getType());
@@ -328,6 +328,7 @@ public class AuthorizationCodeGrantControllerTest {
         params.put("redirect_uri", REDIRECT_URI);
         params.put("client_id", CLIENT_ID);
 
+        response = RestAssured.with().params(params).get(PATH_OAUTH_AUTHORIZE_TOKEN);
         String result = StringEscapeUtils.unescapeJson(response.asString());  // 反转义
         result = result.substring(1, result.length() - 1);
         System.out.println(result);
@@ -345,6 +346,12 @@ public class AuthorizationCodeGrantControllerTest {
         Assert.assertEquals(ErrorCode.INVALID_AUTHORIZATION_CODE.getCode(), json.getInt("code"));
     }
 
+    /**
+     * 解析Location字段中的url参数列表
+     *
+     * @param response
+     * @return
+     */
     private Map<String, String> getLocationUrlParamsValue(Response response) {
         String location = response.getHeader("Location");
         if (StringUtils.isBlank(location)) {
@@ -353,6 +360,12 @@ public class AuthorizationCodeGrantControllerTest {
         return this.getUrlParamsValue(location);
     }
 
+    /**
+     * 解析url参数列表
+     *
+     * @param url
+     * @return
+     */
     private Map<String, String> getUrlParamsValue(String url) {
         Map<String, String> result = new HashMap<>();
         try {
