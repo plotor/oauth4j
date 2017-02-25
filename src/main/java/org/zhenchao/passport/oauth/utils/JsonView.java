@@ -8,6 +8,7 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.http.server.ServletServerHttpResponse;
 import org.springframework.web.servlet.ModelAndView;
 import org.zhenchao.passport.oauth.commons.GlobalConstant;
+import org.zhenchao.passport.oauth.domain.ResultInfo;
 
 import java.io.IOException;
 import javax.servlet.http.HttpServletResponse;
@@ -33,6 +34,9 @@ public class JsonView {
         MappingJackson2HttpMessageConverter jsonConverter = new MappingJackson2HttpMessageConverter();
         try {
             Object json = jsonSafe ? StringUtils.join(GlobalConstant.JSON_SAFE_PREFIX, model) : model;
+            if(model instanceof ResultInfo) {
+                json = ((ResultInfo) model).toJson();
+            }
             jsonConverter.write(json, MediaType.APPLICATION_JSON, new ServletServerHttpResponse(response));
         } catch (IOException e) {
             log.error("Write response data [{}] as json view error!", model, e);

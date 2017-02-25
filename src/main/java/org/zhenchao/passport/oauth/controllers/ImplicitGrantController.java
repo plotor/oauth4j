@@ -40,6 +40,7 @@ import org.zhenchao.passport.oauth.utils.SessionUtils;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
@@ -82,7 +83,7 @@ public class ImplicitGrantController {
      *
      * @return
      */
-    @RequestMapping(value = PATH_OAUTH_IMPLICIT_TOKEN, method = {GET, POST})
+    @RequestMapping(value = PATH_OAUTH_IMPLICIT_TOKEN, method = {GET, POST}, params = "response_type=token")
     public ModelAndView authorize(HttpServletRequest request, HttpServletResponse response, HttpSession session,
                                   @RequestParam("response_type") String responseType,
                                   @RequestParam("client_id") long clientId,
@@ -96,6 +97,12 @@ public class ImplicitGrantController {
         log.debug("Entering implicit grant method...");
 
         ModelAndView mav = new ModelAndView();
+
+        try {
+            redirectUri = URLDecoder.decode(redirectUri, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            // never happen
+        }
 
         AuthorizeRequestParams requestParams = new AuthorizeRequestParams();
         requestParams.setResponseType(responseType).setClientId(clientId).setRedirectUri(redirectUri).setScope(scope).setState(StringUtils.trimToEmpty(state));
@@ -200,7 +207,7 @@ public class ImplicitGrantController {
      * @param state
      * @return
      */
-    public ModelAndView buildErrorResponse(ModelAndView mav, String redirectUri, ErrorCode errorCode, String state) {
+    private ModelAndView buildErrorResponse(ModelAndView mav, String redirectUri, ErrorCode errorCode, String state) {
         List<String> params = new ArrayList<>();
         params.add(String.format("error=%s", errorCode.getCode()));
         if (StringUtils.isNotBlank(errorCode.getDesc())) {

@@ -1,5 +1,7 @@
 package org.zhenchao.passport.oauth.domain;
 
+import net.sf.json.JSONObject;
+import net.sf.json.JsonConfig;
 import org.apache.commons.lang3.StringUtils;
 import org.zhenchao.passport.oauth.commons.ErrorCode;
 
@@ -62,6 +64,24 @@ public class ResultInfo {
         this.desc = errorCode.getDesc();
         this.uri = uri;
         this.state = StringUtils.trimToEmpty(state);
+    }
+
+    /**
+     * 转化成json
+     *
+     * @return
+     */
+    public JSONObject toJson() {
+        JsonConfig config = new JsonConfig();
+        config.setJsonPropertyFilter((Object source, String name, Object value) -> {
+            if ("uri".equals(name) || "state".equals(name)) {
+                if (StringUtils.isBlank((String) value)) {
+                    return true;
+                }
+            }
+            return false;
+        });
+        return JSONObject.fromObject(this, config);
     }
 
     public int getCode() {

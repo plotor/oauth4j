@@ -19,9 +19,9 @@ import static org.zhenchao.passport.oauth.commons.GlobalConstant.PATH_ROOT_OAUTH
 import org.zhenchao.passport.oauth.commons.GrantType;
 import org.zhenchao.passport.oauth.commons.ResponseType;
 import org.zhenchao.passport.oauth.token.MacAccessToken;
-import org.zhenchao.passport.oauth.utils.MockUserOperateUtils;
+import org.zhenchao.passport.oauth.utils.MockUserOperationUtils;
+import org.zhenchao.passport.oauth.utils.ResultUtils;
 
-import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -46,7 +46,7 @@ public class AuthorizationCodeGrantControllerTest {
     @Before
     public void setUp() throws Exception {
         RestAssured.baseURI = "http://localhost:8080" + PATH_ROOT_OAUTH;
-        resp4Login = MockUserOperateUtils.login();
+        resp4Login = MockUserOperationUtils.login();
     }
 
     @Test
@@ -75,16 +75,16 @@ public class AuthorizationCodeGrantControllerTest {
         String errorResponseType = RandomStringUtils.randomAlphanumeric(8);
         params.put("response_type", errorResponseType);
         response = RestAssured.with().params(params).cookies(resp4Login.getCookies()).post(PATH_OAUTH_AUTHORIZE_CODE);
-        Assert.assertEquals(302, response.getStatusCode());
-        Map<String, String> errors = this.getLocationUrlParamsValue(response);
-        Assert.assertEquals(ErrorCode.UNSUPPORTED_RESPONSE_TYPE.getCode(), NumberUtils.toInt(errors.get("error")));
+        Assert.assertEquals(400, response.getStatusCode());
+        // Map<String, String> errors = this.getLocationUrlParamsValue(response);
+        // Assert.assertEquals(ErrorCode.UNSUPPORTED_RESPONSE_TYPE.getCode(), NumberUtils.toInt(errors.get("error")));
 
         long errorClientId = RandomUtils.nextLong();
         params.put("response_type", ResponseType.AUTHORIZATION_CODE.getType());
         params.put("client_id", errorClientId);
         response = RestAssured.with().params(params).cookies(resp4Login.getCookies()).post(PATH_OAUTH_AUTHORIZE_CODE);
         Assert.assertEquals(302, response.getStatusCode());
-        errors = this.getLocationUrlParamsValue(response);
+        Map<String, String> errors = ResultUtils.getLocationUrlParamsValue(response);
         Assert.assertEquals(ErrorCode.CLIENT_NOT_EXIST.getCode(), NumberUtils.toInt(errors.get("error")));
 
         String errorRedirectUrl = "https://www.google.com";
@@ -105,14 +105,14 @@ public class AuthorizationCodeGrantControllerTest {
         Response response = RestAssured.with().params(params).cookies(resp4Login.cookies()).get(PATH_OAUTH_AUTHORIZE_CODE);
         Assert.assertEquals(200, response.getStatusCode());
         // System.out.println(response.asString());
-        response = MockUserOperateUtils.userAuthorize(response, resp4Login.cookies(), ALL_SCOPE, StringUtils.EMPTY);
+        response = MockUserOperationUtils.authorizationCodeUserAuthorize(response, resp4Login.cookies(), ALL_SCOPE, StringUtils.EMPTY);
         System.out.println(response.asString());
         Assert.assertEquals(302, response.getStatusCode());
         String redirectUrl = response.getHeader("Location");
         System.out.println(redirectUrl);
         response = RestAssured.with().cookies(resp4Login.getCookies()).cookies(response.cookies()).post(redirectUrl);
         System.out.println(response.getHeader("Location"));
-        Map<String, String> results = this.getLocationUrlParamsValue(response);
+        Map<String, String> results = ResultUtils.getLocationUrlParamsValue(response);
         Assert.assertNotNull(results.get("code"));
     }
 
@@ -126,14 +126,14 @@ public class AuthorizationCodeGrantControllerTest {
         Response response = RestAssured.with().params(params).cookies(resp4Login.cookies()).get(PATH_OAUTH_AUTHORIZE_CODE);
         Assert.assertEquals(200, response.getStatusCode());
         // System.out.println(response.asString());
-        response = MockUserOperateUtils.userAuthorize(response, resp4Login.cookies(), ALL_SCOPE, StringUtils.EMPTY);
+        response = MockUserOperationUtils.authorizationCodeUserAuthorize(response, resp4Login.cookies(), ALL_SCOPE, StringUtils.EMPTY);
         System.out.println(response.asString());
         Assert.assertEquals(302, response.getStatusCode());
         String redirectUrl = response.getHeader("Location");
         System.out.println(redirectUrl);
         response = RestAssured.with().cookies(resp4Login.getCookies()).cookies(response.cookies()).post(redirectUrl);
         System.out.println(response.getHeader("Location"));
-        Map<String, String> results = this.getLocationUrlParamsValue(response);
+        Map<String, String> results = ResultUtils.getLocationUrlParamsValue(response);
         Assert.assertNotNull(results.get("code"));
 
         // 获取token，错误的请求
@@ -171,14 +171,14 @@ public class AuthorizationCodeGrantControllerTest {
         Response response = RestAssured.with().params(params).cookies(resp4Login.cookies()).get(PATH_OAUTH_AUTHORIZE_CODE);
         Assert.assertEquals(200, response.getStatusCode());
         // System.out.println(response.asString());
-        response = MockUserOperateUtils.userAuthorize(response, resp4Login.cookies(), ALL_SCOPE, StringUtils.EMPTY);
+        response = MockUserOperationUtils.authorizationCodeUserAuthorize(response, resp4Login.cookies(), ALL_SCOPE, StringUtils.EMPTY);
         System.out.println(response.asString());
         Assert.assertEquals(302, response.getStatusCode());
         String redirectUrl = response.getHeader("Location");
         System.out.println(redirectUrl);
         response = RestAssured.with().cookies(resp4Login.getCookies()).cookies(response.cookies()).post(redirectUrl);
         System.out.println(response.getHeader("Location"));
-        Map<String, String> results = this.getLocationUrlParamsValue(response);
+        Map<String, String> results = ResultUtils.getLocationUrlParamsValue(response);
         Assert.assertNotNull(results.get("code"));
 
         // 获取token
@@ -206,14 +206,14 @@ public class AuthorizationCodeGrantControllerTest {
         Response response = RestAssured.with().params(params).cookies(resp4Login.cookies()).get(PATH_OAUTH_AUTHORIZE_CODE);
         Assert.assertEquals(200, response.getStatusCode());
         // System.out.println(response.asString());
-        response = MockUserOperateUtils.userAuthorize(response, resp4Login.cookies(), ALL_SCOPE, StringUtils.EMPTY);
+        response = MockUserOperationUtils.authorizationCodeUserAuthorize(response, resp4Login.cookies(), ALL_SCOPE, StringUtils.EMPTY);
         System.out.println(response.asString());
         Assert.assertEquals(302, response.getStatusCode());
         String redirectUrl = response.getHeader("Location");
         System.out.println(redirectUrl);
         response = RestAssured.with().cookies(resp4Login.getCookies()).cookies(response.cookies()).post(redirectUrl);
         System.out.println(response.getHeader("Location"));
-        Map<String, String> results = this.getLocationUrlParamsValue(response);
+        Map<String, String> results = ResultUtils.getLocationUrlParamsValue(response);
         Assert.assertNotNull(results.get("code"));
 
         // 获取token
@@ -241,14 +241,14 @@ public class AuthorizationCodeGrantControllerTest {
         Response response = RestAssured.with().params(params).cookies(resp4Login.cookies()).get(PATH_OAUTH_AUTHORIZE_CODE);
         Assert.assertEquals(200, response.getStatusCode());
         // System.out.println(response.asString());
-        response = MockUserOperateUtils.userAuthorize(response, resp4Login.cookies(), ALL_SCOPE, StringUtils.EMPTY);
+        response = MockUserOperationUtils.authorizationCodeUserAuthorize(response, resp4Login.cookies(), ALL_SCOPE, StringUtils.EMPTY);
         System.out.println(response.asString());
         Assert.assertEquals(302, response.getStatusCode());
         String redirectUrl = response.getHeader("Location");
         System.out.println(redirectUrl);
         response = RestAssured.with().cookies(resp4Login.getCookies()).cookies(response.cookies()).post(redirectUrl);
         System.out.println(response.getHeader("Location"));
-        Map<String, String> results = this.getLocationUrlParamsValue(response);
+        Map<String, String> results = ResultUtils.getLocationUrlParamsValue(response);
         Assert.assertNotNull(results.get("code"));
 
         // 获取token
@@ -276,14 +276,14 @@ public class AuthorizationCodeGrantControllerTest {
         Response response = RestAssured.with().params(params).cookies(resp4Login.cookies()).get(PATH_OAUTH_AUTHORIZE_CODE);
         Assert.assertEquals(200, response.getStatusCode());
         // System.out.println(response.asString());
-        response = MockUserOperateUtils.userAuthorize(response, resp4Login.cookies(), ALL_SCOPE, StringUtils.EMPTY);
+        response = MockUserOperationUtils.authorizationCodeUserAuthorize(response, resp4Login.cookies(), ALL_SCOPE, StringUtils.EMPTY);
         System.out.println(response.asString());
         Assert.assertEquals(302, response.getStatusCode());
         String redirectUrl = response.getHeader("Location");
         System.out.println(redirectUrl);
         response = RestAssured.with().cookies(resp4Login.getCookies()).cookies(response.cookies()).post(redirectUrl);
         System.out.println(response.getHeader("Location"));
-        Map<String, String> results = this.getLocationUrlParamsValue(response);
+        Map<String, String> results = ResultUtils.getLocationUrlParamsValue(response);
         Assert.assertNotNull(results.get("code"));
 
         // 获取token
@@ -311,14 +311,14 @@ public class AuthorizationCodeGrantControllerTest {
         Response response = RestAssured.with().params(params).cookies(resp4Login.cookies()).get(PATH_OAUTH_AUTHORIZE_CODE);
         Assert.assertEquals(200, response.getStatusCode());
         // System.out.println(response.asString());
-        response = MockUserOperateUtils.userAuthorize(response, resp4Login.cookies(), ALL_SCOPE, StringUtils.EMPTY);
+        response = MockUserOperationUtils.authorizationCodeUserAuthorize(response, resp4Login.cookies(), ALL_SCOPE, StringUtils.EMPTY);
         System.out.println(response.asString());
         Assert.assertEquals(302, response.getStatusCode());
         String redirectUrl = response.getHeader("Location");
         System.out.println(redirectUrl);
         response = RestAssured.with().cookies(resp4Login.getCookies()).cookies(response.cookies()).post(redirectUrl);
         System.out.println(response.getHeader("Location"));
-        Map<String, String> results = this.getLocationUrlParamsValue(response);
+        Map<String, String> results = ResultUtils.getLocationUrlParamsValue(response);
         Assert.assertNotNull(results.get("code"));
 
         // 获取token
@@ -346,40 +346,4 @@ public class AuthorizationCodeGrantControllerTest {
         Assert.assertEquals(ErrorCode.INVALID_AUTHORIZATION_CODE.getCode(), json.getInt("code"));
     }
 
-    /**
-     * 解析Location字段中的url参数列表
-     *
-     * @param response
-     * @return
-     */
-    private Map<String, String> getLocationUrlParamsValue(Response response) {
-        String location = response.getHeader("Location");
-        if (StringUtils.isBlank(location)) {
-            return new HashMap<>();
-        }
-        return this.getUrlParamsValue(location);
-    }
-
-    /**
-     * 解析url参数列表
-     *
-     * @param url
-     * @return
-     */
-    private Map<String, String> getUrlParamsValue(String url) {
-        Map<String, String> result = new HashMap<>();
-        try {
-            String query = new URI(url).getQuery();
-            if (StringUtils.isNotBlank(query)) {
-                String[] pairs = query.split("&");
-                for (final String pair : pairs) {
-                    int index = pair.indexOf('=');
-                    result.put(pair.substring(0, index), pair.substring(index + 1));
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return result;
-    }
 }

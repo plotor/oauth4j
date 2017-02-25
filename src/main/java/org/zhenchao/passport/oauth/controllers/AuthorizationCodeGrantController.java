@@ -88,7 +88,7 @@ public class AuthorizationCodeGrantController {
      *
      * @return
      */
-    @RequestMapping(value = PATH_OAUTH_AUTHORIZE_CODE, method = {GET, POST})
+    @RequestMapping(value = PATH_OAUTH_AUTHORIZE_CODE, method = {GET, POST}, params = "response_type=code")
     public ModelAndView authorize(HttpServletRequest request, HttpServletResponse response, HttpSession session,
                                   @RequestParam("response_type") String responseType,
                                   @RequestParam("client_id") long clientId,
@@ -274,7 +274,7 @@ public class AuthorizationCodeGrantController {
      * @param state
      * @return
      */
-    public ModelAndView buildErrorResponse(ModelAndView mav, String redirectUri, ErrorCode errorCode, String state) {
+    private ModelAndView buildErrorResponse(ModelAndView mav, String redirectUri, ErrorCode errorCode, String state) {
         List<String> params = new ArrayList<>();
         params.add(String.format("error=%s", errorCode.getCode()));
         if (StringUtils.isNotBlank(errorCode.getDesc())) {
