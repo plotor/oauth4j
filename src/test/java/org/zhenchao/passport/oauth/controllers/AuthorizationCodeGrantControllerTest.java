@@ -68,13 +68,13 @@ public class AuthorizationCodeGrantControllerTest {
         // System.out.println(response.asString());
 
         params.put("redirect_uri", REDIRECT_URI);
-        response = RestAssured.with().params(params).cookies(resp4Login.getCookies()).post(PATH_OAUTH_AUTHORIZE_CODE);
+        response = RestAssured.with().redirects().follow(false).params(params).cookies(resp4Login.getCookies()).get(PATH_OAUTH_AUTHORIZE_CODE);
         Assert.assertEquals(200, response.getStatusCode());
         Assert.assertTrue(response.asString().contains("用户授权"));
 
         String errorResponseType = RandomStringUtils.randomAlphanumeric(8);
         params.put("response_type", errorResponseType);
-        response = RestAssured.with().params(params).cookies(resp4Login.getCookies()).post(PATH_OAUTH_AUTHORIZE_CODE);
+        response = RestAssured.with().redirects().follow(false).params(params).cookies(resp4Login.getCookies()).get(PATH_OAUTH_AUTHORIZE_CODE);
         Assert.assertEquals(400, response.getStatusCode());
         // Map<String, String> errors = this.getLocationUrlParamsValue(response);
         // Assert.assertEquals(ErrorCode.UNSUPPORTED_RESPONSE_TYPE.getCode(), NumberUtils.toInt(errors.get("error")));
@@ -82,7 +82,7 @@ public class AuthorizationCodeGrantControllerTest {
         long errorClientId = RandomUtils.nextLong();
         params.put("response_type", ResponseType.AUTHORIZATION_CODE.getType());
         params.put("client_id", errorClientId);
-        response = RestAssured.with().params(params).cookies(resp4Login.getCookies()).post(PATH_OAUTH_AUTHORIZE_CODE);
+        response = RestAssured.with().redirects().follow(false).params(params).cookies(resp4Login.getCookies()).get(PATH_OAUTH_AUTHORIZE_CODE);
         Assert.assertEquals(302, response.getStatusCode());
         Map<String, String> errors = ResultUtils.getLocationUrlParamsValue(response);
         Assert.assertEquals(ErrorCode.CLIENT_NOT_EXIST.getCode(), NumberUtils.toInt(errors.get("error")));
@@ -90,7 +90,7 @@ public class AuthorizationCodeGrantControllerTest {
         String errorRedirectUrl = "https://www.google.com";
         params.put("client_id", CLIENT_ID);
         params.put("redirect_uri", errorRedirectUrl);
-        response = RestAssured.with().params(params).cookies(resp4Login.getCookies()).post(PATH_OAUTH_AUTHORIZE_CODE);
+        response = RestAssured.with().redirects().follow(false).params(params).cookies(resp4Login.getCookies()).get(PATH_OAUTH_AUTHORIZE_CODE);
         Assert.assertEquals(200, response.getStatusCode());
         System.out.println(response.asString());
         Assert.assertEquals(ErrorCode.INVALID_REDIRECT_URI.getCode(), response.jsonPath().getInt("code"));
@@ -110,7 +110,7 @@ public class AuthorizationCodeGrantControllerTest {
         Assert.assertEquals(302, response.getStatusCode());
         String redirectUrl = response.getHeader("Location");
         System.out.println(redirectUrl);
-        response = RestAssured.with().cookies(resp4Login.getCookies()).cookies(response.cookies()).post(redirectUrl);
+        response = RestAssured.with().redirects().follow(false).cookies(resp4Login.getCookies()).cookies(response.cookies()).get(redirectUrl);
         System.out.println(response.getHeader("Location"));
         Map<String, String> results = ResultUtils.getLocationUrlParamsValue(response);
         Assert.assertNotNull(results.get("code"));
@@ -131,7 +131,7 @@ public class AuthorizationCodeGrantControllerTest {
         Assert.assertEquals(302, response.getStatusCode());
         String redirectUrl = response.getHeader("Location");
         System.out.println(redirectUrl);
-        response = RestAssured.with().cookies(resp4Login.getCookies()).cookies(response.cookies()).post(redirectUrl);
+        response = RestAssured.with().redirects().follow(false).cookies(resp4Login.getCookies()).cookies(response.cookies()).get(redirectUrl);
         System.out.println(response.getHeader("Location"));
         Map<String, String> results = ResultUtils.getLocationUrlParamsValue(response);
         Assert.assertNotNull(results.get("code"));
@@ -176,7 +176,7 @@ public class AuthorizationCodeGrantControllerTest {
         Assert.assertEquals(302, response.getStatusCode());
         String redirectUrl = response.getHeader("Location");
         System.out.println(redirectUrl);
-        response = RestAssured.with().cookies(resp4Login.getCookies()).cookies(response.cookies()).post(redirectUrl);
+        response = RestAssured.with().redirects().follow(false).cookies(resp4Login.getCookies()).cookies(response.cookies()).get(redirectUrl);
         System.out.println(response.getHeader("Location"));
         Map<String, String> results = ResultUtils.getLocationUrlParamsValue(response);
         Assert.assertNotNull(results.get("code"));
@@ -211,7 +211,7 @@ public class AuthorizationCodeGrantControllerTest {
         Assert.assertEquals(302, response.getStatusCode());
         String redirectUrl = response.getHeader("Location");
         System.out.println(redirectUrl);
-        response = RestAssured.with().cookies(resp4Login.getCookies()).cookies(response.cookies()).post(redirectUrl);
+        response = RestAssured.with().redirects().follow(false).cookies(resp4Login.getCookies()).cookies(response.cookies()).get(redirectUrl);
         System.out.println(response.getHeader("Location"));
         Map<String, String> results = ResultUtils.getLocationUrlParamsValue(response);
         Assert.assertNotNull(results.get("code"));
@@ -246,7 +246,7 @@ public class AuthorizationCodeGrantControllerTest {
         Assert.assertEquals(302, response.getStatusCode());
         String redirectUrl = response.getHeader("Location");
         System.out.println(redirectUrl);
-        response = RestAssured.with().cookies(resp4Login.getCookies()).cookies(response.cookies()).post(redirectUrl);
+        response = RestAssured.with().redirects().follow(false).cookies(resp4Login.getCookies()).cookies(response.cookies()).get(redirectUrl);
         System.out.println(response.getHeader("Location"));
         Map<String, String> results = ResultUtils.getLocationUrlParamsValue(response);
         Assert.assertNotNull(results.get("code"));
@@ -281,7 +281,7 @@ public class AuthorizationCodeGrantControllerTest {
         Assert.assertEquals(302, response.getStatusCode());
         String redirectUrl = response.getHeader("Location");
         System.out.println(redirectUrl);
-        response = RestAssured.with().cookies(resp4Login.getCookies()).cookies(response.cookies()).post(redirectUrl);
+        response = RestAssured.with().redirects().follow(false).cookies(resp4Login.getCookies()).cookies(response.cookies()).get(redirectUrl);
         System.out.println(response.getHeader("Location"));
         Map<String, String> results = ResultUtils.getLocationUrlParamsValue(response);
         Assert.assertNotNull(results.get("code"));
@@ -316,7 +316,7 @@ public class AuthorizationCodeGrantControllerTest {
         Assert.assertEquals(302, response.getStatusCode());
         String redirectUrl = response.getHeader("Location");
         System.out.println(redirectUrl);
-        response = RestAssured.with().cookies(resp4Login.getCookies()).cookies(response.cookies()).post(redirectUrl);
+        response = RestAssured.with().redirects().follow(false).cookies(resp4Login.getCookies()).cookies(response.cookies()).get(redirectUrl);
         System.out.println(response.getHeader("Location"));
         Map<String, String> results = ResultUtils.getLocationUrlParamsValue(response);
         Assert.assertNotNull(results.get("code"));
