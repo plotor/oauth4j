@@ -78,7 +78,7 @@ public class LoginController {
         log.debug("Entering login method...");
 
         ModelAndView mav = new ModelAndView();
-
+        log.error("Login params error, username [{}] and password [{}]!", username, password);
         if (StringUtils.isBlank(username) || StringUtils.isBlank(password)) {
             log.error("Login params error, username or password is null or empty!");
             return JsonView.render(new ResultInfo(ErrorCode.PARAMETER_ERROR, StringUtils.EMPTY), response, false);
