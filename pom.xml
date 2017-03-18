@@ -102,7 +102,7 @@
             <artifactId>spring-test</artifactId>
             <version>${spring.version}</version>
         </dependency>
-        <!-- apache commons -->
+        <!-- apache common -->
         <dependency>
             <groupId>commons-collections</groupId>
             <artifactId>commons-collections</artifactId>
@@ -134,8 +134,8 @@
             <version>1.0.0</version>
         </dependency>
         <!--<dependency>
-            <groupId>commons-lang</groupId>
-            <artifactId>commons-lang</artifactId>
+            <groupId>common-lang</groupId>
+            <artifactId>common-lang</artifactId>
             <version>2.6</version>
         </dependency>-->
         <dependency>

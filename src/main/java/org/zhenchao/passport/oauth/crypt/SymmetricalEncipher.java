@@ -1,6 +1,6 @@
 package org.zhenchao.passport.oauth.crypt;
 
-import org.zhenchao.passport.oauth.exceptions.CryptException;
+import org.zhenchao.passport.oauth.exception.CryptException;
 
 /**
  * symmetrical encipher

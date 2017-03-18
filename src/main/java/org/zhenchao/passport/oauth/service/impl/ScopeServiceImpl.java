@@ -5,7 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import static org.zhenchao.passport.oauth.commons.GlobalConstant.SEPARATOR_REDIRECT_SCOPE;
+import static org.zhenchao.passport.oauth.common.GlobalConstant.SEPARATOR_REDIRECT_SCOPE;
 import org.zhenchao.passport.oauth.dao.ScopeMapper;
 import org.zhenchao.passport.oauth.model.Scope;
 import org.zhenchao.passport.oauth.model.ScopeExample;

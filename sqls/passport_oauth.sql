@@ -10,6 +10,7 @@ CREATE TABLE `t_oauth_app_info` (
   `logo` varchar(1024) CHARACTER SET utf8mb4 NOT NULL DEFAULT '',
   `enable` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT 'app enable status, 0:disable, 1:enable',
   `redirect_uri` varchar(4096) DEFAULT NULL,
+  `cancel_redirect_uri` varchar(4096) DEFAULT NULL,
   `scope` varchar(1024) DEFAULT NULL,
   `token_validity` int(11) NOT NULL DEFAULT '7776000' COMMENT 'seconds',
   `secret` varchar(255) NOT NULL,
@@ -23,7 +24,7 @@ CREATE TABLE `t_oauth_app_info` (
 -- ----------------------------
 -- Records of t_oauth_app_info
 -- ----------------------------
-INSERT INTO `t_oauth_app_info` VALUES ('2882303761517520186', '指间生活', 'https://github.com/ZhenchaoWang/zhenchaowang.github.io/blob/master/img/milogo@2x.png?raw=true', '0', 'http://www.zhenchao.com', '1 4', '7776000', 'empty', '1', '888888', '2017-01-21 15:53:37', '2017-02-11 18:17:19');
+INSERT INTO `t_oauth_app_info` VALUES ('2882303761517520186', '指间生活', 'https://github.com/interdigital-life/interdigital-life.github.io/blob/master/img/google-logo.jpg?raw=true', '0', 'http://www.zhenchao.com', null, '1 2 4 5', '7776000', 'empty', '1', '888888', '2017-01-21 15:53:37', '2017-02-28 22:33:27');
 
 -- ----------------------------
 -- Table structure for t_scope
@@ -89,7 +90,8 @@ CREATE TABLE `t_user_app_authorization` (
 -- ----------------------------
 -- Records of t_user_app_authorization
 -- ----------------------------
-INSERT INTO `t_user_app_authorization` VALUES ('2882303761517520186', '100000', '1 4', '024c64526d52b0cfdf038dfa', 'pCR3KsGY0H63AUhhwRMBJ6ZAcdJo5w7IdOB9w1cAyvEoJWPdyzVvaQIglIn7Aetk', 'ZhSPpZJMj1pz342ppi2LuoEOJsH91VkIWTlb4krRpE3Xpn3nsymjIekhjTtwhtct', '31536000', '2017-02-11 18:25:02', null);
+INSERT INTO `t_user_app_authorization` VALUES ('2882303761517520186', '100000', '1 4', '024c64526d52b0cfdf038dfa', 'KpM13xk3QXnDm0VhPvKqT9Mj86ZxmOXiwwwnsIfcr42AQVNhbd3YaJ0Id1TQLxjw', '8B2Y3EtPEIG0o2kF9VMKjg2jNghlaKXRD6tmogQhsfIMFufpmcKwkuzqN6dLqO6k', '31536000', '2017-02-11 18:25:02', '2017-02-25 12:13:09');
+INSERT INTO `t_user_app_authorization` VALUES ('2882303761517520186', '100000', '1 2 4 5', 'e8b66581ac324fc39f031262', 'RBDo3sMk2wQvZ4nUEEsqnQeagQbyuaLKe2WOTlPN7ajpFQ5BP4jViMZFN9Ezlpbn', 'Y1GDDuAxSzNAhh2afzW92WXxt7kZC6q5A4AonAD7rTWpP5Do8ArAmVkoS8v5yLms', '31536000', '2017-02-25 14:33:10', '2017-03-01 22:10:07');
 
 -- ----------------------------
 -- Table structure for t_user_id

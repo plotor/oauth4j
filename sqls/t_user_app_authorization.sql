@@ -16,4 +16,3 @@ CREATE TABLE `t_user_app_authorization` (
   `update_time` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
   UNIQUE KEY `index_app_user_scope` (`app_id`,`user_id`,`scope_sign`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-SET FOREIGN_KEY_CHECKS=1;

@@ -1,6 +1,6 @@
 package org.zhenchao.passport.oauth.service;
 
-import org.zhenchao.passport.oauth.exceptions.CryptException;
+import org.zhenchao.passport.oauth.exception.CryptException;
 import org.zhenchao.passport.oauth.model.User;
 
 import java.util.Optional;

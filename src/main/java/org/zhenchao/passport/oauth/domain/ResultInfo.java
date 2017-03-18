@@ -3,7 +3,7 @@ package org.zhenchao.passport.oauth.domain;
 import net.sf.json.JSONObject;
 import net.sf.json.JsonConfig;
 import org.apache.commons.lang3.StringUtils;
-import org.zhenchao.passport.oauth.commons.ErrorCode;
+import org.zhenchao.passport.oauth.common.ErrorCode;
 
 /**
  * 返回信息

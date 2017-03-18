@@ -1,8 +1,8 @@
 package org.zhenchao.passport.oauth.crypt;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.zhenchao.passport.oauth.commons.ErrorCode;
-import org.zhenchao.passport.oauth.exceptions.CryptException;
+import org.zhenchao.passport.oauth.common.ErrorCode;
+import org.zhenchao.passport.oauth.exception.CryptException;
 
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;

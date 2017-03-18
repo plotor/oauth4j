@@ -5,8 +5,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.routines.UrlValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.zhenchao.passport.oauth.commons.ErrorCode;
-import static org.zhenchao.passport.oauth.commons.GlobalConstant.SEPARATOR_REDIRECT_URI;
+import org.zhenchao.passport.oauth.common.ErrorCode;
+import static org.zhenchao.passport.oauth.common.GlobalConstant.SEPARATOR_REDIRECT_URI;
 import org.zhenchao.passport.oauth.domain.RequestParams;
 
 import java.net.URI;

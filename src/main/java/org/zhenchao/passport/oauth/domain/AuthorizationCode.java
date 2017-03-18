@@ -2,9 +2,9 @@ package org.zhenchao.passport.oauth.domain;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
-import static org.zhenchao.passport.oauth.commons.GlobalConstant.SALT;
+import static org.zhenchao.passport.oauth.common.GlobalConstant.SALT;
 import org.zhenchao.passport.oauth.model.OAuthAppInfo;
-import org.zhenchao.passport.oauth.utils.CommonUtils;
+import org.zhenchao.passport.oauth.util.CommonUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
