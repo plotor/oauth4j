@@ -1,4 +1,4 @@
-### OAuth2.0协议实现
+### OAuth2.0授权协议实现
 
 ---
 
@@ -80,4 +80,4 @@ Location: http://www.zhenchao.com#access_token=AAAAHFM5T1ZCZG5hL0RBeTlRekJCSjlWY
 3. [RFC6750 - The OAuth 2.0 Authorization Framework: Bearer Token Usage](https://tools.ietf.org/html/rfc6750)
 4. [ HTTP Authentication: MAC Authentication (draft-hammer-oauth-v2-mac-token-02)](https://tools.ietf.org/html/draft-hammer-oauth-v2-mac-token-02)
 
-如有任何疑问，请发邮件到[zhenchao.wang@hotmail.com](mailto://zhenchao.wang@hotmail.com)咨询。
+如有任何疑问，请发邮件到 [zhenchao.wang@hotmail.com](mailto://zhenchao.wang@hotmail.com) 咨询。
