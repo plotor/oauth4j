@@ -15,7 +15,7 @@ __项目相关博文：__
 
 1. [OAuth2.0协议原理与实现：协议原理](http://www.zhenchao.org/2017/03/04/oauth-v2-principle/)
 2. [OAuth2.0协议原理与实现：TOKEN生成算法](http://www.zhenchao.org/2017/03/11/oauth-v2-token/)
-3. OAuth2.0协议原理与实现：协议实现
+3. [OAuth2.0协议原理与实现：协议实现](http://www.zhenchao.org/2017/03/19/oauth-v2-implementation/)
 
 ---
 
