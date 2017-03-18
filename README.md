@@ -4,14 +4,14 @@
 
 本项目为[RFC6749](https://tools.ietf.org/html/rfc6749)协议的标准实现，主要用于对该协议的学习和理解，也可以在本项目基础上结合自己的业务场景做相应的改造，用于生产环境授权。
 
-项目采用java语言开发，采用 __Spring MVC__, __Spring__, 以及 __MyBatis__ 框架，开发和运行环境如下：
+项目采用java语言开发，基于 __Spring MVC__, __Spring__, 以及 __MyBatis__ 框架，开发和运行环境如下：
 
 > - 数据库: MySQL 5.7
 > - jdk版本: 1.8
 
 本项目主要实现了[RFC6749](https://tools.ietf.org/html/rfc6749)定义的授权码授权模式和隐式授权模式，并参考文档“[HTTP Authentication: MAC Authentication](https://tools.ietf.org/html/draft-hammer-oauth-v2-mac-token-02)”实现了MAC类型的令牌。由于token的验证，以及OpenID的生成已经超出了OAuth2.0协议的范畴，本项目未作相应实现，token属于对称加密字符串，所以内部元素可以自行定义和验证，你可以采用AOP或注解的方式来实现token验证的逻辑，而OpenID只需要保证在（user_id, client_id）维度唯一即可。
 
-项目相关博文：
+__项目相关博文：__
 
 1. [OAuth2.0协议原理与实现：协议原理](http://www.zhenchao.org/2017/03/04/oauth-v2-principle/)
 2. [OAuth2.0协议原理与实现：TOKEN生成算法](http://www.zhenchao.org/2017/03/11/oauth-v2-token/)
