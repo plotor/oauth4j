@@ -14,7 +14,9 @@ public enum GrantType {
 
     PASSWORD_CREDENTIALS("password"),
 
-    CLIENT_CREDENTIALS("client_credentials");
+    CLIENT_CREDENTIALS("client_credentials"),
+
+    REFRESH_TOKEN("refresh_token");
 
     private String type;
 
