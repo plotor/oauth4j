@@ -2,10 +2,10 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.zhenchao</groupId>
-    <artifactId>passport-oauth</artifactId>
+    <artifactId>x-oauth</artifactId>
     <packaging>war</packaging>
     <version>1.0.0-SNAPSHOT</version>
-    <name>passport-oauth</name>
+    <name>x-oauth</name>
     <url>http://maven.apache.org</url>
 
     <repositories>
@@ -300,7 +300,7 @@
     </dependencies>
     <build>
         <!-- 用来指定war包的名称 -->
-        <finalName>passport-oauth</finalName>
+        <finalName>x-oauth</finalName>
         <resources>
             <resource>
                 <directory>${project.basedir}/src/main/resources</directory>

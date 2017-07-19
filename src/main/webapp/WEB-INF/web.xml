@@ -3,7 +3,7 @@
          xmlns="http://java.sun.com/xml/ns/javaee"
          xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
          version="3.0">
-    <display-name>passport-oauth</display-name>
+    <display-name>x-oauth</display-name>
 
     <!-- 配置logback -->
     <!--<context-param>
