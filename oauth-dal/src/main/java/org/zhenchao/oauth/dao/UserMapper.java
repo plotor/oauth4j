@@ -1,8 +1,8 @@
-package org.zhenchao.passport.oauth.dao;
+package org.zhenchao.oauth.dao;
 
 import org.apache.ibatis.annotations.Param;
-import org.zhenchao.passport.oauth.model.User;
-import org.zhenchao.passport.oauth.model.UserExample;
+import org.zhenchao.oauth.model.User;
+import org.zhenchao.oauth.model.UserExample;
 
 import java.util.List;
 

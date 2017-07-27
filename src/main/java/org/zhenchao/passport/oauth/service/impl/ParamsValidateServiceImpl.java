@@ -12,7 +12,7 @@ import org.zhenchao.passport.oauth.domain.AuthorizationCode;
 import org.zhenchao.passport.oauth.domain.AuthorizeRequestParams;
 import org.zhenchao.passport.oauth.domain.RequestParams;
 import org.zhenchao.passport.oauth.domain.TokenRequestParams;
-import org.zhenchao.passport.oauth.model.OAuthAppInfo;
+import org.zhenchao.oauth.model.OAuthAppInfo;
 import org.zhenchao.passport.oauth.service.AuthorizeService;
 import org.zhenchao.passport.oauth.service.OAuthAppInfoService;
 import org.zhenchao.passport.oauth.service.ParamsValidateService;

@@ -15,7 +15,7 @@ import static org.zhenchao.passport.oauth.common.GlobalConstant.PATH_OAUTH_USER_
 import static org.zhenchao.passport.oauth.common.GlobalConstant.PATH_ROOT_LOGIN;
 import static org.zhenchao.passport.oauth.common.GlobalConstant.PATH_ROOT_OAUTH;
 import org.zhenchao.passport.oauth.domain.ResultInfo;
-import org.zhenchao.passport.oauth.model.UserAppAuthorization;
+import org.zhenchao.oauth.model.UserAppAuthorization;
 import org.zhenchao.passport.oauth.service.UserAppAuthorizationService;
 import org.zhenchao.passport.oauth.util.CommonUtils;
 import org.zhenchao.passport.oauth.util.JsonView;

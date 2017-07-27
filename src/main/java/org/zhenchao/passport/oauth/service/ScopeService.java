@@ -1,6 +1,6 @@
 package org.zhenchao.passport.oauth.service;
 
-import org.zhenchao.passport.oauth.model.Scope;
+import org.zhenchao.oauth.model.Scope;
 
 import java.util.List;
 

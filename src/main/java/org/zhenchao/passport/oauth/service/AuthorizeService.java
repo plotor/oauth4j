@@ -3,7 +3,7 @@ package org.zhenchao.passport.oauth.service;
 import org.zhenchao.passport.oauth.exception.OAuthServiceException;
 import org.zhenchao.passport.oauth.domain.AuthorizationCode;
 import org.zhenchao.passport.oauth.domain.AuthorizeRequestParams;
-import org.zhenchao.passport.oauth.model.UserAppAuthorization;
+import org.zhenchao.oauth.model.UserAppAuthorization;
 
 import java.util.Optional;
 

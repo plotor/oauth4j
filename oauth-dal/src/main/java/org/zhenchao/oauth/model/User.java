@@ -1,4 +1,4 @@
-package org.zhenchao.passport.oauth.model;
+package org.zhenchao.oauth.model;
 
 public class User {
     /**

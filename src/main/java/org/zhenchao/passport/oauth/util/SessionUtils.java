@@ -2,7 +2,7 @@ package org.zhenchao.passport.oauth.util;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.zhenchao.passport.oauth.model.User;
+import org.zhenchao.oauth.model.User;
 
 import javax.servlet.http.HttpSession;
 

@@ -1,4 +1,4 @@
-package org.zhenchao.passport.oauth.model;
+package org.zhenchao.oauth.model;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;

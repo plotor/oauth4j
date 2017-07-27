@@ -8,8 +8,8 @@ import org.springframework.stereotype.Service;
 import org.zhenchao.passport.oauth.common.GlobalConstant;
 import org.zhenchao.passport.oauth.dao.UserMapper;
 import org.zhenchao.passport.oauth.exception.CryptException;
-import org.zhenchao.passport.oauth.model.User;
-import org.zhenchao.passport.oauth.model.UserExample;
+import org.zhenchao.oauth.model.User;
+import org.zhenchao.oauth.model.UserExample;
 import org.zhenchao.passport.oauth.service.UserService;
 import org.zhenchao.passport.oauth.util.CryptUtils;
 

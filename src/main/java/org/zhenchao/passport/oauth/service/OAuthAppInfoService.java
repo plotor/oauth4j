@@ -1,6 +1,6 @@
 package org.zhenchao.passport.oauth.service;
 
-import org.zhenchao.passport.oauth.model.OAuthAppInfo;
+import org.zhenchao.oauth.model.OAuthAppInfo;
 
 import java.util.Optional;
 

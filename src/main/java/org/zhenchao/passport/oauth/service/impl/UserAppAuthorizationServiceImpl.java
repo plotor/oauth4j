@@ -6,8 +6,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.zhenchao.passport.oauth.dao.UserAppAuthorizationMapper;
-import org.zhenchao.passport.oauth.model.UserAppAuthorization;
-import org.zhenchao.passport.oauth.model.UserAppAuthorizationExample;
+import org.zhenchao.oauth.model.UserAppAuthorization;
+import org.zhenchao.oauth.model.UserAppAuthorizationExample;
 import org.zhenchao.passport.oauth.service.UserAppAuthorizationService;
 
 import java.util.ArrayList;

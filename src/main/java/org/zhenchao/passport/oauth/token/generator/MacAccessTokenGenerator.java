@@ -1,8 +1,8 @@
 package org.zhenchao.passport.oauth.token.generator;
 
 import org.zhenchao.passport.oauth.domain.TokenRequestParams;
-import org.zhenchao.passport.oauth.model.OAuthAppInfo;
-import org.zhenchao.passport.oauth.model.UserAppAuthorization;
+import org.zhenchao.oauth.model.OAuthAppInfo;
+import org.zhenchao.oauth.model.UserAppAuthorization;
 import org.zhenchao.passport.oauth.token.AbstractAccessToken;
 import org.zhenchao.passport.oauth.token.MacAccessToken;
 

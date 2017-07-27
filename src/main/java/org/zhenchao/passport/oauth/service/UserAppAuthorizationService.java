@@ -1,6 +1,6 @@
 package org.zhenchao.passport.oauth.service;
 
-import org.zhenchao.passport.oauth.model.UserAppAuthorization;
+import org.zhenchao.oauth.model.UserAppAuthorization;
 
 import java.util.List;
 import java.util.Optional;

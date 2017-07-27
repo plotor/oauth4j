@@ -1,9 +1,9 @@
-package org.zhenchao.passport.oauth.dao;
+package org.zhenchao.oauth.dao;
 
 import java.util.List;
 import org.apache.ibatis.annotations.Param;
-import org.zhenchao.passport.oauth.model.UserAppAuthorization;
-import org.zhenchao.passport.oauth.model.UserAppAuthorizationExample;
+import org.zhenchao.oauth.model.UserAppAuthorization;
+import org.zhenchao.oauth.model.UserAppAuthorizationExample;
 
 public interface UserAppAuthorizationMapper {
     /**

@@ -3,8 +3,8 @@ package org.zhenchao.passport.oauth.service.impl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.zhenchao.passport.oauth.dao.OAuthAppInfoMapper;
-import org.zhenchao.passport.oauth.model.OAuthAppInfo;
+import org.zhenchao.oauth.dao.OAuthAppInfoMapper;
+import org.zhenchao.oauth.model.OAuthAppInfo;
 import org.zhenchao.passport.oauth.service.OAuthAppInfoService;
 
 import java.util.Optional;

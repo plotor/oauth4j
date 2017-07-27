@@ -2,8 +2,8 @@ package org.zhenchao.passport.oauth.domain;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
-import org.zhenchao.passport.oauth.model.OAuthAppInfo;
-import org.zhenchao.passport.oauth.model.UserAppAuthorization;
+import org.zhenchao.oauth.model.OAuthAppInfo;
+import org.zhenchao.oauth.model.UserAppAuthorization;
 import org.zhenchao.passport.oauth.token.AbstractAccessToken;
 
 /**

@@ -10,7 +10,7 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.zhenchao.passport.oauth.common.GlobalConstant;
 import static org.zhenchao.passport.oauth.common.GlobalConstant.COOKIE_KEY_USER_LOGIN_SIGN;
-import org.zhenchao.passport.oauth.model.OAuthAppInfo;
+import org.zhenchao.oauth.model.OAuthAppInfo;
 import org.zhenchao.passport.oauth.service.OAuthAppInfoService;
 import org.zhenchao.passport.oauth.util.CookieUtils;
 import org.zhenchao.passport.oauth.util.HttpRequestUtils;
