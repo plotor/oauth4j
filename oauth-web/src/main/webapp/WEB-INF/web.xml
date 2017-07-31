@@ -1,7 +1,103 @@
-<!DOCTYPE web-app PUBLIC
- "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
- "http://java.sun.com/dtd/web-app_2_3.dtd" >
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://java.sun.com/xml/ns/javaee"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+         version="3.0">
+    <display-name>x-oauth</display-name>
 
-<web-app>
-  <display-name>Archetype Created Web Application</display-name>
+    <!-- 配置logback -->
+    <!--<context-param>
+        <param-name>logbackConfigLocation</param-name>
+        <param-value>classpath:/config/log/logback.xml</param-value>
+    </context-param>
+    <listener>
+        <listener-class>ch.qos.logback.ext.spring.web.LogbackConfigListener</listener-class>
+    </listener>-->
+
+    <context-param>
+        <param-name>log4jConfigLocation</param-name>
+        <param-value>classpath:/config/log/log4j.properties</param-value>
+    </context-param>
+    <listener>
+        <listener-class>org.springframework.web.util.Log4jConfigListener</listener-class>
+    </listener>
+
+    <!-- spring配置初始化 -->
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>classpath:spring/spring-core.xml; classpath:spring/spring-mybatis.xml</param-value>
+    </context-param>
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+
+    <!-- 防止spring内存溢出 -->
+    <listener>
+        <listener-class>org.springframework.web.util.IntrospectorCleanupListener</listener-class>
+    </listener>
+
+    <!-- 配置StatViewServlet用于展示Druid的统计信息 -->
+    <servlet>
+        <servlet-name>DruidStatView</servlet-name>
+        <servlet-class>com.alibaba.druid.support.http.StatViewServlet</servlet-class>
+        <!-- 不支持IPV6 -->
+        <!-- ip过滤 允许 128.242.127.1/24 24表示，前面24位是子网掩码，比对的时候，前面24位相同就匹配 -->
+        <!-- <init-param> <param-name>allow</param-name> <param-value>128.242.127.1/24,128.242.128.1</param-value>
+            </init-param> -->
+        <!-- 拒绝 -->
+        <!-- <init-param> <param-name>deny</param-name> <param-value>128.242.127.4</param-value>
+            </init-param> -->
+        <!-- 监控页面重置按钮开关 -->
+        <init-param>
+            <param-name>resetEnable</param-name>
+            <param-value>false</param-value>
+        </init-param>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>DruidStatView</servlet-name>
+        <url-pattern>/druid/*</url-pattern>
+    </servlet-mapping>
+
+    <!-- 配置Spring DispatchServlet -->
+    <servlet>
+        <servlet-name>SpringMVC</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+        <init-param>
+            <param-name>contextConfigLocation</param-name>
+            <param-value>classpath:spring/spring-mvc.xml</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>SpringMVC</servlet-name>
+        <url-pattern>/</url-pattern>
+    </servlet-mapping>
+
+    <!-- 配置字符集过滤器 -->
+    <filter>
+        <filter-name>encoding Filter</filter-name>
+        <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+        <init-param>
+            <param-name>encoding</param-name>
+            <param-value>UTF-8</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>encoding Filter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+    <session-config>
+        <session-timeout>0</session-timeout>
+    </session-config>
+    <!-- 配置webAppRootKey -->
+    <context-param>
+        <param-name>webAppRootKey</param-name>
+        <param-value>base</param-value>
+    </context-param>
+
+    <!-- 配置首页 -->
+    <welcome-file-list>
+        <welcome-file>index.jsp</welcome-file>
+    </welcome-file-list>
+
 </web-app>
