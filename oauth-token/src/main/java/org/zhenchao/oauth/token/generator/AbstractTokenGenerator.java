@@ -1,4 +1,4 @@
-package org.zhenchao.passport.oauth.token.generator;
+package org.zhenchao.oauth.token.generator;
 
 /**
  * abstract token generator

@@ -1,7 +1,7 @@
-package org.zhenchao.passport.oauth.token.generator;
+package org.zhenchao.oauth.token.generator;
 
-import org.zhenchao.passport.oauth.pojo.TokenRequestParams;
-import org.zhenchao.passport.oauth.token.AbstractAccessToken;
+import org.zhenchao.oauth.token.AbstractAccessToken;
+import org.zhenchao.oauth.token.pojo.TokenElement;
 
 import java.util.Optional;
 
@@ -13,8 +13,8 @@ import java.util.Optional;
  */
 public class BearerAccessTokenGenerator extends AbstractAccessTokenGenerator {
 
-    public BearerAccessTokenGenerator(TokenRequestParams params) {
-        super(params);
+    public BearerAccessTokenGenerator(TokenElement element) {
+        super(element);
     }
 
     @Override

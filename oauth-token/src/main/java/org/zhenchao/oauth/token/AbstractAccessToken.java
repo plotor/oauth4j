@@ -1,4 +1,4 @@
-package org.zhenchao.passport.oauth.token;
+package org.zhenchao.oauth.token;
 
 import org.apache.commons.codec.digest.HmacUtils;
 import org.apache.commons.lang3.StringUtils;

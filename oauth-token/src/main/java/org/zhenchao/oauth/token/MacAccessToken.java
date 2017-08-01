@@ -1,4 +1,4 @@
-package org.zhenchao.passport.oauth.token;
+package org.zhenchao.oauth.token;
 
 import org.zhenchao.oauth.token.enums.TokenType;
 

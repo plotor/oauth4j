@@ -16,7 +16,7 @@ import org.zhenchao.oauth.common.GlobalConstant;
 import org.zhenchao.oauth.protocol.enums.GrantType;
 import org.zhenchao.oauth.protocol.enums.ResponseType;
 import org.zhenchao.passport.oauth.common.RequestPath;
-import org.zhenchao.passport.oauth.token.MacAccessToken;
+import org.zhenchao.oauth.token.MacAccessToken;
 import org.zhenchao.passport.oauth.util.MockUserOperationUtils;
 import org.zhenchao.passport.oauth.util.ResultUtils;
 
