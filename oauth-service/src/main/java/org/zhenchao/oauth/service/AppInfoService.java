@@ -1,4 +1,4 @@
-package org.zhenchao.passport.oauth.service;
+package org.zhenchao.oauth.service;
 
 import org.zhenchao.oauth.model.OAuthAppInfo;
 
@@ -10,7 +10,7 @@ import java.util.Optional;
  * @author zhenchao.wang 2017-01-20 17:45
  * @version 1.0.0
  */
-public interface OAuthAppInfoService {
+public interface AppInfoService {
 
     /**
      * 获取APP信息

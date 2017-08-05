@@ -11,6 +11,7 @@
         <module>oauth-protocol</module>
         <module>oauth-token</module>
         <module>oauth-web</module>
+        <module>oauth-service</module>
     </modules>
     <name>x-oauth</name>
     <url>http://maven.apache.org</url>
@@ -70,20 +71,16 @@
             </dependency>
             <dependency>
                 <groupId>org.zhenchao.oauth</groupId>
+                <artifactId>oauth-service</artifactId>
+                <version>1.0.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>org.zhenchao.oauth</groupId>
                 <artifactId>oauth-protocol</artifactId>
                 <version>1.0.0-SNAPSHOT</version>
             </dependency>
-            <!-- Spring三方库 -->
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-web</artifactId>
-                <version>${spring.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-webmvc</artifactId>
-                <version>${spring.version}</version>
-            </dependency>
+
+            <!-- spring -->
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-aop</artifactId>
@@ -92,6 +89,11 @@
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-context</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-context-support</artifactId>
                 <version>${spring.version}</version>
             </dependency>
             <dependency>
@@ -106,6 +108,11 @@
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
+                <artifactId>spring-expression</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
                 <artifactId>spring-jdbc</artifactId>
                 <version>${spring.version}</version>
             </dependency>
@@ -116,12 +123,12 @@
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
-                <artifactId>spring-expression</artifactId>
+                <artifactId>spring-web</artifactId>
                 <version>${spring.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
-                <artifactId>spring-context-support</artifactId>
+                <artifactId>spring-webmvc</artifactId>
                 <version>${spring.version}</version>
             </dependency>
             <dependency>
@@ -129,6 +136,7 @@
                 <artifactId>spring-test</artifactId>
                 <version>${spring.version}</version>
             </dependency>
+
             <!-- apache common -->
             <dependency>
                 <groupId>commons-collections</groupId>
@@ -160,11 +168,6 @@
                 <artifactId>commons-crypto</artifactId>
                 <version>1.0.0</version>
             </dependency>
-            <!--<dependency>
-                <groupId>common-lang</groupId>
-                <artifactId>common-lang</artifactId>
-                <version>2.6</version>
-            </dependency>-->
             <dependency>
                 <groupId>commons-fileupload</groupId>
                 <artifactId>commons-fileupload</artifactId>

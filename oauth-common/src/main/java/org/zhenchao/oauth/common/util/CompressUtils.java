@@ -1,6 +1,6 @@
-package org.zhenchao.passport.oauth.util;
+package org.zhenchao.oauth.common.util;
 
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.IOException;
 import java.util.zip.DataFormatException;
@@ -13,7 +13,7 @@ import java.util.zip.Inflater;
  * @author zhenchao.wang 2017-02-11 14:29
  * @version 1.0.0
  */
-public class CompressUtils {
+public abstract class CompressUtils {
 
     /**
      * compress

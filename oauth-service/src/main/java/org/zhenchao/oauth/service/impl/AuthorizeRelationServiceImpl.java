@@ -1,14 +1,14 @@
-package org.zhenchao.passport.oauth.service.impl;
+package org.zhenchao.oauth.service.impl;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.zhenchao.passport.oauth.dao.UserAppAuthorizationMapper;
+import org.zhenchao.oauth.dao.UserAppAuthorizationMapper;
 import org.zhenchao.oauth.model.UserAppAuthorization;
 import org.zhenchao.oauth.model.UserAppAuthorizationExample;
-import org.zhenchao.passport.oauth.service.UserAppAuthorizationService;
+import org.zhenchao.oauth.service.AuthorizeRelationService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,15 +16,15 @@ import java.util.Optional;
 import javax.annotation.Resource;
 
 /**
- * {@link UserAppAuthorizationService} 实现类
+ * {@link AuthorizeRelationService} 实现类
  *
  * @author zhenchao.wang 2017-01-20 23:19
  * @version 1.0.0
  */
 @Service
-public class UserAppAuthorizationServiceImpl implements UserAppAuthorizationService {
+public class AuthorizeRelationServiceImpl implements AuthorizeRelationService {
 
-    private static final Logger log = LoggerFactory.getLogger(UserAppAuthorizationServiceImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(AuthorizeRelationServiceImpl.class);
 
     @Resource
     private UserAppAuthorizationMapper userAppAuthorizationMapper;

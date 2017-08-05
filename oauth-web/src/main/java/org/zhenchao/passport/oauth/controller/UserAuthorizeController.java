@@ -14,7 +14,7 @@ import org.zhenchao.oauth.common.ErrorCode;
 import org.zhenchao.oauth.model.UserAppAuthorization;
 import org.zhenchao.passport.oauth.common.RequestPath;
 import org.zhenchao.passport.oauth.pojo.ResultInfo;
-import org.zhenchao.passport.oauth.service.UserAppAuthorizationService;
+import org.zhenchao.oauth.service.AuthorizeRelationService;
 import org.zhenchao.passport.oauth.util.CommonUtils;
 import org.zhenchao.passport.oauth.util.JsonView;
 
@@ -37,7 +37,7 @@ public class UserAuthorizeController {
     private static final Logger log = LoggerFactory.getLogger(UserAuthorizeController.class);
 
     @Resource
-    private UserAppAuthorizationService authorizeRelationService;
+    private AuthorizeRelationService authorizeRelationService;
 
     /**
      * user authorize on app

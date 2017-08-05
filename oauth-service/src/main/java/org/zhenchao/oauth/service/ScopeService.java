@@ -1,4 +1,4 @@
-package org.zhenchao.passport.oauth.service;
+package org.zhenchao.oauth.service;
 
 import org.zhenchao.oauth.model.Scope;
 

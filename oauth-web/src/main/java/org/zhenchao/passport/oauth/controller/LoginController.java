@@ -17,7 +17,7 @@ import org.zhenchao.oauth.common.exception.CryptException;
 import org.zhenchao.oauth.model.User;
 import org.zhenchao.passport.oauth.common.RequestPath;
 import org.zhenchao.passport.oauth.pojo.ResultInfo;
-import org.zhenchao.passport.oauth.service.UserService;
+import org.zhenchao.oauth.service.UserInfoService;
 import org.zhenchao.passport.oauth.util.JsonView;
 import org.zhenchao.passport.oauth.util.SessionUtils;
 
@@ -39,7 +39,7 @@ public class LoginController {
     private static final Logger log = LoggerFactory.getLogger(LoginController.class);
 
     @Resource
-    private UserService userService;
+    private UserInfoService userInfoService;
 
     /**
      * 跳转登录页
@@ -85,7 +85,7 @@ public class LoginController {
         }
 
         try {
-            Optional<User> optUser = userService.validatePassword(username, password);
+            Optional<User> optUser = userInfoService.validatePassword(username, password);
             if (optUser.isPresent()) {
                 User user = optUser.get();
                 // session user

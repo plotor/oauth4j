@@ -8,37 +8,27 @@ import org.zhenchao.oauth.common.ErrorCode;
  * @author zhenchao.wang 2017-01-22 15:58
  * @version 1.0.0
  */
-public class OAuthServiceException extends Exception {
+public class OAuthServiceException extends ServiceException {
 
-    private ErrorCode errorCode;
+    private static final long serialVersionUID = 4727143238486804703L;
 
     public OAuthServiceException(ErrorCode errorCode) {
-        super();
-        this.errorCode = errorCode;
+        super(errorCode);
     }
 
     public OAuthServiceException(String message, ErrorCode errorCode) {
-        super(message);
-        this.errorCode = errorCode;
+        super(message, errorCode);
     }
 
     public OAuthServiceException(String message, Throwable cause, ErrorCode errorCode) {
-        super(message, cause);
-        this.errorCode = errorCode;
+        super(message, cause, errorCode);
     }
 
     public OAuthServiceException(Throwable cause, ErrorCode errorCode) {
-        super(cause);
-        this.errorCode = errorCode;
+        super(cause, errorCode);
     }
 
-    protected OAuthServiceException(
-            String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace, ErrorCode errorCode) {
-        super(message, cause, enableSuppression, writableStackTrace);
-        this.errorCode = errorCode;
-    }
-
-    public ErrorCode getErrorCode() {
-        return errorCode;
+    public OAuthServiceException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace, ErrorCode errorCode) {
+        super(message, cause, enableSuppression, writableStackTrace, errorCode);
     }
 }

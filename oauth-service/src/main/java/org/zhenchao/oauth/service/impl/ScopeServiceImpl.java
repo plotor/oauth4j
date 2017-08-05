@@ -1,4 +1,4 @@
-package org.zhenchao.passport.oauth.service.impl;
+package org.zhenchao.oauth.service.impl;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -6,10 +6,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import static org.zhenchao.oauth.common.GlobalConstant.SEPARATOR_REDIRECT_SCOPE;
-import org.zhenchao.passport.oauth.dao.ScopeMapper;
+import org.zhenchao.oauth.dao.ScopeMapper;
 import org.zhenchao.oauth.model.Scope;
 import org.zhenchao.oauth.model.ScopeExample;
-import org.zhenchao.passport.oauth.service.ScopeService;
+import org.zhenchao.oauth.service.ScopeService;
 
 import java.util.ArrayList;
 import java.util.Arrays;

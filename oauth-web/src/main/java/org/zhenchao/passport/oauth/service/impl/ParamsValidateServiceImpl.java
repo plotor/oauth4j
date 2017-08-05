@@ -14,7 +14,7 @@ import org.zhenchao.passport.oauth.pojo.AuthorizeRequestParams;
 import org.zhenchao.passport.oauth.pojo.RequestParams;
 import org.zhenchao.passport.oauth.pojo.TokenRequestParams;
 import org.zhenchao.passport.oauth.service.AuthorizeService;
-import org.zhenchao.passport.oauth.service.OAuthAppInfoService;
+import org.zhenchao.oauth.service.AppInfoService;
 import org.zhenchao.passport.oauth.service.ParamsValidateService;
 
 import java.util.Optional;
@@ -32,7 +32,7 @@ public class ParamsValidateServiceImpl implements ParamsValidateService {
     private static final Logger log = LoggerFactory.getLogger(ParamsValidateServiceImpl.class);
 
     @Resource
-    private OAuthAppInfoService appInfoService;
+    private AppInfoService appInfoService;
 
     @Resource
     private AuthorizeService authorizeService;

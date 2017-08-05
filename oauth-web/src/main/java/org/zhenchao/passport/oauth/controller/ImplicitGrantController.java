@@ -22,10 +22,10 @@ import org.zhenchao.passport.oauth.common.RequestPath;
 import org.zhenchao.passport.oauth.pojo.AuthorizeRequestParams;
 import org.zhenchao.passport.oauth.pojo.ResultInfo;
 import org.zhenchao.passport.oauth.pojo.TokenRequestParams;
-import org.zhenchao.passport.oauth.service.OAuthAppInfoService;
+import org.zhenchao.oauth.service.AppInfoService;
 import org.zhenchao.passport.oauth.service.ParamsValidateService;
-import org.zhenchao.passport.oauth.service.ScopeService;
-import org.zhenchao.passport.oauth.service.UserAppAuthorizationService;
+import org.zhenchao.oauth.service.ScopeService;
+import org.zhenchao.oauth.service.AuthorizeRelationService;
 import org.zhenchao.oauth.token.AbstractAccessToken;
 import org.zhenchao.oauth.token.MacAccessToken;
 import org.zhenchao.oauth.token.generator.AbstractAccessTokenGenerator;
@@ -65,10 +65,10 @@ public class ImplicitGrantController {
     private ParamsValidateService paramsValidateService;
 
     @Resource
-    private OAuthAppInfoService appInfoService;
+    private AppInfoService appInfoService;
 
     @Resource
-    private UserAppAuthorizationService authorizeRelationService;
+    private AuthorizeRelationService authorizeRelationService;
 
     @Resource
     private ScopeService scopeService;

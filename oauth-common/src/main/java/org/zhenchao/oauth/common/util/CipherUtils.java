@@ -1,5 +1,6 @@
-package org.zhenchao.passport.oauth.util;
+package org.zhenchao.oauth.common.util;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -17,7 +18,6 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.InvalidParameterSpecException;
 import java.security.spec.KeySpec;
 import java.util.Arrays;
-import java.util.Base64;
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
@@ -34,7 +34,7 @@ import javax.crypto.spec.SecretKeySpec;
  * @author zhenchao.wang 2017-01-02 13:49
  * @version 1.0.0
  */
-public class CryptUtils {
+public abstract class CipherUtils {
 
     private static final String AES = "AES";
 
@@ -69,7 +69,7 @@ public class CryptUtils {
      *
      * @param data
      * @return
-     * @throws Exception
+     * @throws CryptException
      */
     public static byte[] aesEncrypt(byte[] data) throws CryptException {
 
@@ -79,12 +79,12 @@ public class CryptUtils {
 
         // AES加密
         try {
-            Key key = new SecretKeySpec(Base64.getDecoder().decode(AES_KEY), AES);
+            Key key = new SecretKeySpec(Base64.decodeBase64(AES_KEY), AES);
             Security.addProvider(new BouncyCastleProvider());
             Cipher cipher = Cipher.getInstance(AES_CIPHER_ALGORITHM);
             //设置为加密模式
             cipher.init(Cipher.ENCRYPT_MODE, key, generateIV());
-            return Base64.getEncoder().encode(cipher.doFinal(data));
+            return Base64.encodeBase64(cipher.doFinal(data));
         } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | InvalidAlgorithmParameterException |
                 IllegalBlockSizeException | BadPaddingException | InvalidParameterSpecException e) {
             throw new CryptException("Aes encrypt error!", e, ErrorCode.AES_ENCRYPT_ERROR);
@@ -97,7 +97,7 @@ public class CryptUtils {
      *
      * @param data
      * @return
-     * @throws Exception
+     * @throws CryptException
      */
     public static byte[] aesEncrypt(String data) throws CryptException {
 
@@ -120,7 +120,7 @@ public class CryptUtils {
      *
      * @param encryptedData
      * @return
-     * @throws Exception
+     * @throws CryptException
      */
     public static byte[] aesDecrypt(byte[] encryptedData) throws CryptException {
 
@@ -130,11 +130,11 @@ public class CryptUtils {
 
         // AES解密
         try {
-            Key key = new SecretKeySpec(Base64.getDecoder().decode(AES_KEY), AES);
+            Key key = new SecretKeySpec(Base64.decodeBase64(AES_KEY), AES);
             Cipher cipher = Cipher.getInstance(AES_CIPHER_ALGORITHM);
             //设置为解密模式
             cipher.init(Cipher.DECRYPT_MODE, key, generateIV());
-            return cipher.doFinal(Base64.getDecoder().decode(encryptedData));
+            return cipher.doFinal(Base64.decodeBase64(encryptedData));
         } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | InvalidAlgorithmParameterException |
                 IllegalBlockSizeException | BadPaddingException | InvalidParameterSpecException e) {
             throw new CryptException("Aes decrypt error!", e, ErrorCode.AES_DECRYPT_ERROR);
@@ -147,7 +147,7 @@ public class CryptUtils {
      *
      * @param encryptedData
      * @return
-     * @throws Exception
+     * @throws CryptException
      */
     public static byte[] aesDecrypt(String encryptedData) throws CryptException {
 
@@ -179,7 +179,7 @@ public class CryptUtils {
         KeySpec keySpec = new PBEKeySpec(text.toCharArray(), salt.getBytes(), iterationCount, length);
         try {
             SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
-            return Base64.getEncoder().encodeToString(secretKeyFactory.generateSecret(keySpec).getEncoded());
+            return Base64.encodeBase64String(secretKeyFactory.generateSecret(keySpec).getEncoded());
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
             throw new CryptException("PDKDF2 Error", e, ErrorCode.PBKDF2_ENCRYPT_ERROR);
         }
@@ -203,7 +203,8 @@ public class CryptUtils {
      * IV为一个16字节的数组，这里数据全为0
      *
      * @return
-     * @throws Exception
+     * @throws NoSuchAlgorithmException
+     * @throws InvalidParameterSpecException
      */
     private static AlgorithmParameters generateIV() throws NoSuchAlgorithmException, InvalidParameterSpecException {
         byte[] iv = new byte[16];

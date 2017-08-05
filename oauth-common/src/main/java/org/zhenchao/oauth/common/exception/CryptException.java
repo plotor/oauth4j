@@ -3,14 +3,16 @@ package org.zhenchao.oauth.common.exception;
 import org.zhenchao.oauth.common.ErrorCode;
 
 /**
- * 加解密相关错误
+ * 加解密相关异常
  *
  * @author zhenchao.wang 2017-01-02 13:59
  * @version 1.0.0
  */
 public class CryptException extends Exception {
 
-    private ErrorCode errorCode;
+    private static final long serialVersionUID = 729009559555889799L;
+
+    protected ErrorCode errorCode;
 
     public CryptException(ErrorCode errorCode) {
         super();

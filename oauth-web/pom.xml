@@ -26,6 +26,10 @@
         </dependency>
         <dependency>
             <groupId>org.zhenchao.oauth</groupId>
+            <artifactId>oauth-service</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.zhenchao.oauth</groupId>
             <artifactId>oauth-protocol</artifactId>
         </dependency>
 

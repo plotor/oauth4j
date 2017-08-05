@@ -1,4 +1,4 @@
-package org.zhenchao.passport.oauth.service;
+package org.zhenchao.oauth.service;
 
 import org.zhenchao.oauth.model.UserAppAuthorization;
 
@@ -11,7 +11,7 @@ import java.util.Optional;
  * @author zhenchao.wang 2017-01-20 23:16
  * @version 1.0.0
  */
-public interface UserAppAuthorizationService {
+public interface AuthorizeRelationService {
 
     /**
      * 获取用户与APP之间全部的授权关系

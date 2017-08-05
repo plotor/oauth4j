@@ -1,4 +1,4 @@
-package org.zhenchao.passport.oauth.service.impl;
+package org.zhenchao.oauth.service.impl;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -6,27 +6,27 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.zhenchao.oauth.common.GlobalConstant;
-import org.zhenchao.passport.oauth.dao.UserMapper;
 import org.zhenchao.oauth.common.exception.CryptException;
+import org.zhenchao.oauth.common.util.CipherUtils;
+import org.zhenchao.oauth.dao.UserMapper;
 import org.zhenchao.oauth.model.User;
 import org.zhenchao.oauth.model.UserExample;
-import org.zhenchao.passport.oauth.service.UserService;
-import org.zhenchao.passport.oauth.util.CryptUtils;
+import org.zhenchao.oauth.service.UserInfoService;
 
 import java.util.List;
 import java.util.Optional;
 import javax.annotation.Resource;
 
 /**
- * {@link UserService} 实现类
+ * {@link UserInfoService} 实现类
  *
  * @author zhenchao.wang 2017-01-02 13:25
  * @version 1.0.0
  */
 @Service
-public class UserServiceImpl implements UserService {
+public class UserInfoServiceImpl implements UserInfoService {
 
-    private static final Logger log = LoggerFactory.getLogger(UserServiceImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(UserInfoServiceImpl.class);
 
     @Resource
     private UserMapper userMapper;
@@ -47,7 +47,7 @@ public class UserServiceImpl implements UserService {
             return Optional.empty();
         }
 
-        String encryptPassword = CryptUtils.pbkdf2(password, GlobalConstant.SALT);
+        String encryptPassword = CipherUtils.pbkdf2(password, GlobalConstant.SALT);
         User user = users.get(0);
         log.debug("Validate password[current={}, expected={}]", encryptPassword, user.getPassword());
         return StringUtils.equals(encryptPassword, user.getPassword()) ? Optional.of(user) : Optional.empty();

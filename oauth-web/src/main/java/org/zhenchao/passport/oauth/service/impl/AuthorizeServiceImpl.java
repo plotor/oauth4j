@@ -19,7 +19,7 @@ import org.zhenchao.oauth.common.exception.OAuthServiceException;
 import org.zhenchao.oauth.model.OAuthAppInfo;
 import org.zhenchao.oauth.model.UserAppAuthorization;
 import org.zhenchao.passport.oauth.service.AuthorizeService;
-import org.zhenchao.passport.oauth.service.OAuthAppInfoService;
+import org.zhenchao.oauth.service.AppInfoService;
 
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -51,7 +51,7 @@ public class AuthorizeServiceImpl implements AuthorizeService {
     }
 
     @Resource
-    private OAuthAppInfoService appInfoService;
+    private AppInfoService appInfoService;
 
     @Override
     public Optional<AuthorizationCode> generateAndCacheAuthorizationCode(UserAppAuthorization uaa, AuthorizeRequestParams codeParams)
