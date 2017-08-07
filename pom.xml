@@ -5,14 +5,15 @@
     <artifactId>x-oauth</artifactId>
     <packaging>pom</packaging>
     <version>1.0.0-SNAPSHOT</version>
+
     <modules>
         <module>oauth-common</module>
         <module>oauth-dal</module>
-        <module>oauth-protocol</module>
         <module>oauth-token</module>
-        <module>oauth-web</module>
         <module>oauth-service</module>
+        <module>oauth-protocol</module>
     </modules>
+
     <name>x-oauth</name>
     <url>http://maven.apache.org</url>
 

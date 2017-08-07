@@ -19,7 +19,7 @@ import org.zhenchao.oauth.model.OAuthAppInfo;
 import org.zhenchao.oauth.model.Scope;
 import org.zhenchao.oauth.model.User;
 import org.zhenchao.oauth.model.UserAppAuthorization;
-import org.zhenchao.oauth.protocol.enums.ResponseType;
+import org.zhenchao.passport.oauth.enums.ResponseType;
 import org.zhenchao.oauth.token.enums.TokenType;
 import org.zhenchao.passport.oauth.common.RequestPath;
 import org.zhenchao.passport.oauth.pojo.AuthorizationCode;

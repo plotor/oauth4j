@@ -9,7 +9,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.zhenchao.oauth.common.ErrorCode;
-import org.zhenchao.oauth.protocol.enums.ResponseType;
+import org.zhenchao.passport.oauth.enums.ResponseType;
 import org.zhenchao.passport.oauth.common.RequestPath;
 import org.zhenchao.passport.oauth.util.MockUserOperationUtils;
 
