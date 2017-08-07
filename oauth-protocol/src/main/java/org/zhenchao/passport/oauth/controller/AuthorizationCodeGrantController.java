@@ -148,7 +148,7 @@ public class AuthorizationCodeGrantController {
         }
 
         Optional<UserAppAuthorization> authorization =
-                authorizeRelationService.getUserAndAppAuthorizationInfo(
+                authorizeRelationService.getUserAndAppRelationList(
                         user.getId(), requestParams.getClientId(), CommonUtils.genScopeSign(requestParams.getScope()));
 
         if (authorization.isPresent() && skipConfirm) {
@@ -217,7 +217,7 @@ public class AuthorizationCodeGrantController {
         }
 
         // 校验用户与APP之间是否存在授权关系
-        Optional<UserAppAuthorization> opt = authorizeRelationService.getUserAndAppAuthorizationInfo(
+        Optional<UserAppAuthorization> opt = authorizeRelationService.getUserAndAppRelationList(
                 requestParams.getUserId(), requestParams.getAppInfo().getAppId(), CommonUtils.genScopeSign(requestParams.getScope()));
         if (!opt.isPresent()) {
             // 用户与APP之间不存在指定的授权关系

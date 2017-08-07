@@ -1,6 +1,6 @@
 package org.zhenchao.oauth.service;
 
-import org.zhenchao.oauth.model.OAuthAppInfo;
+import org.zhenchao.oauth.entity.AppInfo;
 
 import java.util.Optional;
 
@@ -18,6 +18,6 @@ public interface AppInfoService {
      * @param clientId
      * @return
      */
-    Optional<OAuthAppInfo> getAppInfo(long clientId);
+    Optional<AppInfo> getAppInfo(long clientId);
 
 }

@@ -1,7 +1,7 @@
 package org.zhenchao.oauth.service;
 
 import org.zhenchao.oauth.common.exception.CryptException;
-import org.zhenchao.oauth.model.User;
+import org.zhenchao.oauth.entity.UserInfo;
 
 import java.util.Optional;
 
@@ -20,5 +20,5 @@ public interface UserInfoService {
      * @param password
      * @return 验证成功返回user对象，否则返回null
      */
-    Optional<User> validatePassword(String username, String password) throws CryptException;
+    Optional<UserInfo> validatePassword(String username, String password) throws CryptException;
 }

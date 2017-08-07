@@ -3,8 +3,8 @@ package org.zhenchao.oauth.service.impl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.zhenchao.oauth.dao.OAuthAppInfoMapper;
-import org.zhenchao.oauth.model.OAuthAppInfo;
+import org.zhenchao.oauth.dao.AppInfoMapper;
+import org.zhenchao.oauth.entity.AppInfo;
 import org.zhenchao.oauth.service.AppInfoService;
 
 import java.util.Optional;
@@ -22,10 +22,10 @@ public class AppInfoServiceImpl implements AppInfoService {
     private static final Logger log = LoggerFactory.getLogger(AppInfoServiceImpl.class);
 
     @Resource
-    private OAuthAppInfoMapper appInfoMapper;
+    private AppInfoMapper appInfoMapper;
 
     @Override
-    public Optional<OAuthAppInfo> getAppInfo(long clientId) {
+    public Optional<AppInfo> getAppInfo(long clientId) {
         log.debug("Get oauth app info by id[{}].", clientId);
         if (clientId < 0) {
             log.error("Client id [{}] error");

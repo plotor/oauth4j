@@ -76,7 +76,7 @@ public class UserAuthorizeController {
         authorization.setTokenKey(RandomStringUtils.randomAlphanumeric(64));  // 随机生成key
         authorization.setRefreshTokenKey(RandomStringUtils.randomAlphanumeric(64));  // 随机生成刷新令牌key
         authorization.setRefreshTokenExpirationTime(365 * 24 * 3600L);  // 设置刷新令牌有效期
-        if (authorizeRelationService.replaceUserAndAppAuthorizationInfo(authorization)) {
+        if (authorizeRelationService.replaceAuthorizeRelation(authorization)) {
             // 更新用户授权关系成功
             try {
                 mav.setViewName(String.format("redirect:%s&skip_confirm=true", URLDecoder.decode(callback, "UTF-8")));

@@ -8,9 +8,9 @@ import org.springframework.stereotype.Service;
 import org.zhenchao.oauth.common.GlobalConstant;
 import org.zhenchao.oauth.common.exception.CryptException;
 import org.zhenchao.oauth.common.util.CipherUtils;
-import org.zhenchao.oauth.dao.UserMapper;
-import org.zhenchao.oauth.model.User;
-import org.zhenchao.oauth.model.UserExample;
+import org.zhenchao.oauth.dao.UserInfoMapper;
+import org.zhenchao.oauth.entity.UserInfo;
+import org.zhenchao.oauth.entity.UserInfoExample;
 import org.zhenchao.oauth.service.UserInfoService;
 
 import java.util.List;
@@ -29,26 +29,26 @@ public class UserInfoServiceImpl implements UserInfoService {
     private static final Logger log = LoggerFactory.getLogger(UserInfoServiceImpl.class);
 
     @Resource
-    private UserMapper userMapper;
+    private UserInfoMapper userInfoMapper;
 
     @Override
-    public Optional<User> validatePassword(String username, String password) throws CryptException {
+    public Optional<UserInfo> validatePassword(String username, String password) throws CryptException {
         if (StringUtils.isBlank(username) || StringUtils.isBlank(password)) {
             log.error("Params error, username or password is null or empty!");
             return Optional.empty();
         }
 
-        UserExample userExample = new UserExample();
-        UserExample.Criteria criteria = userExample.createCriteria();
+        UserInfoExample example = new UserInfoExample();
+        UserInfoExample.Criteria criteria = example.createCriteria();
         criteria.andUsernameEqualTo(username);
-        List<User> users = userMapper.selectByExample(userExample);
+        List<UserInfo> users = userInfoMapper.selectByExample(example);
         if (CollectionUtils.isEmpty(users)) {
             log.error("Can't find any user by name[{}]!", username);
             return Optional.empty();
         }
 
         String encryptPassword = CipherUtils.pbkdf2(password, GlobalConstant.SALT);
-        User user = users.get(0);
+        UserInfo user = users.get(0);
         log.debug("Validate password[current={}, expected={}]", encryptPassword, user.getPassword());
         return StringUtils.equals(encryptPassword, user.getPassword()) ? Optional.of(user) : Optional.empty();
     }

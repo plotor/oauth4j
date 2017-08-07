@@ -1,6 +1,6 @@
 package org.zhenchao.oauth.service;
 
-import org.zhenchao.oauth.model.UserAppAuthorization;
+import org.zhenchao.oauth.entity.AuthorizeRelation;
 
 import java.util.List;
 import java.util.Optional;
@@ -20,7 +20,7 @@ public interface AuthorizeRelationService {
      * @param appId
      * @return
      */
-    List<UserAppAuthorization> getUserAndAppAuthorizationInfo(long userId, long appId);
+    List<AuthorizeRelation> getUserAndAppRelationList(long userId, long appId);
 
     /**
      * 获取用户与APP之间特定权限的授权关系
@@ -30,14 +30,14 @@ public interface AuthorizeRelationService {
      * @param scopeSign
      * @return
      */
-    Optional<UserAppAuthorization> getUserAndAppAuthorizationInfo(long userId, long appId, String scopeSign);
+    Optional<AuthorizeRelation> getUserAndAppRelationList(long userId, long appId, String scopeSign);
 
     /**
      * 更新用户与APP之间的授权关系
      *
-     * @param authorization
+     * @param relation
      * @return
      */
-    boolean replaceUserAndAppAuthorizationInfo(UserAppAuthorization authorization);
+    boolean replaceAuthorizeRelation(AuthorizeRelation relation);
 
 }

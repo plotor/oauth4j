@@ -1,6 +1,6 @@
 package org.zhenchao.oauth.service;
 
-import org.zhenchao.oauth.model.Scope;
+import org.zhenchao.oauth.entity.Scope;
 
 import java.util.List;
 

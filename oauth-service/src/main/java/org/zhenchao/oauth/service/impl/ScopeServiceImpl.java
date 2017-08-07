@@ -7,8 +7,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import static org.zhenchao.oauth.common.GlobalConstant.SEPARATOR_REDIRECT_SCOPE;
 import org.zhenchao.oauth.dao.ScopeMapper;
-import org.zhenchao.oauth.model.Scope;
-import org.zhenchao.oauth.model.ScopeExample;
+import org.zhenchao.oauth.entity.Scope;
+import org.zhenchao.oauth.entity.ScopeExample;
 import org.zhenchao.oauth.service.ScopeService;
 
 import java.util.ArrayList;

@@ -19,22 +19,22 @@
             <property name="forceBigDecimals" value="false"/>
         </javaTypeResolver>
         <!-- 生成模型的包名和位置-->
-        <javaModelGenerator targetPackage="org.zhenchao.passport.oauth.entity" targetProject="./output">
+        <javaModelGenerator targetPackage="org.zhenchao.oauth.entity" targetProject="./output">
             <property name="enableSubPackages" value="true"/>
             <property name="trimStrings" value="true"/>
         </javaModelGenerator>
         <!-- 生成映射文件的包名和位置-->
-        <sqlMapGenerator targetPackage="org.zhenchao.passport.oauth.mapper" targetProject="./output">
+        <sqlMapGenerator targetPackage="org.zhenchao.oauth.mapper" targetProject="./output">
             <property name="enableSubPackages" value="true"/>
         </sqlMapGenerator>
         <!-- 生成DAO的包名和位置-->
-        <javaClientGenerator type="XMLMAPPER" targetPackage="org.zhenchao.passport.oauth.dao" targetProject="./output">
+        <javaClientGenerator type="XMLMAPPER" targetPackage="org.zhenchao.oauth.dao" targetProject="./output">
             <property name="enableSubPackages" value="true"/>
         </javaClientGenerator>
         <!-- 要生成哪些表-->
-        <table tableName="t_oauth_app_info" domainObjectName="AppInfo"/>
+        <table tableName="t_app_info" domainObjectName="AppInfo"/>
         <table tableName="t_scope" domainObjectName="Scope"/>
-        <table tableName="t_user" domainObjectName="UserInfo"/>
-        <table tableName="t_user_app_authorization" domainObjectName="AuthorizeRelation"/>
+        <table tableName="t_user_info" domainObjectName="UserInfo"/>
+        <table tableName="t_authorize_relation" domainObjectName="AuthorizeRelation"/>
     </context>
 </generatorConfiguration>
