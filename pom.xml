@@ -39,7 +39,7 @@
                 <datasource.url.master>jdbc:mysql://localhost:3306/passport_oauth?useUnicode=true&amp;amp;characterEncoding=utf8
                 </datasource.url.master>
                 <datasource.username>root</datasource.username>
-                <!--暂时不启用密码加密-->
+                <!-- FIXME 暂时不启用密码加密 -->
                 <datasource.password>123456</datasource.password>
             </properties>
             <activation>
@@ -73,11 +73,6 @@
             <dependency>
                 <groupId>org.zhenchao.oauth</groupId>
                 <artifactId>oauth-service</artifactId>
-                <version>1.0.0-SNAPSHOT</version>
-            </dependency>
-            <dependency>
-                <groupId>org.zhenchao.oauth</groupId>
-                <artifactId>oauth-protocol</artifactId>
                 <version>1.0.0-SNAPSHOT</version>
             </dependency>
 
@@ -194,12 +189,14 @@
                 <artifactId>commons-compress</artifactId>
                 <version>1.13</version>
             </dependency>
+
             <!-- httpclient -->
             <dependency>
                 <groupId>org.apache.httpcomponents</groupId>
                 <artifactId>httpclient</artifactId>
                 <version>4.5.2</version>
             </dependency>
+
             <!-- MyBatis三方库 -->
             <dependency>
                 <groupId>org.mybatis</groupId>
@@ -211,30 +208,35 @@
                 <artifactId>mybatis-spring</artifactId>
                 <version>1.3.0</version>
             </dependency>
+
             <!-- MySQL驱动 -->
             <dependency>
                 <groupId>mysql</groupId>
                 <artifactId>mysql-connector-java</artifactId>
                 <version>5.1.40</version>
             </dependency>
+
             <!-- 数据库连接池 -->
             <dependency>
                 <groupId>com.alibaba</groupId>
                 <artifactId>druid</artifactId>
                 <version>1.0.27</version>
             </dependency>
+
             <!-- 缓存 -->
             <dependency>
                 <groupId>org.ehcache</groupId>
                 <artifactId>ehcache</artifactId>
                 <version>3.2.0</version>
             </dependency>
+
             <!-- 定时器框架 -->
             <dependency>
                 <groupId>org.quartz-scheduler</groupId>
                 <artifactId>quartz</artifactId>
                 <version>1.8.6</version>
             </dependency>
+
             <!-- 日志相关 -->
             <!-- sl4j -->
             <dependency>
@@ -289,6 +291,7 @@
                 <groupId>Javax.servlet</groupId>
                 <artifactId>javax.servlet-api</artifactId>
                 <version>3.1.0</version>
+                <scope>compile</scope>
             </dependency>
             <dependency>
                 <groupId>javax.servlet</groupId>
@@ -302,6 +305,7 @@
                 <version>1.2</version>
                 <scope>compile</scope>
             </dependency>
+
             <!-- rest-assured -->
             <dependency>
                 <groupId>io.rest-assured</groupId>
