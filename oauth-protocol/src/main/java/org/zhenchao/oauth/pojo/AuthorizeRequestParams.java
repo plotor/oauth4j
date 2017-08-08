@@ -1,8 +1,19 @@
 package org.zhenchao.oauth.pojo;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.zhenchao.oauth.common.ErrorCode;
+import org.zhenchao.oauth.common.exception.VerificationException;
+import org.zhenchao.oauth.entity.AppInfo;
+import org.zhenchao.oauth.enums.ResponseType;
+import org.zhenchao.oauth.service.factory.SpringBeanFactory;
 import org.zhenchao.oauth.token.pojo.TokenElement;
+import org.zhenchao.oauth.util.RedirectUriUtils;
+
+import java.util.Optional;
 
 /**
  * 授权请求参数
@@ -11,6 +22,8 @@ import org.zhenchao.oauth.token.pojo.TokenElement;
  * @version 1.0.0
  */
 public class AuthorizeRequestParams implements RequestParams {
+
+    private static final Logger log = LoggerFactory.getLogger(AuthorizeRequestParams.class);
 
     private String responseType;
 
@@ -21,6 +34,8 @@ public class AuthorizeRequestParams implements RequestParams {
     private String scope;
 
     private String state;
+
+    private AppInfo appInfo;
 
     public AuthorizeRequestParams() {
     }
@@ -40,9 +55,55 @@ public class AuthorizeRequestParams implements RequestParams {
     }
 
     @Override
+    public ErrorCode validate() throws VerificationException {
+        // 校验response type
+        if (!ResponseType.isAllowed(responseType)) {
+            log.error("Authorize request params error, response type is not allowed, appId[{}], responseType[{}]", clientId, responseType);
+            return ErrorCode.UNSUPPORTED_RESPONSE_TYPE;
+        }
+
+        Optional<AppInfo> opt = SpringBeanFactory.getAppInfoService().getAppInfo(clientId);
+        if (!opt.isPresent()) {
+            log.error("No app info found, appId[{}]", clientId);
+            return ErrorCode.CLIENT_NOT_EXIST;
+        }
+        this.appInfo = opt.get();
+
+        // 回调地址校验
+        // FIXME 请求授权码时回调地址不是必须的
+        if (StringUtils.isBlank(redirectUri) || StringUtils.isBlank(appInfo.getRedirectUri())) {
+            return ErrorCode.INVALID_REDIRECT_URI;
+        }
+
+        if (!RedirectUriUtils.isValid(redirectUri, appInfo.getRedirectUri())) {
+            log.error("Illegal redirect uri, appId[{}], input[{}], config[{}]", clientId, redirectUri, appInfo.getRedirectUri());
+            return ErrorCode.INVALID_REDIRECT_URI;
+        }
+
+        /*
+         * scope校验，如果没有传递则设置为当前允许的所有权限
+         * 如果授权的scope与客户端请求的scope不一致，那么需要在下发token的时候说明真实下发的scope列表
+         */
+        if (StringUtils.isBlank(scope)) {
+            log.info("No request scope set and use default scope[{}], appId[{}]", appInfo.getScope(), clientId);
+            this.scope = appInfo.getScope();
+            return ErrorCode.NO_ERROR;
+        } else {
+            // 校验传递的scope是否是许可scope的子集
+            return this.isSubScopes(appInfo.getScope(), requestParams.getScope()) ? ErrorCode.NO_ERROR : ErrorCode.INVALID_SCOPE;
+        }
+    }
+
+}
+
+    @Override
     public TokenElement toTokenElement() {
         // TODO 2017-08-08 18:11:05
         return null;
+    }
+
+    public AppInfo getAppInfo() {
+        return this.appInfo;
     }
 
     @Override

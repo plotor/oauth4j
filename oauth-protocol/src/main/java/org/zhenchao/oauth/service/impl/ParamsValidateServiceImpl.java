@@ -5,17 +5,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.zhenchao.oauth.common.ErrorCode;
+import org.zhenchao.oauth.entity.AppInfo;
 import org.zhenchao.oauth.enums.GrantType;
-import org.zhenchao.oauth.model.OAuthAppInfo;
-import org.zhenchao.oauth.pojo.AuthorizationCode;
-import org.zhenchao.oauth.service.AuthorizeService;
 import org.zhenchao.oauth.enums.ResponseType;
-import org.zhenchao.oauth.token.enums.TokenType;
+import org.zhenchao.oauth.pojo.AuthorizationCode;
 import org.zhenchao.oauth.pojo.AuthorizeRequestParams;
 import org.zhenchao.oauth.pojo.RequestParams;
-import org.zhenchao.oauth.pojo.TokenRequestParams;
+import org.zhenchao.oauth.pojo.TokenRelevantRequestParams;
 import org.zhenchao.oauth.service.AppInfoService;
+import org.zhenchao.oauth.service.AuthorizeService;
 import org.zhenchao.oauth.service.ParamsValidateService;
+import org.zhenchao.oauth.token.enums.TokenType;
 
 import java.util.Optional;
 import javax.annotation.Resource;
@@ -51,12 +51,12 @@ public class ParamsValidateServiceImpl implements ParamsValidateService {
             return ErrorCode.UNSUPPORTED_RESPONSE_TYPE;
         }
 
-        Optional<OAuthAppInfo> optAppInfo = appInfoService.getAppInfo(requestParams.getClientId());
+        Optional<AppInfo> optAppInfo = appInfoService.getAppInfo(requestParams.getClientId());
         if (optAppInfo.isPresent()) {
             /*
              * 客户端存在
              */
-            OAuthAppInfo appInfo = optAppInfo.get();
+            AppInfo appInfo = optAppInfo.get();
 
             // 回调地址校验
             // FIXME 请求授权码时回调地址不是必须的
@@ -87,11 +87,11 @@ public class ParamsValidateServiceImpl implements ParamsValidateService {
 
     @Override
     public ErrorCode validateTokenRequestParams(RequestParams params) {
-        if (!(params instanceof TokenRequestParams)) {
+        if (!(params instanceof TokenRelevantRequestParams)) {
             return ErrorCode.INVALID_REQUEST;
         }
 
-        TokenRequestParams requestParams = (TokenRequestParams) params;
+        TokenRelevantRequestParams requestParams = (TokenRelevantRequestParams) params;
 
         // 检测grant type
         if (!GrantType.AUTHORIZATION_CODE.getType().equals(requestParams.getGrantType())) {

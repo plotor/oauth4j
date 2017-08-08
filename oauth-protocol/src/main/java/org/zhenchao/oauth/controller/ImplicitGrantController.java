@@ -32,7 +32,7 @@ import org.zhenchao.oauth.util.CookieUtils;
 import org.zhenchao.oauth.util.SessionUtils;
 import org.zhenchao.oauth.pojo.AuthorizeRequestParams;
 import org.zhenchao.oauth.pojo.ResultInfo;
-import org.zhenchao.oauth.pojo.TokenRequestParams;
+import org.zhenchao.oauth.pojo.TokenRelevantRequestParams;
 import org.zhenchao.oauth.service.ParamsValidateService;
 import org.zhenchao.oauth.util.HttpRequestUtils;
 import org.zhenchao.oauth.util.JsonView;
@@ -142,7 +142,7 @@ public class ImplicitGrantController {
         if (authorization.isPresent() && skipConfirm) {
             // 用户已授权，下发token
             AuthorizeRelation relation = authorization.get();
-            TokenRequestParams trp = new TokenRequestParams();
+            TokenRelevantRequestParams trp = new TokenRelevantRequestParams();
             trp.setRedirectUri(redirectUri).setClientId(clientId).setTokenType(StringUtils.defaultString(tokenType, TokenType.MAC.getValue()));
             trp.setResponseType(responseType).setIrt(false).setUserId(user.getId()).setScope(requestParams.getScope()).setAppInfo(appInfo).setAuthorizeRelation(relation);
             // 验证通过，下发accessToken

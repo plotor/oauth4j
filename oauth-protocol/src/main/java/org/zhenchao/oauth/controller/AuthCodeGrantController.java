@@ -14,13 +14,21 @@ import org.springframework.web.util.UriComponentsBuilder;
 import org.zhenchao.oauth.common.ErrorCode;
 import org.zhenchao.oauth.common.GlobalConstant;
 import static org.zhenchao.oauth.common.GlobalConstant.COOKIE_KEY_USER_LOGIN_SIGN;
+import org.zhenchao.oauth.common.RequestPath;
 import org.zhenchao.oauth.common.exception.ServiceException;
 import org.zhenchao.oauth.entity.AppInfo;
 import org.zhenchao.oauth.entity.AuthorizeRelation;
 import org.zhenchao.oauth.entity.Scope;
 import org.zhenchao.oauth.entity.UserInfo;
+import org.zhenchao.oauth.enums.ResponseType;
+import org.zhenchao.oauth.pojo.AuthorizationCode;
+import org.zhenchao.oauth.pojo.AuthorizeRequestParams;
+import org.zhenchao.oauth.pojo.ResultInfo;
+import org.zhenchao.oauth.pojo.TokenRelevantRequestParams;
 import org.zhenchao.oauth.service.AppInfoService;
 import org.zhenchao.oauth.service.AuthorizeRelationService;
+import org.zhenchao.oauth.service.AuthorizeService;
+import org.zhenchao.oauth.service.ParamsValidateService;
 import org.zhenchao.oauth.service.ScopeService;
 import org.zhenchao.oauth.token.AbstractAccessToken;
 import org.zhenchao.oauth.token.MacAccessToken;
@@ -30,14 +38,6 @@ import org.zhenchao.oauth.token.generator.AbstractAccessTokenGenerator;
 import org.zhenchao.oauth.token.generator.AbstractTokenGenerator;
 import org.zhenchao.oauth.util.CommonUtils;
 import org.zhenchao.oauth.util.CookieUtils;
-import org.zhenchao.oauth.common.RequestPath;
-import org.zhenchao.oauth.enums.ResponseType;
-import org.zhenchao.oauth.pojo.AuthorizationCode;
-import org.zhenchao.oauth.pojo.AuthorizeRequestParams;
-import org.zhenchao.oauth.pojo.ResultInfo;
-import org.zhenchao.oauth.pojo.TokenRequestParams;
-import org.zhenchao.oauth.service.AuthorizeService;
-import org.zhenchao.oauth.service.ParamsValidateService;
 import org.zhenchao.oauth.util.HttpRequestUtils;
 import org.zhenchao.oauth.util.JsonView;
 import org.zhenchao.oauth.util.SessionUtils;
@@ -62,9 +62,9 @@ import javax.servlet.http.HttpSession;
  */
 @Controller
 @RequestMapping(RequestPath.PATH_ROOT_OAUTH)
-public class AuthorizationCodeGrantController {
+public class AuthCodeGrantController {
 
-    private static final Logger log = LoggerFactory.getLogger(AuthorizationCodeGrantController.class);
+    private static final Logger log = LoggerFactory.getLogger(AuthCodeGrantController.class);
 
     @Resource
     private AppInfoService appInfoService;
@@ -91,20 +91,14 @@ public class AuthorizationCodeGrantController {
                                   @RequestParam("response_type") String responseType,
                                   @RequestParam("client_id") long clientId,
                                   @RequestParam("redirect_uri") String redirectUri,
-                                  @RequestParam(value = "scope", required = false) String scope,
-                                  @RequestParam(value = "state", required = false) String state,
-                                  @RequestParam(value = "skip_confirm", required = false, defaultValue = "false") boolean skipConfirm,
-                                  @RequestParam(value = "force_login", required = false, defaultValue = "false") boolean forceLogin) {
+                                  @RequestParam(name = "scope", required = false) String scope,
+                                  @RequestParam(name = "state", required = false) String state,
+                                  @RequestParam(name = "skip_confirm", required = false, defaultValue = "false") boolean skipConfirm,
+                                  @RequestParam(name = "force_login", required = false, defaultValue = "false") boolean forceLogin) {
 
-        log.debug("Entering authorize code method...");
+        log.info("Request authorize code, appId[{}]", clientId);
 
         ModelAndView mav = new ModelAndView();
-
-        try {
-            redirectUri = URLDecoder.decode(redirectUri, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            // never happen
-        }
 
         AuthorizeRequestParams requestParams = new AuthorizeRequestParams();
         requestParams.setResponseType(responseType).setClientId(clientId).setRedirectUri(redirectUri).setScope(scope).setState(StringUtils.trimToEmpty(state));
@@ -166,7 +160,7 @@ public class AuthorizationCodeGrantController {
                     mav.setViewName("redirect:" + builder.toUriString());
                     return mav;
                 }
-                return this.buildErrorResponse(mav, redirectUri, ErrorCode.GENERATE_CODE_ERROR, state);
+                return this.buildErrorResponse(mav, redirectUri, ErrorCode.AUTHORIZATION_CODE_GENERATE_ERROR, state);
             } catch (ServiceException e) {
                 log.error("Generate authorization code error!", e);
                 return JsonView.render(new ResultInfo(e.getErrorCode(), state), response, false);
@@ -193,9 +187,9 @@ public class AuthorizationCodeGrantController {
                                    @RequestParam("code") String code,
                                    @RequestParam("redirect_uri") String redirectUri,
                                    @RequestParam("client_id") long clientId,
-                                   @RequestParam(value = "client_secret", required = false) String clientSecret,
-                                   @RequestParam(value = "token_type", required = false) String tokenType,
-                                   @RequestParam(value = "issue_refresh_token", required = false, defaultValue = "true") boolean refresh) {
+                                   @RequestParam(name = "client_secret", required = false) String clientSecret,
+                                   @RequestParam(name = "token_type", required = false) String tokenType,
+                                   @RequestParam(name = "issue_refresh_token", required = false, defaultValue = "true") boolean refresh) {
 
         log.debug("Entering authorize code method...");
 
@@ -205,7 +199,7 @@ public class AuthorizationCodeGrantController {
             // never happen
         }
 
-        TokenRequestParams requestParams = new TokenRequestParams();
+        TokenRelevantRequestParams requestParams = new TokenRelevantRequestParams();
         requestParams.setResponseType(ResponseType.AUTHORIZATION_CODE.getType()).setGrantType(grantType).setCode(code)
                 .setRedirectUri(redirectUri).setClientId(clientId).setTokenType(StringUtils.defaultString(tokenType, TokenType.MAC.getValue()))
                 .setClientSecret(clientSecret).setIrt(refresh);
@@ -283,9 +277,9 @@ public class AuthorizationCodeGrantController {
     private ModelAndView buildErrorResponse(ModelAndView mav, String redirectUri, ErrorCode errorCode, String state) {
         List<String> params = new ArrayList<>();
         params.add(String.format("error=%s", errorCode.getCode()));
-        if (StringUtils.isNotBlank(errorCode.getDesc())) {
+        if (StringUtils.isNotBlank(errorCode.getDescription())) {
             try {
-                params.add(String.format("error_description=%s", URLEncoder.encode(errorCode.getDesc(), "UTF-8")));
+                params.add(String.format("error_description=%s", URLEncoder.encode(errorCode.getDescription(), "UTF-8")));
             } catch (UnsupportedEncodingException e) {
                 // never happen
             }
