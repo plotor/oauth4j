@@ -112,11 +112,11 @@ public class ParamsValidateServiceImpl implements ParamsValidateService {
             }
         }
 
-        Optional<AuthorizationCode> opt = authorizeService.getAuthorizationCodeFromCache(requestParams.getCode());
+        Optional<AuthorizationCode> opt = authorizeService.getAuthCodeFromCache(requestParams.getCode());
         if (opt.isPresent()) {
 
             // 从缓存中删除授权码，一个授权码只能被使用一次
-            if (!authorizeService.deleteAuthorizationCodeFromCache(requestParams.getCode())) {
+            if (!authorizeService.deleteAuthCodeFromCache(requestParams.getCode())) {
                 log.error("Delete authorization code [{}] from cache error!", requestParams.getCode());
                 return ErrorCode.INVALID_AUTHORIZATION_CODE;
             }

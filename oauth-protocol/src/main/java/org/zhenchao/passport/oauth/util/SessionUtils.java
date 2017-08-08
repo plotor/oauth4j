@@ -2,7 +2,7 @@ package org.zhenchao.passport.oauth.util;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.zhenchao.oauth.model.User;
+import org.zhenchao.oauth.entity.UserInfo;
 
 import javax.servlet.http.HttpSession;
 
@@ -12,7 +12,7 @@ import javax.servlet.http.HttpSession;
  * @author zhenchao.wang 2017-01-02 15:41
  * @version 1.0.0
  */
-public class SessionUtils {
+public abstract class SessionUtils {
 
     /**
      * 缓存用户信息到session
@@ -21,7 +21,7 @@ public class SessionUtils {
      * @param user
      * @return
      */
-    public static boolean putUser(HttpSession session, User user) {
+    public static boolean putUser(HttpSession session, UserInfo user) {
         if (null == user) {
             return false;
         }
@@ -36,11 +36,11 @@ public class SessionUtils {
      * @param key
      * @return
      */
-    public static User getUser(HttpSession session, String key) {
+    public static UserInfo getUser(HttpSession session, String key) {
         if (StringUtils.isBlank(key)) {
             return null;
         }
-        return (User) session.getAttribute("user-" + key);
+        return (UserInfo) session.getAttribute("user-" + key);
     }
 
 }

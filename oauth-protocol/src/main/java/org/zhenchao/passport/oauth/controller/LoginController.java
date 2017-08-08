@@ -14,10 +14,10 @@ import org.zhenchao.oauth.common.ErrorCode;
 import org.zhenchao.oauth.common.GlobalConstant;
 import static org.zhenchao.oauth.common.GlobalConstant.COOKIE_KEY_USER_LOGIN_SIGN;
 import org.zhenchao.oauth.common.exception.CryptException;
-import org.zhenchao.oauth.model.User;
+import org.zhenchao.oauth.entity.UserInfo;
+import org.zhenchao.oauth.service.UserInfoService;
 import org.zhenchao.passport.oauth.common.RequestPath;
 import org.zhenchao.passport.oauth.pojo.ResultInfo;
-import org.zhenchao.oauth.service.UserInfoService;
 import org.zhenchao.passport.oauth.util.JsonView;
 import org.zhenchao.passport.oauth.util.SessionUtils;
 
@@ -85,9 +85,9 @@ public class LoginController {
         }
 
         try {
-            Optional<User> optUser = userInfoService.validatePassword(username, password);
+            Optional<UserInfo> optUser = userInfoService.validatePassword(username, password);
             if (optUser.isPresent()) {
-                User user = optUser.get();
+                UserInfo user = optUser.get();
                 // session user
                 SessionUtils.putUser(session, user);
 

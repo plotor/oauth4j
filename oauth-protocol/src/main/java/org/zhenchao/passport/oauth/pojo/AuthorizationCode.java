@@ -3,7 +3,7 @@ package org.zhenchao.passport.oauth.pojo;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import static org.zhenchao.oauth.common.GlobalConstant.SALT;
-import org.zhenchao.oauth.model.OAuthAppInfo;
+import org.zhenchao.oauth.entity.AppInfo;
 import org.zhenchao.passport.oauth.util.CommonUtils;
 
 import java.io.ByteArrayOutputStream;
@@ -21,7 +21,7 @@ public class AuthorizationCode implements Serializable {
 
     private static final long serialVersionUID = 2991560593633764910L;
 
-    private OAuthAppInfo appInfo;
+    private AppInfo appInfo;
 
     private long userId;
 
@@ -35,7 +35,7 @@ public class AuthorizationCode implements Serializable {
     public AuthorizationCode() {
     }
 
-    public AuthorizationCode(OAuthAppInfo appInfo, long userId, String scopes) {
+    public AuthorizationCode(AppInfo appInfo, long userId, String scopes) {
         this.appInfo = appInfo;
         this.userId = userId;
         this.scopes = scopes;
@@ -86,11 +86,11 @@ public class AuthorizationCode implements Serializable {
         return this.value;
     }
 
-    public OAuthAppInfo getAppInfo() {
+    public AppInfo getAppInfo() {
         return appInfo;
     }
 
-    public AuthorizationCode setAppInfo(OAuthAppInfo appInfo) {
+    public AuthorizationCode setAppInfo(AppInfo appInfo) {
         this.appInfo = appInfo;
         return this;
     }

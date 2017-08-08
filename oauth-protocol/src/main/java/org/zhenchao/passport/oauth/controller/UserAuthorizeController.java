@@ -11,10 +11,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.zhenchao.oauth.common.ErrorCode;
-import org.zhenchao.oauth.model.UserAppAuthorization;
+import org.zhenchao.oauth.entity.AuthorizeRelation;
+import org.zhenchao.oauth.service.AuthorizeRelationService;
 import org.zhenchao.passport.oauth.common.RequestPath;
 import org.zhenchao.passport.oauth.pojo.ResultInfo;
-import org.zhenchao.oauth.service.AuthorizeRelationService;
 import org.zhenchao.passport.oauth.util.CommonUtils;
 import org.zhenchao.passport.oauth.util.JsonView;
 
@@ -66,17 +66,17 @@ public class UserAuthorizeController {
         }
 
         // 添加用户授权关系
-        UserAppAuthorization authorization = new UserAppAuthorization();
-        authorization.setUserId(userId);
-        authorization.setAppId(clientId);
-        authorization.setScope(scope);
-        authorization.setScopeSign(CommonUtils.genScopeSign(scope));
-        authorization.setCreateTime(new Date());
-        authorization.setCreateTime(authorization.getCreateTime());
-        authorization.setTokenKey(RandomStringUtils.randomAlphanumeric(64));  // 随机生成key
-        authorization.setRefreshTokenKey(RandomStringUtils.randomAlphanumeric(64));  // 随机生成刷新令牌key
-        authorization.setRefreshTokenExpirationTime(365 * 24 * 3600L);  // 设置刷新令牌有效期
-        if (authorizeRelationService.replaceAuthorizeRelation(authorization)) {
+        AuthorizeRelation relation = new AuthorizeRelation();
+        relation.setUserId(userId);
+        relation.setAppId(clientId);
+        relation.setScope(scope);
+        relation.setScopeSign(CommonUtils.genScopeSign(scope));
+        relation.setCreateTime(new Date());
+        relation.setCreateTime(relation.getCreateTime());
+        relation.setTokenKey(RandomStringUtils.randomAlphanumeric(64));  // 随机生成key
+        relation.setRefreshTokenKey(RandomStringUtils.randomAlphanumeric(64));  // 随机生成刷新令牌key
+        relation.setRefreshTokenExpirationTime(365 * 24 * 3600L);  // 设置刷新令牌有效期
+        if (authorizeRelationService.replaceAuthorizeRelation(relation)) {
             // 更新用户授权关系成功
             try {
                 mav.setViewName(String.format("redirect:%s&skip_confirm=true", URLDecoder.decode(callback, "UTF-8")));

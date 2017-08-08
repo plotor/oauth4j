@@ -13,13 +13,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.zhenchao.oauth.common.ErrorCode;
 import static org.zhenchao.oauth.common.GlobalConstant.CACHE_NAMESPACE_AUTHORIZATION_CODE;
+import org.zhenchao.oauth.common.exception.OAuthServiceException;
+import org.zhenchao.oauth.common.exception.ServiceException;
+import org.zhenchao.oauth.entity.AppInfo;
+import org.zhenchao.oauth.entity.AuthorizeRelation;
+import org.zhenchao.oauth.service.AppInfoService;
 import org.zhenchao.passport.oauth.pojo.AuthorizationCode;
 import org.zhenchao.passport.oauth.pojo.AuthorizeRequestParams;
-import org.zhenchao.oauth.common.exception.OAuthServiceException;
-import org.zhenchao.oauth.model.OAuthAppInfo;
-import org.zhenchao.oauth.model.UserAppAuthorization;
 import org.zhenchao.passport.oauth.service.AuthorizeService;
-import org.zhenchao.oauth.service.AppInfoService;
 
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -54,16 +55,16 @@ public class AuthorizeServiceImpl implements AuthorizeService {
     private AppInfoService appInfoService;
 
     @Override
-    public Optional<AuthorizationCode> generateAndCacheAuthorizationCode(UserAppAuthorization uaa, AuthorizeRequestParams codeParams)
-            throws OAuthServiceException {
-        if (null == uaa || null == codeParams) {
+    public Optional<AuthorizationCode> buildAndCacheAuthCode(AuthorizeRelation relation, AuthorizeRequestParams codeParams)
+            throws ServiceException {
+        if (null == relation || null == codeParams) {
             log.error("Generate authorization code error, the input params is null!");
             return Optional.empty();
         }
 
-        OAuthAppInfo appInfo = appInfoService.getAppInfo(uaa.getAppId()).orElseThrow(() -> new OAuthServiceException(ErrorCode.CLIENT_NOT_EXIST));
+        AppInfo appInfo = appInfoService.getAppInfo(relation.getAppId()).orElseThrow(() -> new OAuthServiceException(ErrorCode.CLIENT_NOT_EXIST));
         AuthorizationCode code = new AuthorizationCode();
-        code.setAppInfo(appInfo).setUserId(uaa.getUserId()).setScopes(uaa.getScope()).setRedirectUri(codeParams.getRedirectUri());
+        code.setAppInfo(appInfo).setUserId(relation.getUserId()).setScopes(relation.getScope()).setRedirectUri(codeParams.getRedirectUri());
         String key = code.getValue();
         if (StringUtils.isBlank(key)) {
             log.error("Generate authorization code error!");
@@ -75,7 +76,7 @@ public class AuthorizeServiceImpl implements AuthorizeService {
     }
 
     @Override
-    public Optional<AuthorizationCode> getAuthorizationCodeFromCache(String code) {
+    public Optional<AuthorizationCode> getAuthCodeFromCache(String code) {
         if (StringUtils.isBlank(code)) {
             return Optional.empty();
         }
@@ -90,7 +91,7 @@ public class AuthorizeServiceImpl implements AuthorizeService {
     }
 
     @Override
-    public boolean deleteAuthorizationCodeFromCache(String code) {
+    public boolean deleteAuthCodeFromCache(String code) {
         if (StringUtils.isBlank(code)) {
             return false;
         }

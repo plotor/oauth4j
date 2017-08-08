@@ -13,24 +13,24 @@ import org.springframework.web.util.UriComponentsBuilder;
 import org.zhenchao.oauth.common.ErrorCode;
 import org.zhenchao.oauth.common.GlobalConstant;
 import static org.zhenchao.oauth.common.GlobalConstant.COOKIE_KEY_USER_LOGIN_SIGN;
-import org.zhenchao.oauth.model.OAuthAppInfo;
-import org.zhenchao.oauth.model.Scope;
-import org.zhenchao.oauth.model.User;
-import org.zhenchao.oauth.model.UserAppAuthorization;
+import org.zhenchao.oauth.entity.AppInfo;
+import org.zhenchao.oauth.entity.AuthorizeRelation;
+import org.zhenchao.oauth.entity.Scope;
+import org.zhenchao.oauth.entity.UserInfo;
+import org.zhenchao.oauth.service.AppInfoService;
+import org.zhenchao.oauth.service.AuthorizeRelationService;
+import org.zhenchao.oauth.service.ScopeService;
+import org.zhenchao.oauth.token.AbstractAccessToken;
+import org.zhenchao.oauth.token.MacAccessToken;
+import org.zhenchao.oauth.token.TokenGeneratorFactory;
 import org.zhenchao.oauth.token.enums.TokenType;
+import org.zhenchao.oauth.token.generator.AbstractAccessTokenGenerator;
+import org.zhenchao.oauth.token.generator.AbstractTokenGenerator;
 import org.zhenchao.passport.oauth.common.RequestPath;
 import org.zhenchao.passport.oauth.pojo.AuthorizeRequestParams;
 import org.zhenchao.passport.oauth.pojo.ResultInfo;
 import org.zhenchao.passport.oauth.pojo.TokenRequestParams;
-import org.zhenchao.oauth.service.AppInfoService;
 import org.zhenchao.passport.oauth.service.ParamsValidateService;
-import org.zhenchao.oauth.service.ScopeService;
-import org.zhenchao.oauth.service.AuthorizeRelationService;
-import org.zhenchao.oauth.token.AbstractAccessToken;
-import org.zhenchao.oauth.token.MacAccessToken;
-import org.zhenchao.oauth.token.generator.AbstractAccessTokenGenerator;
-import org.zhenchao.oauth.token.generator.AbstractTokenGenerator;
-import org.zhenchao.oauth.token.TokenGeneratorFactory;
 import org.zhenchao.passport.oauth.util.CommonUtils;
 import org.zhenchao.passport.oauth.util.CookieUtils;
 import org.zhenchao.passport.oauth.util.HttpRequestUtils;
@@ -114,14 +114,14 @@ public class ImplicitGrantController {
         }
 
         // 获取APP信息
-        Optional<OAuthAppInfo> optAppInfo = appInfoService.getAppInfo(clientId);
+        Optional<AppInfo> optAppInfo = appInfoService.getAppInfo(clientId);
         if (!optAppInfo.isPresent()) {
             log.error("Client[id={}] is not exist!", clientId);
             return JsonView.render(new ResultInfo(ErrorCode.CLIENT_NOT_EXIST, state), response, false);
         }
 
-        OAuthAppInfo appInfo = optAppInfo.get();
-        User user = SessionUtils.getUser(session, CookieUtils.get(request, COOKIE_KEY_USER_LOGIN_SIGN));
+        AppInfo appInfo = optAppInfo.get();
+        UserInfo user = SessionUtils.getUser(session, CookieUtils.get(request, COOKIE_KEY_USER_LOGIN_SIGN));
         if (null == user || forceLogin) {
             try {
                 // 用户未登录或需要强制登录，跳转到登录页面
@@ -136,17 +136,17 @@ public class ImplicitGrantController {
             }
         }
 
-        Optional<UserAppAuthorization> authorization =
+        Optional<AuthorizeRelation> authorization =
                 authorizeRelationService.getUserAndAppRelationList(
                         user.getId(), requestParams.getClientId(), CommonUtils.genScopeSign(requestParams.getScope()));
         if (authorization.isPresent() && skipConfirm) {
             // 用户已授权，下发token
-            UserAppAuthorization uaa = authorization.get();
+            AuthorizeRelation relation = authorization.get();
             TokenRequestParams trp = new TokenRequestParams();
             trp.setRedirectUri(redirectUri).setClientId(clientId).setTokenType(StringUtils.defaultString(tokenType, TokenType.MAC.getValue()));
-            trp.setResponseType(responseType).setIrt(false).setUserId(user.getId()).setScope(requestParams.getScope()).setAppInfo(appInfo).setUserAppAuthorization(uaa);
+            trp.setResponseType(responseType).setIrt(false).setUserId(user.getId()).setScope(requestParams.getScope()).setAppInfo(appInfo).setAuthorizeRelation(relation);
             // 验证通过，下发accessToken
-            Optional<AbstractTokenGenerator> optTokenGenerator = TokenGeneratorFactory.getGenerator(trp);
+            Optional<AbstractTokenGenerator> optTokenGenerator = TokenGeneratorFactory.getGenerator(trp.toTokenElement());
             if (!optTokenGenerator.isPresent()) {
                 log.error("Generate implicit access token failed, unknown tokenType[{}]", trp.getTokenType());
                 return this.buildErrorResponse(mav, redirectUri, ErrorCode.UNSUPPORTED_GRANT_TYPE, state);

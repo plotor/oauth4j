@@ -2,6 +2,7 @@ package org.zhenchao.passport.oauth.pojo;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
+import org.zhenchao.oauth.token.pojo.TokenElement;
 
 /**
  * 授权请求参数
@@ -36,6 +37,12 @@ public class AuthorizeRequestParams implements RequestParams {
         this.redirectUri = redirectUri;
         this.scope = scope;
         this.state = state;
+    }
+
+    @Override
+    public TokenElement toTokenElement() {
+        // TODO 2017-08-08 18:11:05
+        return null;
     }
 
     @Override

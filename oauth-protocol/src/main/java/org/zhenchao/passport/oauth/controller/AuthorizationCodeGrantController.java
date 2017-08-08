@@ -14,28 +14,28 @@ import org.springframework.web.util.UriComponentsBuilder;
 import org.zhenchao.oauth.common.ErrorCode;
 import org.zhenchao.oauth.common.GlobalConstant;
 import static org.zhenchao.oauth.common.GlobalConstant.COOKIE_KEY_USER_LOGIN_SIGN;
-import org.zhenchao.oauth.common.exception.OAuthServiceException;
-import org.zhenchao.oauth.model.OAuthAppInfo;
-import org.zhenchao.oauth.model.Scope;
-import org.zhenchao.oauth.model.User;
-import org.zhenchao.oauth.model.UserAppAuthorization;
-import org.zhenchao.passport.oauth.enums.ResponseType;
+import org.zhenchao.oauth.common.exception.ServiceException;
+import org.zhenchao.oauth.entity.AppInfo;
+import org.zhenchao.oauth.entity.AuthorizeRelation;
+import org.zhenchao.oauth.entity.Scope;
+import org.zhenchao.oauth.entity.UserInfo;
+import org.zhenchao.oauth.service.AppInfoService;
+import org.zhenchao.oauth.service.AuthorizeRelationService;
+import org.zhenchao.oauth.service.ScopeService;
+import org.zhenchao.oauth.token.AbstractAccessToken;
+import org.zhenchao.oauth.token.MacAccessToken;
+import org.zhenchao.oauth.token.TokenGeneratorFactory;
 import org.zhenchao.oauth.token.enums.TokenType;
+import org.zhenchao.oauth.token.generator.AbstractAccessTokenGenerator;
+import org.zhenchao.oauth.token.generator.AbstractTokenGenerator;
 import org.zhenchao.passport.oauth.common.RequestPath;
+import org.zhenchao.passport.oauth.enums.ResponseType;
 import org.zhenchao.passport.oauth.pojo.AuthorizationCode;
 import org.zhenchao.passport.oauth.pojo.AuthorizeRequestParams;
 import org.zhenchao.passport.oauth.pojo.ResultInfo;
 import org.zhenchao.passport.oauth.pojo.TokenRequestParams;
 import org.zhenchao.passport.oauth.service.AuthorizeService;
-import org.zhenchao.oauth.service.AppInfoService;
 import org.zhenchao.passport.oauth.service.ParamsValidateService;
-import org.zhenchao.oauth.service.ScopeService;
-import org.zhenchao.oauth.service.AuthorizeRelationService;
-import org.zhenchao.oauth.token.AbstractAccessToken;
-import org.zhenchao.oauth.token.MacAccessToken;
-import org.zhenchao.oauth.token.generator.AbstractAccessTokenGenerator;
-import org.zhenchao.oauth.token.generator.AbstractTokenGenerator;
-import org.zhenchao.oauth.token.TokenGeneratorFactory;
 import org.zhenchao.passport.oauth.util.CommonUtils;
 import org.zhenchao.passport.oauth.util.CookieUtils;
 import org.zhenchao.passport.oauth.util.HttpRequestUtils;
@@ -125,14 +125,14 @@ public class AuthorizationCodeGrantController {
         }
 
         // 获取APP信息
-        Optional<OAuthAppInfo> opt = appInfoService.getAppInfo(clientId);
+        Optional<AppInfo> opt = appInfoService.getAppInfo(clientId);
         if (!opt.isPresent()) {
             log.error("Client[id={}] is not exist!", clientId);
             return JsonView.render(new ResultInfo(ErrorCode.CLIENT_NOT_EXIST, state), response, false);
         }
 
-        OAuthAppInfo appInfo = opt.get();
-        User user = SessionUtils.getUser(session, CookieUtils.get(request, COOKIE_KEY_USER_LOGIN_SIGN));
+        AppInfo appInfo = opt.get();
+        UserInfo user = SessionUtils.getUser(session, CookieUtils.get(request, COOKIE_KEY_USER_LOGIN_SIGN));
         if (null == user || forceLogin) {
             try {
                 // 用户未登录或需要强制登录，跳转到登录页面
@@ -147,14 +147,14 @@ public class AuthorizationCodeGrantController {
             }
         }
 
-        Optional<UserAppAuthorization> authorization =
+        Optional<AuthorizeRelation> relation =
                 authorizeRelationService.getUserAndAppRelationList(
                         user.getId(), requestParams.getClientId(), CommonUtils.genScopeSign(requestParams.getScope()));
 
-        if (authorization.isPresent() && skipConfirm) {
+        if (relation.isPresent() && skipConfirm) {
             // 用户已授权该APP，下发授权码
             try {
-                Optional<AuthorizationCode> optCode = authorizeService.generateAndCacheAuthorizationCode(authorization.get(), requestParams);
+                Optional<AuthorizationCode> optCode = authorizeService.buildAndCacheAuthCode(relation.get(), requestParams);
                 if (optCode.isPresent()) {
                     // 下发授权码
                     String code = optCode.get().getValue();
@@ -167,7 +167,7 @@ public class AuthorizationCodeGrantController {
                     return mav;
                 }
                 return this.buildErrorResponse(mav, redirectUri, ErrorCode.GENERATE_CODE_ERROR, state);
-            } catch (OAuthServiceException e) {
+            } catch (ServiceException e) {
                 log.error("Generate authorization code error!", e);
                 return JsonView.render(new ResultInfo(e.getErrorCode(), state), response, false);
             }
@@ -217,7 +217,7 @@ public class AuthorizationCodeGrantController {
         }
 
         // 校验用户与APP之间是否存在授权关系
-        Optional<UserAppAuthorization> opt = authorizeRelationService.getUserAndAppRelationList(
+        Optional<AuthorizeRelation> opt = authorizeRelationService.getUserAndAppRelationList(
                 requestParams.getUserId(), requestParams.getAppInfo().getAppId(), CommonUtils.genScopeSign(requestParams.getScope()));
         if (!opt.isPresent()) {
             // 用户与APP之间不存在指定的授权关系
@@ -225,10 +225,10 @@ public class AuthorizationCodeGrantController {
                     requestParams.getUserId(), requestParams.getAppInfo().getAppId(), requestParams.getScope());
             return JsonView.render(new ResultInfo(ErrorCode.UNAUTHORIZED_CLIENT, StringUtils.EMPTY), response, false);
         }
-        requestParams.setUserAppAuthorization(opt.get());
+        requestParams.setAuthorizeRelation(opt.get());
 
         // 验证通过，下发accessToken
-        Optional<AbstractTokenGenerator> optTokenGenerator = TokenGeneratorFactory.getGenerator(requestParams);
+        Optional<AbstractTokenGenerator> optTokenGenerator = TokenGeneratorFactory.getGenerator(requestParams.toTokenElement());
         if (!optTokenGenerator.isPresent()) {
             log.error("Unknown grantType[{}] or tokenType[{}]", requestParams.getGrantType(), requestParams.getTokenType());
             return JsonView.render(new ResultInfo(ErrorCode.UNSUPPORTED_GRANT_TYPE, StringUtils.EMPTY), response, false);

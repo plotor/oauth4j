@@ -2,9 +2,10 @@ package org.zhenchao.passport.oauth.pojo;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
-import org.zhenchao.oauth.model.OAuthAppInfo;
-import org.zhenchao.oauth.model.UserAppAuthorization;
+import org.zhenchao.oauth.entity.AppInfo;
+import org.zhenchao.oauth.entity.AuthorizeRelation;
 import org.zhenchao.oauth.token.enums.TokenType;
+import org.zhenchao.oauth.token.pojo.TokenElement;
 
 /**
  * 令牌请求参数
@@ -35,9 +36,9 @@ public class TokenRequestParams implements RequestParams {
 
     private String scope;
 
-    private OAuthAppInfo appInfo;
+    private AppInfo appInfo;
 
-    private UserAppAuthorization userAppAuthorization;
+    private AuthorizeRelation authorizeRelation;
 
     public TokenRequestParams() {
     }
@@ -58,6 +59,12 @@ public class TokenRequestParams implements RequestParams {
         this.tokenType = tokenType;
         this.clientSecret = clientSecret;
         this.irt = irt;
+    }
+
+    @Override
+    public TokenElement toTokenElement() {
+        // TODO 2017-08-08 18:11:29
+        return null;
     }
 
     @Override
@@ -155,21 +162,21 @@ public class TokenRequestParams implements RequestParams {
         return this;
     }
 
-    public OAuthAppInfo getAppInfo() {
+    public AppInfo getAppInfo() {
         return appInfo;
     }
 
-    public TokenRequestParams setAppInfo(OAuthAppInfo appInfo) {
+    public TokenRequestParams setAppInfo(AppInfo appInfo) {
         this.appInfo = appInfo;
         return this;
     }
 
-    public UserAppAuthorization getUserAppAuthorization() {
-        return userAppAuthorization;
+    public AuthorizeRelation getAuthorizeRelation() {
+        return authorizeRelation;
     }
 
-    public TokenRequestParams setUserAppAuthorization(UserAppAuthorization userAppAuthorization) {
-        this.userAppAuthorization = userAppAuthorization;
+    public TokenRequestParams setAuthorizeRelation(AuthorizeRelation authorizeRelation) {
+        this.authorizeRelation = authorizeRelation;
         return this;
     }
 }
