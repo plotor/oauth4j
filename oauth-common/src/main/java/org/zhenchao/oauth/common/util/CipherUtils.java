@@ -5,7 +5,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.zhenchao.oauth.common.ErrorCode;
-import org.zhenchao.oauth.common.exception.CryptException;
+import org.zhenchao.oauth.common.exception.CodecException;
 
 import java.io.UnsupportedEncodingException;
 import java.security.AlgorithmParameters;
@@ -69,12 +69,12 @@ public abstract class CipherUtils {
      *
      * @param data
      * @return
-     * @throws CryptException
+     * @throws CodecException
      */
-    public static byte[] aesEncrypt(byte[] data) throws CryptException {
+    public static byte[] aesEncrypt(byte[] data) throws CodecException {
 
         if (ArrayUtils.isEmpty(data)) {
-            throw new CryptException("Aes encrypt error, the input data is empty!", ErrorCode.PARAMETER_ERROR);
+            throw new CodecException("Aes encrypt error, the input data is empty!", ErrorCode.PARAMETER_ERROR);
         }
 
         // AES加密
@@ -87,7 +87,7 @@ public abstract class CipherUtils {
             return Base64.encodeBase64(cipher.doFinal(data));
         } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | InvalidAlgorithmParameterException |
                 IllegalBlockSizeException | BadPaddingException | InvalidParameterSpecException e) {
-            throw new CryptException("Aes encrypt error!", e, ErrorCode.AES_ENCRYPT_ERROR);
+            throw new CodecException("Aes encrypt error!", e, ErrorCode.AES_ENCRYPT_ERROR);
         }
 
     }
@@ -97,12 +97,12 @@ public abstract class CipherUtils {
      *
      * @param data
      * @return
-     * @throws CryptException
+     * @throws CodecException
      */
-    public static byte[] aesEncrypt(String data) throws CryptException {
+    public static byte[] aesEncrypt(String data) throws CodecException {
 
         if (StringUtils.isBlank(data)) {
-            throw new CryptException("Aes encrypt error, the input data is empty!", ErrorCode.PARAMETER_ERROR);
+            throw new CodecException("Aes encrypt error, the input data is empty!", ErrorCode.PARAMETER_ERROR);
         }
 
         // AES加密
@@ -120,12 +120,12 @@ public abstract class CipherUtils {
      *
      * @param encryptedData
      * @return
-     * @throws CryptException
+     * @throws CodecException
      */
-    public static byte[] aesDecrypt(byte[] encryptedData) throws CryptException {
+    public static byte[] aesDecrypt(byte[] encryptedData) throws CodecException {
 
         if (ArrayUtils.isEmpty(encryptedData)) {
-            throw new CryptException("Aes decrypt error, the input data is empty!", ErrorCode.PARAMETER_ERROR);
+            throw new CodecException("Aes decrypt error, the input data is empty!", ErrorCode.PARAMETER_ERROR);
         }
 
         // AES解密
@@ -137,7 +137,7 @@ public abstract class CipherUtils {
             return cipher.doFinal(Base64.decodeBase64(encryptedData));
         } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | InvalidAlgorithmParameterException |
                 IllegalBlockSizeException | BadPaddingException | InvalidParameterSpecException e) {
-            throw new CryptException("Aes decrypt error!", e, ErrorCode.AES_DECRYPT_ERROR);
+            throw new CodecException("Aes decrypt error!", e, ErrorCode.AES_DECRYPT_ERROR);
         }
 
     }
@@ -147,12 +147,12 @@ public abstract class CipherUtils {
      *
      * @param encryptedData
      * @return
-     * @throws CryptException
+     * @throws CodecException
      */
-    public static byte[] aesDecrypt(String encryptedData) throws CryptException {
+    public static byte[] aesDecrypt(String encryptedData) throws CodecException {
 
         if (StringUtils.isBlank(encryptedData)) {
-            throw new CryptException("Aes decrypt error, the input data is empty!", ErrorCode.PARAMETER_ERROR);
+            throw new CodecException("Aes decrypt error, the input data is empty!", ErrorCode.PARAMETER_ERROR);
         }
 
         // AES解密
@@ -173,15 +173,15 @@ public abstract class CipherUtils {
      * @param iterationCount 迭代次数
      * @param length 密钥长度
      * @return
-     * @throws CryptException
+     * @throws CodecException
      */
-    public static String pbkdf2(String text, String salt, int iterationCount, int length) throws CryptException {
+    public static String pbkdf2(String text, String salt, int iterationCount, int length) throws CodecException {
         KeySpec keySpec = new PBEKeySpec(text.toCharArray(), salt.getBytes(), iterationCount, length);
         try {
             SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
             return Base64.encodeBase64String(secretKeyFactory.generateSecret(keySpec).getEncoded());
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
-            throw new CryptException("PDKDF2 Error", e, ErrorCode.PBKDF2_ENCRYPT_ERROR);
+            throw new CodecException("PDKDF2 Error", e, ErrorCode.PBKDF2_ENCRYPT_ERROR);
         }
     }
 
@@ -192,9 +192,9 @@ public abstract class CipherUtils {
      * @param text 加密字符串
      * @param salt 盐
      * @return
-     * @throws CryptException
+     * @throws CodecException
      */
-    public static String pbkdf2(String text, String salt) throws CryptException {
+    public static String pbkdf2(String text, String salt) throws CodecException {
         return pbkdf2(text, salt, 8, 128);
     }
 

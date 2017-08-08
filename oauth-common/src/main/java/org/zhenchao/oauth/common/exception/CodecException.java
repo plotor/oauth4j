@@ -8,33 +8,33 @@ import org.zhenchao.oauth.common.ErrorCode;
  * @author zhenchao.wang 2017-01-02 13:59
  * @version 1.0.0
  */
-public class CryptException extends Exception {
+public class CodecException extends Exception {
 
     private static final long serialVersionUID = 729009559555889799L;
 
-    protected ErrorCode errorCode;
+    protected ErrorCode errorCode = ErrorCode.UNKNOWN_ERROR;
 
-    public CryptException(ErrorCode errorCode) {
+    public CodecException(ErrorCode errorCode) {
         super();
         this.errorCode = errorCode;
     }
 
-    public CryptException(String message, ErrorCode errorCode) {
+    public CodecException(String message, ErrorCode errorCode) {
         super(message);
         this.errorCode = errorCode;
     }
 
-    public CryptException(String message, Throwable cause, ErrorCode errorCode) {
+    public CodecException(String message, Throwable cause, ErrorCode errorCode) {
         super(message, cause);
         this.errorCode = errorCode;
     }
 
-    public CryptException(Throwable cause, ErrorCode errorCode) {
+    public CodecException(Throwable cause, ErrorCode errorCode) {
         super(cause);
         this.errorCode = errorCode;
     }
 
-    protected CryptException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace, ErrorCode errorCode) {
+    protected CodecException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace, ErrorCode errorCode) {
         super(message, cause, enableSuppression, writableStackTrace);
         this.errorCode = errorCode;
     }

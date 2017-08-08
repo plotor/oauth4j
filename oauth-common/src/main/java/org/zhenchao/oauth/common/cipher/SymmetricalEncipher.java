@@ -1,6 +1,6 @@
 package org.zhenchao.oauth.common.cipher;
 
-import org.zhenchao.oauth.common.exception.CryptException;
+import org.zhenchao.oauth.common.exception.CodecException;
 
 /**
  * symmetrical encipher
@@ -23,9 +23,9 @@ public abstract class SymmetricalEncipher {
      * @param key
      * @param data
      * @return
-     * @throws CryptException
+     * @throws CodecException
      */
-    public abstract byte[] encrypt(byte[] key, byte[] data) throws CryptException;
+    public abstract byte[] encrypt(byte[] key, byte[] data) throws CodecException;
 
     /**
      * decrypt
@@ -33,7 +33,7 @@ public abstract class SymmetricalEncipher {
      * @param key
      * @param data
      * @return
-     * @throws CryptException
+     * @throws CodecException
      */
-    public abstract byte[] decrypt(byte[] key, byte[] data) throws CryptException;
+    public abstract byte[] decrypt(byte[] key, byte[] data) throws CodecException;
 }

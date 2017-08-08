@@ -2,7 +2,7 @@ package org.zhenchao.oauth.common.cipher;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.zhenchao.oauth.common.ErrorCode;
-import org.zhenchao.oauth.common.exception.CryptException;
+import org.zhenchao.oauth.common.exception.CodecException;
 
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -55,10 +55,10 @@ public class AESEncipher extends SymmetricalEncipher {
      * @param key
      * @param data
      * @return
-     * @throws CryptException
+     * @throws CodecException
      */
     @Override
-    public byte[] encrypt(byte[] key, byte[] data) throws CryptException {
+    public byte[] encrypt(byte[] key, byte[] data) throws CodecException {
         try {
             Security.addProvider(new BouncyCastleProvider());
             Cipher cipher = Cipher.getInstance(CIPHER, BOUNCY_CASTLE);
@@ -66,7 +66,7 @@ public class AESEncipher extends SymmetricalEncipher {
             return cipher.doFinal(data);
         } catch (NoSuchAlgorithmException | NoSuchProviderException | NoSuchPaddingException |
                 BadPaddingException | IllegalBlockSizeException | InvalidKeyException e) {
-            throw new CryptException(e, ErrorCode.AES_ENCRYPT_ERROR);
+            throw new CodecException(e, ErrorCode.AES_ENCRYPT_ERROR);
         }
     }
 
@@ -76,10 +76,10 @@ public class AESEncipher extends SymmetricalEncipher {
      * @param key
      * @param data
      * @return
-     * @throws CryptException
+     * @throws CodecException
      */
     @Override
-    public byte[] decrypt(byte[] key, byte[] data) throws CryptException {
+    public byte[] decrypt(byte[] key, byte[] data) throws CodecException {
         try {
             Security.addProvider(new BouncyCastleProvider());
             Cipher cipher = Cipher.getInstance(CIPHER, BOUNCY_CASTLE);
@@ -87,7 +87,7 @@ public class AESEncipher extends SymmetricalEncipher {
             return cipher.doFinal(data);
         } catch (NoSuchAlgorithmException | NoSuchProviderException | NoSuchPaddingException |
                 InvalidKeyException | BadPaddingException | IllegalBlockSizeException e) {
-            throw new CryptException(e, ErrorCode.AES_DECRYPT_ERROR);
+            throw new CodecException(e, ErrorCode.AES_DECRYPT_ERROR);
         }
     }
 }

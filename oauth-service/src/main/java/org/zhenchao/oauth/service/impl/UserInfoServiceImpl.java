@@ -6,7 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.zhenchao.oauth.common.GlobalConstant;
-import org.zhenchao.oauth.common.exception.CryptException;
+import org.zhenchao.oauth.common.exception.CodecException;
 import org.zhenchao.oauth.common.util.CipherUtils;
 import org.zhenchao.oauth.dao.UserInfoMapper;
 import org.zhenchao.oauth.entity.UserInfo;
@@ -32,7 +32,7 @@ public class UserInfoServiceImpl implements UserInfoService {
     private UserInfoMapper userInfoMapper;
 
     @Override
-    public Optional<UserInfo> validatePassword(String username, String password) throws CryptException {
+    public Optional<UserInfo> validatePassword(String username, String password) throws CodecException {
         if (StringUtils.isBlank(username) || StringUtils.isBlank(password)) {
             log.error("Params error, username or password is null or empty!");
             return Optional.empty();

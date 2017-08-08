@@ -2,7 +2,7 @@ package org.zhenchao.oauth.common.cipher;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.zhenchao.oauth.common.ErrorCode;
-import org.zhenchao.oauth.common.exception.CryptException;
+import org.zhenchao.oauth.common.exception.CodecException;
 
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -47,7 +47,7 @@ public class IDEAEncipher extends SymmetricalEncipher {
     }
 
     @Override
-    public byte[] encrypt(byte[] key, byte[] data) throws CryptException {
+    public byte[] encrypt(byte[] key, byte[] data) throws CodecException {
         Security.addProvider(new BouncyCastleProvider());
         try {
             Cipher cipher = Cipher.getInstance(CIPHER, BOUNCY_CASTLE);
@@ -55,12 +55,12 @@ public class IDEAEncipher extends SymmetricalEncipher {
             return cipher.doFinal(data);
         } catch (NoSuchAlgorithmException | NoSuchProviderException | NoSuchPaddingException |
                 BadPaddingException | IllegalBlockSizeException | InvalidKeyException e) {
-            throw new CryptException(e, ErrorCode.IDEA_ENCRYPT_ERROR);
+            throw new CodecException(e, ErrorCode.IDEA_ENCRYPT_ERROR);
         }
     }
 
     @Override
-    public byte[] decrypt(byte[] key, byte[] data) throws CryptException {
+    public byte[] decrypt(byte[] key, byte[] data) throws CodecException {
         Security.addProvider(new BouncyCastleProvider());
         try {
             Cipher cipher = Cipher.getInstance(CIPHER, BOUNCY_CASTLE);
@@ -68,7 +68,7 @@ public class IDEAEncipher extends SymmetricalEncipher {
             return cipher.doFinal(data);
         } catch (NoSuchAlgorithmException | NoSuchProviderException | NoSuchPaddingException |
                 BadPaddingException | IllegalBlockSizeException | InvalidKeyException e) {
-            throw new CryptException(e, ErrorCode.IDEA_DECRYPT_ERROR);
+            throw new CodecException(e, ErrorCode.IDEA_DECRYPT_ERROR);
         }
     }
 

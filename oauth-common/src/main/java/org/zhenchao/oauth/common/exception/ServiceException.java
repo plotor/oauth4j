@@ -12,7 +12,7 @@ public abstract class ServiceException extends Exception {
 
     private static final long serialVersionUID = -7359473116626228099L;
 
-    protected ErrorCode errorCode;
+    protected ErrorCode errorCode = ErrorCode.UNKNOWN_ERROR;
 
     public ServiceException(ErrorCode errorCode) {
         this.errorCode = errorCode;

@@ -13,7 +13,7 @@ import org.springframework.web.servlet.ModelAndView;
 import org.zhenchao.oauth.common.ErrorCode;
 import org.zhenchao.oauth.common.GlobalConstant;
 import static org.zhenchao.oauth.common.GlobalConstant.COOKIE_KEY_USER_LOGIN_SIGN;
-import org.zhenchao.oauth.common.exception.CryptException;
+import org.zhenchao.oauth.common.exception.CodecException;
 import org.zhenchao.oauth.entity.UserInfo;
 import org.zhenchao.oauth.service.UserInfoService;
 import org.zhenchao.passport.oauth.common.RequestPath;
@@ -103,7 +103,7 @@ public class LoginController {
                 }
                 return JsonView.render(new ResultInfo("login success"), response, false);
             }
-        } catch (CryptException e) {
+        } catch (CodecException e) {
             log.error("Validate user[{}] error!", username, e);
         }
         log.error("User login failed, username or password error!");
