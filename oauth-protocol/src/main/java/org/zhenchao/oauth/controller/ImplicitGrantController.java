@@ -123,7 +123,7 @@ public class ImplicitGrantController {
         }
 
         Optional<AuthorizeRelation> authorization =
-                authorizeRelationService.getUserAndAppRelationList(
+                authorizeRelationService.getAuthorizeRelation(
                         user.getId(), requestParams.getClientId(), ScopeUtils.getScopeSign(requestParams.getScope()));
         if (authorization.isPresent() && skipConfirm) {
             // 用户已授权，下发token

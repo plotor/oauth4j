@@ -30,7 +30,7 @@ public interface AuthorizeRelationService {
      * @param scopeSign
      * @return
      */
-    Optional<AuthorizeRelation> getUserAndAppRelationList(long userId, long appId, String scopeSign);
+    Optional<AuthorizeRelation> getAuthorizeRelation(long userId, long appId, String scopeSign);
 
     /**
      * 更新用户与APP之间的授权关系

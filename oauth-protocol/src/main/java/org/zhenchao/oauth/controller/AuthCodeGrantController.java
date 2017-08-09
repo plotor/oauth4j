@@ -109,6 +109,7 @@ public class AuthCodeGrantController {
         if (null == user || forceLogin) {
             try {
                 // 用户未登录或需要强制登录，跳转到登录页面
+                log.info("User not login and redirect to login page, appId[{}]", clientId);
                 UriComponentsBuilder builder = UriComponentsBuilder.newInstance();
                 builder.path(RequestPath.PATH_ROOT_LOGIN)
                         .queryParam(GlobalConstant.CALLBACK, HttpRequestUtils.getEncodeRequestUrl(request))
@@ -121,9 +122,9 @@ public class AuthCodeGrantController {
         }
         requestParams.setUserInfo(user);
 
-        Optional<AuthorizeRelation> relation =
-                authorizeRelationService.getUserAndAppRelationList(
-                        user.getId(), requestParams.getClientId(), ScopeUtils.getScopeSign(requestParams.getScope()));
+        // 获取用户与APP之间的授权关系记录
+        Optional<AuthorizeRelation> relation = authorizeRelationService.getAuthorizeRelation(
+                user.getId(), requestParams.getClientId(), ScopeUtils.getScopeSign(requestParams.getScope()));
 
         if (relation.isPresent() && skipConfirm) {
             // 用户已授权该APP，下发授权码
@@ -144,10 +145,16 @@ public class AuthCodeGrantController {
             return mav;
         } else {
             // 用户未授权该APP，跳转到授权页面
+            // TODO 页面跳转需要添加参数签名，防止请求被更改或伪造
             List<Scope> scopes = scopeService.getScopes(requestParams.getScope());
             mav.setViewName("user-authorize");
             mav.addObject(GlobalConstant.CALLBACK, HttpRequestUtils.getEncodeRequestUrl(request))
-                    .addObject("scopes", scopes).addObject("user", user).addObject("app", appInfo).addObject("state", StringUtils.trimToEmpty(state));
+                    .addObject("scopes", scopes)
+                    .addObject("user", user)
+                    .addObject("app", appInfo);
+            if (StringUtils.isNotBlank(state)) {
+                mav.addObject("state", StringUtils.trimToEmpty(state));
+            }
             return mav;
         }
 
@@ -183,7 +190,7 @@ public class AuthCodeGrantController {
         }
 
         // 校验用户与APP之间是否存在授权关系
-        Optional<AuthorizeRelation> opt = authorizeRelationService.getUserAndAppRelationList(
+        Optional<AuthorizeRelation> opt = authorizeRelationService.getAuthorizeRelation(
                 requestParams.getUserId(), requestParams.getAppInfo().getAppId(), ScopeUtils.getScopeSign(requestParams.getScope()));
         if (!opt.isPresent()) {
             // 用户与APP之间不存在指定的授权关系

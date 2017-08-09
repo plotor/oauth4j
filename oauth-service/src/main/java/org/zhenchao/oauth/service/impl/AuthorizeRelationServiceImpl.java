@@ -42,7 +42,7 @@ public class AuthorizeRelationServiceImpl implements AuthorizeRelationService {
     }
 
     @Override
-    public Optional<AuthorizeRelation> getUserAndAppRelationList(long userId, long appId, String scopeSign) {
+    public Optional<AuthorizeRelation> getAuthorizeRelation(long userId, long appId, String scopeSign) {
         if (userId < 0 || appId < 0 || StringUtils.isBlank(scopeSign)) {
             log.error("Get user and app authorization params error, userId[{}], appId[{}], scope sign [{}]!", userId, appId, scopeSign);
             return Optional.empty();
