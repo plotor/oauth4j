@@ -1,13 +1,19 @@
 package org.zhenchao.oauth.pojo;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.zhenchao.oauth.common.ErrorCode;
 import org.zhenchao.oauth.common.exception.VerificationException;
 import org.zhenchao.oauth.entity.AppInfo;
 import org.zhenchao.oauth.entity.AuthorizeRelation;
+import org.zhenchao.oauth.enums.GrantType;
+import org.zhenchao.oauth.handler.AuthCodeCacheHandler;
 import org.zhenchao.oauth.token.enums.TokenType;
 import org.zhenchao.oauth.token.pojo.TokenElement;
+import org.zhenchao.oauth.util.RedirectUriUtils;
 
 /**
  * 令牌请求参数
@@ -16,6 +22,8 @@ import org.zhenchao.oauth.token.pojo.TokenElement;
  * @version 1.0.0
  */
 public class TokenRelevantRequestParams implements RequestParams {
+
+    private static final Logger log = LoggerFactory.getLogger(TokenRelevantRequestParams.class);
 
     private String responseType;
 
@@ -65,8 +73,64 @@ public class TokenRelevantRequestParams implements RequestParams {
 
     @Override
     public ErrorCode validate() throws VerificationException {
-        // TODO 2017-8-8 22:39:18
-        return null;
+        // 检测grant type
+        if (!GrantType.AUTHORIZATION_CODE.getType().equals(responseType)) {
+            log.error("Illegal grant type, appId[{}], input[{}], expected[{}]!", clientId, responseType, GrantType.AUTHORIZATION_CODE);
+            return ErrorCode.UNSUPPORTED_GRANT_TYPE;
+        }
+
+        if (StringUtils.isBlank(code)) {
+            log.error("Authorization code missing when request access token, appId[{}]", clientId);
+            return ErrorCode.INVALID_AUTHORIZATION_CODE;
+        }
+
+        // 验证token类型
+        if (StringUtils.isNotBlank(tokenType) && !TokenType.isValid(tokenType)) {
+            log.error("Unsupported token type, appId[{}], tokenType[{}]", clientId, tokenType);
+            return ErrorCode.UNSUPPORTED_TOKEN_TYPE;
+        }
+
+        AuthorizationCode authCode = AuthCodeCacheHandler.getInstance().get(code);
+        if (null == authCode) {
+            log.error("No cache auth code found, appId[{}], key[{}]", clientId, code);
+            return ErrorCode.INVALID_AUTHORIZATION_CODE;
+        }
+        // 从缓存中删除授权码，一个授权码只能被使用一次
+        AuthCodeCacheHandler.getInstance().remove(code);
+        this.appInfo = authCode.getAppInfo();
+
+        if (this.clientId != appInfo.getAppId()) {
+            log.error("Client id mismatch, input[{}], in code [{}]", clientId, appInfo.getAppId());
+            return ErrorCode.UNAUTHORIZED_CLIENT;
+        }
+
+        // 记录部分信息，创建token时需要
+        this.setScope(authCode.getScopes());
+        this.setAppInfo(authCode.getAppInfo());
+
+        // 回调地址验证
+        String redirectUri = authCode.getRedirectUri();
+        if (StringUtils.isNotBlank(redirectUri) && !redirectUri.equals(authCode.getRedirectUri())) {
+            // 如果请求code时带redirectUri参数，那么请求token时的redirectUri必须与之前一致
+            log.error("Illegal redirect uri, appId[{}], input[{}], in code [{}]", clientId, redirectUri, authCode.getRedirectUri());
+            return ErrorCode.INVALID_GRANT;
+        }
+        if (!RedirectUriUtils.isValid(redirectUri, appInfo.getRedirectUri())) {
+            log.error("Illegal redirect uri, appId[{}], input[{}], config[{}]", clientId, redirectUri, appInfo.getRedirectUri());
+            return ErrorCode.INVALID_REDIRECT_URI;
+        }
+
+        /*
+         * TODO client secret 验证
+         *
+         * client_secret属于创建APP时下发，这一块可以调用开放平台接口进行验证
+         * client_secret由APP自己保管，这个主要用来验证当前请求授权的APP是持有对应ID的APP自己
+         * 如果client_secret遭到泄露，那么相关责任应该由APP自己承担
+         * 这一块的实现可以基于AES加密，client_secret是加密后的秘闻，然后每个APP持有一个aes key，这个存储在我们这，
+         * 当APP请求授权的时候，我们利用它的key去解密对应的client_secret，得到APP_ID，与传递而来的ID进行比对
+         */
+
+        return ErrorCode.NO_ERROR;
     }
 
     @Override

@@ -14,11 +14,14 @@ import org.zhenchao.oauth.common.ErrorCode;
 import org.zhenchao.oauth.common.GlobalConstant;
 import static org.zhenchao.oauth.common.GlobalConstant.COOKIE_KEY_USER_LOGIN_SIGN;
 import org.zhenchao.oauth.common.RequestPath;
+import org.zhenchao.oauth.common.exception.VerificationException;
 import org.zhenchao.oauth.entity.AppInfo;
 import org.zhenchao.oauth.entity.AuthorizeRelation;
 import org.zhenchao.oauth.entity.Scope;
 import org.zhenchao.oauth.entity.UserInfo;
-import org.zhenchao.oauth.service.AppInfoService;
+import org.zhenchao.oauth.pojo.AuthorizeRequestParams;
+import org.zhenchao.oauth.pojo.ResultInfo;
+import org.zhenchao.oauth.pojo.TokenRelevantRequestParams;
 import org.zhenchao.oauth.service.AuthorizeRelationService;
 import org.zhenchao.oauth.service.ScopeService;
 import org.zhenchao.oauth.token.AbstractAccessToken;
@@ -29,17 +32,13 @@ import org.zhenchao.oauth.token.generator.AbstractAccessTokenGenerator;
 import org.zhenchao.oauth.token.generator.AbstractTokenGenerator;
 import org.zhenchao.oauth.util.CommonUtils;
 import org.zhenchao.oauth.util.CookieUtils;
-import org.zhenchao.oauth.util.SessionUtils;
-import org.zhenchao.oauth.pojo.AuthorizeRequestParams;
-import org.zhenchao.oauth.pojo.ResultInfo;
-import org.zhenchao.oauth.pojo.TokenRelevantRequestParams;
-import org.zhenchao.oauth.service.ParamsValidateService;
 import org.zhenchao.oauth.util.HttpRequestUtils;
 import org.zhenchao.oauth.util.JsonView;
+import org.zhenchao.oauth.util.ResponseUtils;
+import org.zhenchao.oauth.util.SessionUtils;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
@@ -60,12 +59,6 @@ import javax.servlet.http.HttpSession;
 public class ImplicitGrantController {
 
     private static final Logger log = LoggerFactory.getLogger(ImplicitGrantController.class);
-
-    @Resource
-    private ParamsValidateService paramsValidateService;
-
-    @Resource
-    private AppInfoService appInfoService;
 
     @Resource
     private AuthorizeRelationService authorizeRelationService;
@@ -91,36 +84,29 @@ public class ImplicitGrantController {
                                   @RequestParam(value = "state", required = false) String state,
                                   @RequestParam(value = "token_type", required = false) String tokenType,
                                   @RequestParam(value = "force_login", required = false, defaultValue = "false") boolean forceLogin,
-                                  @RequestParam(value = "skip_confirm", required = false, defaultValue = "false") boolean skipConfirm) {
-
-        log.debug("Entering implicit grant method...");
+                                  @RequestParam(value = "skip_confirm", required = false, defaultValue = "false") boolean skipConfirm)
+            throws VerificationException {
 
         ModelAndView mav = new ModelAndView();
+        log.debug("Request implicit token, appId[{}]", clientId);
 
-        try {
-            redirectUri = URLDecoder.decode(redirectUri, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            // never happen
-        }
-
-        AuthorizeRequestParams requestParams = new AuthorizeRequestParams();
-        requestParams.setResponseType(responseType).setClientId(clientId).setRedirectUri(redirectUri).setScope(scope).setState(StringUtils.trimToEmpty(state));
-
-        ErrorCode validateResult = paramsValidateService.validateAuthorizeRequestParams(requestParams);
+        AuthorizeRequestParams requestParams = new AuthorizeRequestParams(responseType, clientId, redirectUri, scope, state);
+        ErrorCode validateResult = requestParams.validate();
         if (ErrorCode.NO_ERROR != validateResult) {
             // 请求参数有误
-            log.error("Request authorize params error, params[{}], errorCode[{}]", requestParams, validateResult);
-            return JsonView.render(new ResultInfo(validateResult, state), response, false);
+            log.error("Request implicit params error, appId[{}], code[{}]", clientId, validateResult);
+            if (ErrorCode.INVALID_CLIENT.equals(validateResult) || ErrorCode.INVALID_REDIRECT_URI.equals(validateResult)) {
+                /*
+                 * If the request fails due to a missing, invalid, or mismatching redirection URI,
+                 * or if the client identifier is missing or invalid, the authorization server SHOULD inform the resource owner of the
+                 * error and MUST NOT automatically redirect the user-agent to the invalid redirection URI.
+                 */
+                return JsonView.render(new ResultInfo(validateResult, state), response, false);
+            }
+            return ResponseUtils.buildErrorResponse(mav, redirectUri, validateResult, state);
         }
 
-        // 获取APP信息
-        Optional<AppInfo> optAppInfo = appInfoService.getAppInfo(clientId);
-        if (!optAppInfo.isPresent()) {
-            log.error("Client[id={}] is not exist!", clientId);
-            return JsonView.render(new ResultInfo(ErrorCode.CLIENT_NOT_EXIST, state), response, false);
-        }
-
-        AppInfo appInfo = optAppInfo.get();
+        AppInfo appInfo = requestParams.getAppInfo();
         UserInfo user = SessionUtils.getUser(session, CookieUtils.get(request, COOKIE_KEY_USER_LOGIN_SIGN));
         if (null == user || forceLogin) {
             try {
@@ -185,7 +171,7 @@ public class ImplicitGrantController {
                 return mav;
             } catch (IOException e) {
                 log.error("Get string access token error by [{}]!", accessToken, e);
-                return this.buildErrorResponse(mav, redirectUri, ErrorCode.SERVICE_TEMPORARILY_UNAVAILABLE, state);
+                return this.buildErrorResponse(mav, redirectUri, ErrorCode.SERVICE_ERROR, state);
             }
         } else {
             // 用户未授权该APP，跳转到授权页面
@@ -209,9 +195,9 @@ public class ImplicitGrantController {
     private ModelAndView buildErrorResponse(ModelAndView mav, String redirectUri, ErrorCode errorCode, String state) {
         List<String> params = new ArrayList<>();
         params.add(String.format("error=%s", errorCode.getCode()));
-        if (StringUtils.isNotBlank(errorCode.getDesc())) {
+        if (StringUtils.isNotBlank(errorCode.getDescription())) {
             try {
-                params.add(String.format("error_description=%s", URLEncoder.encode(errorCode.getDesc(), "UTF-8")));
+                params.add(String.format("error_description=%s", URLEncoder.encode(errorCode.getDescription(), "UTF-8")));
             } catch (UnsupportedEncodingException e) {
                 // never happen
             }

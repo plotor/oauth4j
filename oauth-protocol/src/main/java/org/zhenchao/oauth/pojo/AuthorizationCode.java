@@ -35,10 +35,11 @@ public class AuthorizationCode implements Serializable {
     public AuthorizationCode() {
     }
 
-    public AuthorizationCode(AppInfo appInfo, long userId, String scopes) {
+    public AuthorizationCode(AppInfo appInfo, long userId, String scopes, String redirectUri) {
         this.appInfo = appInfo;
         this.userId = userId;
         this.scopes = scopes;
+        this.redirectUri = redirectUri;
     }
 
     /**

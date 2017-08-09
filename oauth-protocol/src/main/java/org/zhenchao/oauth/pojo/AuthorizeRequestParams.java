@@ -8,10 +8,12 @@ import org.slf4j.LoggerFactory;
 import org.zhenchao.oauth.common.ErrorCode;
 import org.zhenchao.oauth.common.exception.VerificationException;
 import org.zhenchao.oauth.entity.AppInfo;
+import org.zhenchao.oauth.entity.UserInfo;
 import org.zhenchao.oauth.enums.ResponseType;
 import org.zhenchao.oauth.service.factory.SpringBeanFactory;
 import org.zhenchao.oauth.token.pojo.TokenElement;
 import org.zhenchao.oauth.util.RedirectUriUtils;
+import org.zhenchao.oauth.util.ScopeUtils;
 
 import java.util.Optional;
 
@@ -37,6 +39,8 @@ public class AuthorizeRequestParams implements RequestParams {
 
     private AppInfo appInfo;
 
+    private UserInfo userInfo;
+
     public AuthorizeRequestParams() {
     }
 
@@ -56,7 +60,6 @@ public class AuthorizeRequestParams implements RequestParams {
 
     @Override
     public ErrorCode validate() throws VerificationException {
-        // 校验response type
         if (!ResponseType.isAllowed(responseType)) {
             log.error("Authorize request params error, response type is not allowed, appId[{}], responseType[{}]", clientId, responseType);
             return ErrorCode.UNSUPPORTED_RESPONSE_TYPE;
@@ -90,11 +93,14 @@ public class AuthorizeRequestParams implements RequestParams {
             return ErrorCode.NO_ERROR;
         } else {
             // 校验传递的scope是否是许可scope的子集
-            return this.isSubScopes(appInfo.getScope(), requestParams.getScope()) ? ErrorCode.NO_ERROR : ErrorCode.INVALID_SCOPE;
+            if (ScopeUtils.isSubScopes(appInfo.getScope(), scope)) {
+                log.error("Illegal request scope, appId[{}], input[{}], config[{}]", clientId, scope, appInfo.getScope());
+                return ErrorCode.INVALID_SCOPE;
+            }
         }
+        log.info("Validate authorize request params success, appId[{}]", clientId);
+        return ErrorCode.NO_ERROR;
     }
-
-}
 
     @Override
     public TokenElement toTokenElement() {
@@ -153,6 +159,15 @@ public class AuthorizeRequestParams implements RequestParams {
 
     public AuthorizeRequestParams setState(String state) {
         this.state = state;
+        return this;
+    }
+
+    public UserInfo getUserInfo() {
+        return userInfo;
+    }
+
+    public AuthorizeRequestParams setUserInfo(UserInfo userInfo) {
+        this.userInfo = userInfo;
         return this;
     }
 }

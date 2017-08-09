@@ -15,20 +15,18 @@ import org.zhenchao.oauth.common.ErrorCode;
 import org.zhenchao.oauth.common.GlobalConstant;
 import static org.zhenchao.oauth.common.GlobalConstant.COOKIE_KEY_USER_LOGIN_SIGN;
 import org.zhenchao.oauth.common.RequestPath;
-import org.zhenchao.oauth.common.exception.ServiceException;
+import org.zhenchao.oauth.common.exception.VerificationException;
 import org.zhenchao.oauth.entity.AppInfo;
 import org.zhenchao.oauth.entity.AuthorizeRelation;
 import org.zhenchao.oauth.entity.Scope;
 import org.zhenchao.oauth.entity.UserInfo;
 import org.zhenchao.oauth.enums.ResponseType;
+import org.zhenchao.oauth.handler.AuthCodeCacheHandler;
 import org.zhenchao.oauth.pojo.AuthorizationCode;
 import org.zhenchao.oauth.pojo.AuthorizeRequestParams;
 import org.zhenchao.oauth.pojo.ResultInfo;
 import org.zhenchao.oauth.pojo.TokenRelevantRequestParams;
-import org.zhenchao.oauth.service.AppInfoService;
 import org.zhenchao.oauth.service.AuthorizeRelationService;
-import org.zhenchao.oauth.service.AuthorizeService;
-import org.zhenchao.oauth.service.ParamsValidateService;
 import org.zhenchao.oauth.service.ScopeService;
 import org.zhenchao.oauth.token.AbstractAccessToken;
 import org.zhenchao.oauth.token.MacAccessToken;
@@ -40,13 +38,13 @@ import org.zhenchao.oauth.util.CommonUtils;
 import org.zhenchao.oauth.util.CookieUtils;
 import org.zhenchao.oauth.util.HttpRequestUtils;
 import org.zhenchao.oauth.util.JsonView;
+import org.zhenchao.oauth.util.ResponseUtils;
+import org.zhenchao.oauth.util.ScopeUtils;
 import org.zhenchao.oauth.util.SessionUtils;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import javax.annotation.Resource;
@@ -67,19 +65,10 @@ public class AuthCodeGrantController {
     private static final Logger log = LoggerFactory.getLogger(AuthCodeGrantController.class);
 
     @Resource
-    private AppInfoService appInfoService;
-
-    @Resource
     private AuthorizeRelationService authorizeRelationService;
 
     @Resource
     private ScopeService scopeService;
-
-    @Resource
-    private ParamsValidateService paramsValidateService;
-
-    @Resource
-    private AuthorizeService authorizeService;
 
     /**
      * issue authorization code
@@ -94,19 +83,17 @@ public class AuthCodeGrantController {
                                   @RequestParam(name = "scope", required = false) String scope,
                                   @RequestParam(name = "state", required = false) String state,
                                   @RequestParam(name = "skip_confirm", required = false, defaultValue = "false") boolean skipConfirm,
-                                  @RequestParam(name = "force_login", required = false, defaultValue = "false") boolean forceLogin) {
-
+                                  @RequestParam(name = "force_login", required = false, defaultValue = "false") boolean forceLogin)
+            throws VerificationException {
+        ModelAndView mav = new ModelAndView();
         log.info("Request authorize code, appId[{}]", clientId);
 
-        ModelAndView mav = new ModelAndView();
-
-        AuthorizeRequestParams requestParams = new AuthorizeRequestParams();
-        requestParams.setResponseType(responseType).setClientId(clientId).setRedirectUri(redirectUri).setScope(scope).setState(StringUtils.trimToEmpty(state));
-        // 校验授权请求参数
-        ErrorCode validateResult = paramsValidateService.validateAuthorizeRequestParams(requestParams);
+        // 请求参数封装与校验
+        AuthorizeRequestParams requestParams = new AuthorizeRequestParams(responseType, clientId, redirectUri, scope, state);
+        ErrorCode validateResult = requestParams.validate();
         if (!ErrorCode.NO_ERROR.equals(validateResult)) {
             // 请求参数有误
-            log.error("Request authorize params error, params[{}], errorCode[{}]", requestParams, validateResult);
+            log.error("Request authorize params error, appId[{}], errorCode[{}], params[{}]", clientId, validateResult, requestParams);
             if (ErrorCode.INVALID_CLIENT.equals(validateResult) || ErrorCode.INVALID_REDIRECT_URI.equals(validateResult)) {
                 /*
                  * If the request fails due to a missing, invalid, or mismatching redirection URI,
@@ -115,17 +102,10 @@ public class AuthCodeGrantController {
                  */
                 return JsonView.render(new ResultInfo(validateResult, state), response, false);
             }
-            return this.buildErrorResponse(mav, redirectUri, validateResult, state);
+            return ResponseUtils.buildErrorResponse(mav, redirectUri, validateResult, state);
         }
 
-        // 获取APP信息
-        Optional<AppInfo> opt = appInfoService.getAppInfo(clientId);
-        if (!opt.isPresent()) {
-            log.error("Client[id={}] is not exist!", clientId);
-            return JsonView.render(new ResultInfo(ErrorCode.CLIENT_NOT_EXIST, state), response, false);
-        }
-
-        AppInfo appInfo = opt.get();
+        AppInfo appInfo = requestParams.getAppInfo();
         UserInfo user = SessionUtils.getUser(session, CookieUtils.get(request, COOKIE_KEY_USER_LOGIN_SIGN));
         if (null == user || forceLogin) {
             try {
@@ -140,31 +120,29 @@ public class AuthCodeGrantController {
                 // never happen
             }
         }
+        requestParams.setUserInfo(user);
 
         Optional<AuthorizeRelation> relation =
                 authorizeRelationService.getUserAndAppRelationList(
-                        user.getId(), requestParams.getClientId(), CommonUtils.genScopeSign(requestParams.getScope()));
+                        user.getId(), requestParams.getClientId(), ScopeUtils.getScopeSign(requestParams.getScope()));
 
         if (relation.isPresent() && skipConfirm) {
             // 用户已授权该APP，下发授权码
-            try {
-                Optional<AuthorizationCode> optCode = authorizeService.buildAndCacheAuthCode(relation.get(), requestParams);
-                if (optCode.isPresent()) {
-                    // 下发授权码
-                    String code = optCode.get().getValue();
-                    UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(appInfo.getRedirectUri());
-                    builder.queryParam("code", code);
-                    if (StringUtils.isNotEmpty(state)) {
-                        builder.queryParam("state", state);
-                    }
-                    mav.setViewName("redirect:" + builder.toUriString());
-                    return mav;
-                }
-                return this.buildErrorResponse(mav, redirectUri, ErrorCode.AUTHORIZATION_CODE_GENERATE_ERROR, state);
-            } catch (ServiceException e) {
-                log.error("Generate authorization code error!", e);
-                return JsonView.render(new ResultInfo(e.getErrorCode(), state), response, false);
+            AuthorizationCode code = new AuthorizationCode(
+                    requestParams.getAppInfo(), user.getId(), relation.get().getScope(), requestParams.getRedirectUri());
+            String key = code.getValue();
+            if (StringUtils.isBlank(key)) {
+                log.error("Generate auth code error, appId[{}], userId[{}], scope[{}]", clientId, user.getId(), requestParams.getScope());
+                return ResponseUtils.buildErrorResponse(mav, redirectUri, ErrorCode.AUTHORIZATION_CODE_GENERATE_ERROR, state);
             }
+            UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(requestParams.getRedirectUri());
+            builder.queryParam("code", code);
+            if (StringUtils.isNotEmpty(state)) {
+                builder.queryParam("state", state);
+            }
+            AuthCodeCacheHandler.getInstance().put(key, code);
+            mav.setViewName("redirect:" + builder.toUriString());
+            return mav;
         } else {
             // 用户未授权该APP，跳转到授权页面
             List<Scope> scopes = scopeService.getScopes(requestParams.getScope());
@@ -189,24 +167,19 @@ public class AuthCodeGrantController {
                                    @RequestParam("client_id") long clientId,
                                    @RequestParam(name = "client_secret", required = false) String clientSecret,
                                    @RequestParam(name = "token_type", required = false) String tokenType,
-                                   @RequestParam(name = "issue_refresh_token", required = false, defaultValue = "true") boolean refresh) {
+                                   @RequestParam(name = "issue_refresh_token", required = false, defaultValue = "true") boolean refresh)
+            throws VerificationException {
 
-        log.debug("Entering authorize code method...");
-
-        try {
-            redirectUri = URLDecoder.decode(redirectUri, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            // never happen
-        }
+        log.info("Request authorize token, appId[{}]", clientId);
 
         TokenRelevantRequestParams requestParams = new TokenRelevantRequestParams();
         requestParams.setResponseType(ResponseType.AUTHORIZATION_CODE.getType()).setGrantType(grantType).setCode(code)
                 .setRedirectUri(redirectUri).setClientId(clientId).setTokenType(StringUtils.defaultString(tokenType, TokenType.MAC.getValue()))
                 .setClientSecret(clientSecret).setIrt(refresh);
 
-        ErrorCode validateResult = paramsValidateService.validateTokenRequestParams(requestParams);
+        ErrorCode validateResult = requestParams.validate();
         if (!ErrorCode.NO_ERROR.equals(validateResult)) {
-            log.error("Params error when request token, params [{}], error code [{}]", requestParams, validateResult);
+            log.error("Request authorize token with params error, appId[{}], code[{}]", clientId, validateResult);
             return JsonView.render(new ResultInfo(validateResult, StringUtils.EMPTY), response, false);
         }
 
@@ -263,32 +236,6 @@ public class AuthCodeGrantController {
         }
 
         return JsonView.render(new ResultInfo(ErrorCode.SERVICE_ERROR, StringUtils.EMPTY), response, false);
-    }
-
-    /**
-     * build error response
-     *
-     * @param mav
-     * @param redirectUri
-     * @param errorCode
-     * @param state
-     * @return
-     */
-    private ModelAndView buildErrorResponse(ModelAndView mav, String redirectUri, ErrorCode errorCode, String state) {
-        List<String> params = new ArrayList<>();
-        params.add(String.format("error=%s", errorCode.getCode()));
-        if (StringUtils.isNotBlank(errorCode.getDescription())) {
-            try {
-                params.add(String.format("error_description=%s", URLEncoder.encode(errorCode.getDescription(), "UTF-8")));
-            } catch (UnsupportedEncodingException e) {
-                // never happen
-            }
-        }
-        if (StringUtils.isNotBlank(state)) {
-            params.add(String.format("state=%s", state));
-        }
-        mav.setViewName("redirect:" + String.format("%s?%s", redirectUri, StringUtils.join(params, "&")));
-        return mav;
     }
 
 }
