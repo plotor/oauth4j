@@ -4,7 +4,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import static org.zhenchao.oauth.common.GlobalConstant.SALT;
 import org.zhenchao.oauth.entity.AppInfo;
-import org.zhenchao.oauth.util.CommonUtils;
+import org.zhenchao.oauth.util.ScopeUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
@@ -60,7 +60,7 @@ public class AuthorizationCode implements Serializable {
             dos.writeLong(this.appInfo.getAppId());
             dos.writeLong(this.userId);
             dos.write(this.scopes.getBytes());
-            dos.write(CommonUtils.genScopeSign(this.scopes).getBytes());
+            dos.write(ScopeUtils.getScopeSign(this.scopes).getBytes());
             dos.write(StringUtils.trimToEmpty(this.redirectUri).getBytes());
             dos.write(SALT.getBytes());
             dos.writeLong(System.currentTimeMillis());

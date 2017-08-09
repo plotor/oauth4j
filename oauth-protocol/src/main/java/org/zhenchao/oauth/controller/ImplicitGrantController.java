@@ -30,11 +30,11 @@ import org.zhenchao.oauth.token.TokenGeneratorFactory;
 import org.zhenchao.oauth.token.enums.TokenType;
 import org.zhenchao.oauth.token.generator.AbstractAccessTokenGenerator;
 import org.zhenchao.oauth.token.generator.AbstractTokenGenerator;
-import org.zhenchao.oauth.util.CommonUtils;
 import org.zhenchao.oauth.util.CookieUtils;
 import org.zhenchao.oauth.util.HttpRequestUtils;
 import org.zhenchao.oauth.util.JsonView;
 import org.zhenchao.oauth.util.ResponseUtils;
+import org.zhenchao.oauth.util.ScopeUtils;
 import org.zhenchao.oauth.util.SessionUtils;
 
 import java.io.IOException;
@@ -124,7 +124,7 @@ public class ImplicitGrantController {
 
         Optional<AuthorizeRelation> authorization =
                 authorizeRelationService.getUserAndAppRelationList(
-                        user.getId(), requestParams.getClientId(), CommonUtils.genScopeSign(requestParams.getScope()));
+                        user.getId(), requestParams.getClientId(), ScopeUtils.getScopeSign(requestParams.getScope()));
         if (authorization.isPresent() && skipConfirm) {
             // 用户已授权，下发token
             AuthorizeRelation relation = authorization.get();
@@ -160,7 +160,7 @@ public class ImplicitGrantController {
                     params.add(String.format("mac_algorithm=%s", ((MacAccessToken) accessToken).getAlgorithm().getValue()));
                 }
                 params.add(String.format("expires_in=%d", accessToken.getExpirationTime()));
-                if (!CommonUtils.checkScopeIsSame(scope, accessToken.getScope())) {
+                if (!ScopeUtils.isSame(scope, accessToken.getScope())) {
                     // 最终授权的scope与请求的scope不一致，返回说明
                     params.add(String.format("scope=%s", URLEncoder.encode(accessToken.getScope(), "UTF-8")));
                 }

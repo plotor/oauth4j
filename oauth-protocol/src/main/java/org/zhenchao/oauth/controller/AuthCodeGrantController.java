@@ -34,7 +34,6 @@ import org.zhenchao.oauth.token.TokenGeneratorFactory;
 import org.zhenchao.oauth.token.enums.TokenType;
 import org.zhenchao.oauth.token.generator.AbstractAccessTokenGenerator;
 import org.zhenchao.oauth.token.generator.AbstractTokenGenerator;
-import org.zhenchao.oauth.util.CommonUtils;
 import org.zhenchao.oauth.util.CookieUtils;
 import org.zhenchao.oauth.util.HttpRequestUtils;
 import org.zhenchao.oauth.util.JsonView;
@@ -185,7 +184,7 @@ public class AuthCodeGrantController {
 
         // 校验用户与APP之间是否存在授权关系
         Optional<AuthorizeRelation> opt = authorizeRelationService.getUserAndAppRelationList(
-                requestParams.getUserId(), requestParams.getAppInfo().getAppId(), CommonUtils.genScopeSign(requestParams.getScope()));
+                requestParams.getUserId(), requestParams.getAppInfo().getAppId(), ScopeUtils.getScopeSign(requestParams.getScope()));
         if (!opt.isPresent()) {
             // 用户与APP之间不存在指定的授权关系
             log.error("No authorization between user[{}] and app[{}] on scope[{}]!",
@@ -221,7 +220,7 @@ public class AuthCodeGrantController {
                 // 客户端指定下发refreshToken
                 result.put("refresh_token", accessToken.getRefreshToken());
             }
-            if (!CommonUtils.checkScopeIsSame(requestParams.getScope(), accessToken.getScope())) {
+            if (!ScopeUtils.isSame(requestParams.getScope(), accessToken.getScope())) {
                 // 如果最终下发的scope与请求时不一致，需要说明
                 result.put("scope", accessToken.getScope());
             }
