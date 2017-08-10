@@ -14,7 +14,6 @@ import org.zhenchao.oauth.common.ErrorCode;
 import static org.zhenchao.oauth.common.GlobalConstant.COOKIE_KEY_USER_LOGIN_SIGN;
 import org.zhenchao.oauth.common.RequestPath;
 import org.zhenchao.oauth.common.exception.VerificationException;
-import org.zhenchao.oauth.common.util.ScopeUtils;
 import org.zhenchao.oauth.entity.AppInfo;
 import org.zhenchao.oauth.entity.AuthorizeRelation;
 import org.zhenchao.oauth.entity.Scope;
@@ -105,11 +104,12 @@ public class AuthCodeGrantController {
         requestParams.setUserInfo(user);
 
         // 获取用户与APP之间的授权关系记录
-        Optional<AuthorizeRelation> relation = authorizeRelationService.getAuthorizeRelation(
-                user.getId(), requestParams.getClientId(), ScopeUtils.getScopeSign(requestParams.getScope()));
+        Optional<AuthorizeRelation> relation =
+                authorizeRelationService.getAuthorizeRelation(user.getId(), requestParams.getClientId(), requestParams.getScope());
 
         if (relation.isPresent() && skipConfirm) {
             // 用户已授权该APP，下发授权码
+            log.info("User had authorized and issue auth code, appId[{}], userId[{}], scope[{}]", clientId, user.getId(), requestParams.getScope());
             AuthorizationCode code = new AuthorizationCode(
                     requestParams.getAppInfo(), user.getId(), relation.get().getScope(), requestParams.getRedirectUri());
             String key = code.getValue();
@@ -118,16 +118,19 @@ public class AuthCodeGrantController {
                 return ResponseUtils.buildErrorResponse(redirectUri, ErrorCode.AUTHORIZATION_CODE_GENERATE_ERROR, state);
             }
             UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(requestParams.getRedirectUri());
-            builder.queryParam("code", code);
+            builder.queryParam("code", key);
             if (StringUtils.isNotEmpty(state)) {
                 builder.queryParam("state", state);
             }
+            // cache auth code
             AuthCodeCacheHandler.getInstance().put(key, code);
             mav.setViewName("redirect:" + builder.toUriString());
             return mav;
         }
 
         // 用户未授权该APP，跳转到授权页面
+        log.info("User not authorized and goto authorize page, appId[{}], userId[{}], relationExist[{}], skipConfirm[{}]",
+                clientId, user.getId(), relation.isPresent(), skipConfirm);
         List<Scope> scopes = scopeService.getScopes(requestParams.getScope());
         return ResponseUtils.buildAuthorizeResponse(request, scopes, user, appInfo, state);
     }

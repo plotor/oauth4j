@@ -92,6 +92,15 @@ public abstract class ResponseUtils {
         return mav;
     }
 
+    public static ModelAndView buildLoginResponse(String callback) {
+        ModelAndView mav = new ModelAndView();
+        UriComponentsBuilder builder = UriComponentsBuilder.newInstance();
+        builder.path(RequestPath.PATH_ROOT_LOGIN);
+        builder.queryParam("callback", callback);
+        mav.setViewName("redirect:" + builder.toUriString());
+        return mav;
+    }
+
     public static ModelAndView buildAuthorizeResponse(
             HttpServletRequest request, List<Scope> scopes, UserInfo userInfo, AppInfo appInfo, String state) {
         return buildAuthorizeResponse(new ModelAndView(), request, scopes, userInfo, appInfo, state);
@@ -112,7 +121,8 @@ public abstract class ResponseUtils {
         return mav;
     }
 
-    public static ModelAndView buildImplicitTokenResponse(AbstractAccessToken accessToken, TokenRelevantRequestParams tokenParams) throws IOException {
+    public static ModelAndView buildImplicitTokenResponse(AbstractAccessToken accessToken, TokenRelevantRequestParams tokenParams)
+            throws IOException {
         ModelAndView mav = new ModelAndView();
         List<String> params = new ArrayList<>();
         params.add(String.format("access_token=%s", accessToken.getValue()));

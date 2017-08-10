@@ -71,7 +71,7 @@ public class AuthorizeRelationServiceImpl implements AuthorizeRelationService {
 
         if (CollectionUtils.isEmpty(authorizations)) {
             // 用户与APP之间不存在特定授权关系
-            return authorizeRelationMapper.insertSelective(relation) == 1;
+            return authorizeRelationMapper.insertSelective(relation) > 0;
         } else {
             // 用户与APP之间存在特定授权关系
             AuthorizeRelation ar = authorizations.get(0);
@@ -82,7 +82,7 @@ public class AuthorizeRelationServiceImpl implements AuthorizeRelationService {
             example = new AuthorizeRelationExample();
             criteria = example.createCriteria();
             criteria.andUserIdEqualTo(ar.getUserId()).andAppIdEqualTo(ar.getAppId()).andScopeSignEqualTo(relation.getScopeSign());
-            return authorizeRelationMapper.updateByExampleSelective(ar, example) == 1;
+            return authorizeRelationMapper.updateByExampleSelective(ar, example) > 0;
         }
     }
 

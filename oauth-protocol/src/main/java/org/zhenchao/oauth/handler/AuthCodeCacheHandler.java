@@ -33,7 +33,7 @@ public class AuthCodeCacheHandler extends CacheSupport<AuthorizationCode> {
         // TIPS: 实际应用中对于授权码缓存，只应该在缓存时间上进行控制
         manager = CacheManagerBuilder.newCacheManagerBuilder().withCache(
                 NAMESPACE_AUTH_CODE,
-                CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class, Object.class, ResourcePoolsBuilder.heap(1024))
+                CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class, AuthorizationCode.class, ResourcePoolsBuilder.heap(1024))
                         .withExpiry(Expirations.timeToLiveExpiration(Duration.of(10, TimeUnit.MINUTES)))).build();
         manager.init();
         log.info("Init auth code cache handler success, namespace[{}]", NAMESPACE_AUTH_CODE);
