@@ -13,13 +13,13 @@ import org.springframework.web.servlet.ModelAndView;
 import org.zhenchao.oauth.common.ErrorCode;
 import org.zhenchao.oauth.common.GlobalConstant;
 import static org.zhenchao.oauth.common.GlobalConstant.COOKIE_KEY_USER_LOGIN_SIGN;
+import org.zhenchao.oauth.common.RequestPath;
 import org.zhenchao.oauth.common.exception.CodecException;
 import org.zhenchao.oauth.entity.UserInfo;
-import org.zhenchao.oauth.service.UserInfoService;
-import org.zhenchao.oauth.util.SessionUtils;
-import org.zhenchao.oauth.common.RequestPath;
 import org.zhenchao.oauth.pojo.ResultInfo;
+import org.zhenchao.oauth.service.UserInfoService;
 import org.zhenchao.oauth.util.JsonView;
+import org.zhenchao.oauth.util.SessionUtils;
 
 import java.util.Optional;
 import javax.annotation.Resource;
@@ -46,10 +46,10 @@ public class LoginController {
      *
      * @return
      */
-    @RequestMapping(value = RequestPath.PATH_ROOT_LOGIN, method = RequestMethod.GET)
+    @RequestMapping(path = RequestPath.PATH_ROOT_LOGIN, method = RequestMethod.GET)
     public ModelAndView login(
-            @RequestParam(value = "callback", required = false) String callback,
-            @RequestParam(value = "app_name", required = false) String appName) {
+            @RequestParam(name = "callback", required = false) String callback,
+            @RequestParam(name = "app_name", required = false) String appName) {
         ModelAndView mav = new ModelAndView();
         mav.addObject(GlobalConstant.CALLBACK, StringUtils.trimToEmpty(callback));
         mav.addObject("appName", StringUtils.trimToEmpty(appName));
@@ -67,20 +67,16 @@ public class LoginController {
      * @return
      */
     @ResponseBody
-    @RequestMapping(value = RequestPath.PATH_ROOT_LOGIN, method = RequestMethod.POST)
+    @RequestMapping(path = RequestPath.PATH_ROOT_LOGIN, method = RequestMethod.POST)
     public ModelAndView login(
-            HttpSession session,
-            HttpServletResponse response,
-            @RequestParam(value = "username") String username,
+            HttpSession session, HttpServletResponse response,
+            @RequestParam("username") String username,
             @RequestParam("password") String password,
-            @RequestParam(value = "callback", required = false) String callback) {
-
-        log.debug("Entering login method...");
+            @RequestParam(name = "callback", required = false) String callback) {
 
         ModelAndView mav = new ModelAndView();
-        log.error("Login params error, username [{}] and password [{}]!", username, password);
         if (StringUtils.isBlank(username) || StringUtils.isBlank(password)) {
-            log.error("Login params error, username or password is null or empty!");
+            log.error("Login params error, username[{}] or password[{}] is missing!", username, password);
             return JsonView.render(new ResultInfo(ErrorCode.PARAMETER_ERROR, StringUtils.EMPTY), response, false);
         }
 
@@ -97,16 +93,16 @@ public class LoginController {
                 cookie.setHttpOnly(true);
                 cookie.setMaxAge(24 * 3600);
                 response.addCookie(cookie);
-                if(StringUtils.isNotBlank(callback)) {
+                if (StringUtils.isNotBlank(callback)) {
                     mav.setViewName("redirect:" + callback);
                     return mav;
                 }
                 return JsonView.render(new ResultInfo("login success"), response, false);
             }
         } catch (CodecException e) {
-            log.error("Validate user[{}] error!", username, e);
+            log.error("Validate user info error, username[{}]", username, e);
         }
-        log.error("User login failed, username or password error!");
+        log.error("User login failed, username or password error, username[{}]", username);
         return JsonView.render(new ResultInfo(ErrorCode.INVALID_USER, StringUtils.EMPTY), response, false);
     }
 

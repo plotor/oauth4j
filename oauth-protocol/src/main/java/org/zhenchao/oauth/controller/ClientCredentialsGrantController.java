@@ -12,7 +12,7 @@ import org.zhenchao.oauth.common.RequestPath;
  */
 @Controller
 @RequestMapping(RequestPath.PATH_ROOT_OAUTH)
-public class ClientCredentialsGrant {
+public class ClientCredentialsGrantController {
 
     // TODO 2017-08-10 15:31:05
 
