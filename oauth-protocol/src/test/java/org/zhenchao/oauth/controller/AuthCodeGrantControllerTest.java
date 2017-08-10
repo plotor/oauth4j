@@ -29,7 +29,7 @@ import java.util.Map;
  * @author zhenchao.wang 2017-02-21 22:55
  * @version 1.0.0
  */
-public class AuthorizationCodeGrantControllerTest implements RequestPath {
+public class AuthCodeGrantControllerTest implements RequestPath {
 
     private static final long CLIENT_ID = 2882303761517520186L;
 

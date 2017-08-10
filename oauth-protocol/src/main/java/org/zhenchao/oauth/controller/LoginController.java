@@ -86,7 +86,6 @@ public class LoginController {
                 UserInfo user = optUser.get();
                 // session user
                 SessionUtils.putUser(session, user);
-
                 // cookie user
                 Cookie cookie = new Cookie(COOKIE_KEY_USER_LOGIN_SIGN, DigestUtils.md5Hex(String.valueOf(user.getId())));
                 cookie.setPath("/");

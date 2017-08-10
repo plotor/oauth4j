@@ -1,4 +1,4 @@
-package org.zhenchao.oauth.util;
+package org.zhenchao.oauth.common.util;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;

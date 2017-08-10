@@ -1,5 +1,6 @@
 package org.zhenchao.oauth.token;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.HmacUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.zhenchao.oauth.token.enums.TokenType;
@@ -8,7 +9,6 @@ import org.zhenchao.oauth.token.enums.TokenVersion;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.Base64;
 
 /**
  * abstract access token
@@ -79,23 +79,15 @@ public abstract class AbstractAccessToken implements Token {
     public String getValue() throws IOException {
         if (StringUtils.isBlank(this.value)) {
             byte[] encodeValue = this.encode();
-            byte[] hmacValue = Base64.getEncoder().encode(HmacUtils.hmacSha1(this.key.getBytes(), encodeValue));
-
-            DataOutputStream dos = null;
-            try {
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                dos = new DataOutputStream(baos);
+            byte[] hmacValue = Base64.encodeBase64(HmacUtils.hmacSha1(this.key.getBytes(), encodeValue));
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            try (DataOutputStream dos = new DataOutputStream(baos)) {
                 dos.writeInt(hmacValue.length);
                 dos.write(hmacValue);
                 dos.write(encodeValue);
                 dos.flush();
-                this.value = Base64.getEncoder().encodeToString(baos.toByteArray());
-            } finally {
-                if (null != dos) {
-                    dos.close();
-                }
+                this.value = Base64.encodeBase64String(baos.toByteArray());
             }
-
         }
         return this.value;
     }

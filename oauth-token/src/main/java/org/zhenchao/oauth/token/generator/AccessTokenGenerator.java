@@ -13,13 +13,13 @@ import java.util.Optional;
  * @author zhenchao.wang 2017-02-11 13:51
  * @version 1.0.0
  */
-public abstract class AbstractAccessTokenGenerator implements AbstractTokenGenerator {
+public abstract class AccessTokenGenerator implements AbstractTokenGenerator {
 
-    protected static final Logger log = LoggerFactory.getLogger(AbstractAccessTokenGenerator.class);
+    protected static final Logger log = LoggerFactory.getLogger(AccessTokenGenerator.class);
 
     protected TokenElement element;
 
-    public AbstractAccessTokenGenerator(TokenElement element) {
+    public AccessTokenGenerator(TokenElement element) {
         this.element = element;
     }
 

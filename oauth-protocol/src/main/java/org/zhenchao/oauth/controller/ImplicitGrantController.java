@@ -23,7 +23,7 @@ import org.zhenchao.oauth.service.AuthorizeRelationService;
 import org.zhenchao.oauth.service.ScopeService;
 import org.zhenchao.oauth.token.AbstractAccessToken;
 import org.zhenchao.oauth.token.TokenGeneratorFactory;
-import org.zhenchao.oauth.token.generator.AbstractAccessTokenGenerator;
+import org.zhenchao.oauth.token.generator.AccessTokenGenerator;
 import org.zhenchao.oauth.util.CookieUtils;
 import org.zhenchao.oauth.util.JsonView;
 import org.zhenchao.oauth.util.ResponseUtils;
@@ -105,8 +105,8 @@ public class ImplicitGrantController {
             tokenParams.setUserId(user.getId()).setScope(requestParams.getScope()).setAppInfo(appInfo).setAuthorizeRelation(opt.get());
 
             // 验证通过，下发accessToken
-            AbstractAccessTokenGenerator accessTokenGenerator =
-                    (AbstractAccessTokenGenerator) TokenGeneratorFactory.getGenerator(tokenParams.toTokenElement());
+            AccessTokenGenerator accessTokenGenerator =
+                    (AccessTokenGenerator) TokenGeneratorFactory.getGenerator(tokenParams.toTokenElement());
             Optional<AbstractAccessToken> optAccessToken = accessTokenGenerator.create();
             if (!optAccessToken.isPresent()) {
                 log.error("Generate access token failed, appId[{}], userId[{}]", appInfo.getAppId(), tokenParams.getUserId(), tokenParams.getScope());

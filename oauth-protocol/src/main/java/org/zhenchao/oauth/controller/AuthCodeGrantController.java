@@ -28,7 +28,7 @@ import org.zhenchao.oauth.service.AuthorizeRelationService;
 import org.zhenchao.oauth.service.ScopeService;
 import org.zhenchao.oauth.token.AbstractAccessToken;
 import org.zhenchao.oauth.token.TokenGeneratorFactory;
-import org.zhenchao.oauth.token.generator.AbstractAccessTokenGenerator;
+import org.zhenchao.oauth.token.generator.AccessTokenGenerator;
 import org.zhenchao.oauth.util.CookieUtils;
 import org.zhenchao.oauth.util.JsonView;
 import org.zhenchao.oauth.util.ResponseUtils;
@@ -171,8 +171,8 @@ public class AuthCodeGrantController {
         requestParams.setAuthorizeRelation(opt.get());
 
         // 验证通过，下发accessToken
-        AbstractAccessTokenGenerator accessTokenGenerator =
-                (AbstractAccessTokenGenerator) TokenGeneratorFactory.getGenerator(requestParams.toTokenElement());
+        AccessTokenGenerator accessTokenGenerator =
+                (AccessTokenGenerator) TokenGeneratorFactory.getGenerator(requestParams.toTokenElement());
         Optional<AbstractAccessToken> optAccessToken = accessTokenGenerator.create();
         if (!optAccessToken.isPresent()) {
             log.error("Generate access token failed, appId[{}], userId[{}]", appInfo.getAppId(), requestParams.getUserId(), requestParams.getScope());

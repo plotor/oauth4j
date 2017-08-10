@@ -12,7 +12,7 @@ import org.zhenchao.oauth.entity.AuthorizeRelation;
 import org.zhenchao.oauth.handler.AuthCodeCacheHandler;
 import org.zhenchao.oauth.token.enums.TokenType;
 import org.zhenchao.oauth.token.pojo.TokenElement;
-import org.zhenchao.oauth.util.RedirectUriUtils;
+import org.zhenchao.oauth.common.util.RedirectUriUtils;
 
 /**
  * 令牌请求参数

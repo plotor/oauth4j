@@ -11,7 +11,7 @@ import java.util.Optional;
  * @author zhenchao.wang 2017-02-11 13:52
  * @version 1.0.0
  */
-public class BearerAccessTokenGenerator extends AbstractAccessTokenGenerator {
+public class BearerAccessTokenGenerator extends AccessTokenGenerator {
 
     public BearerAccessTokenGenerator(TokenElement element) {
         super(element);
