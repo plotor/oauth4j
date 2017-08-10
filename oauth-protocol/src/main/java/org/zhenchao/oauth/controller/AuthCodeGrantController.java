@@ -1,6 +1,5 @@
 package org.zhenchao.oauth.controller;
 
-import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,15 +11,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.zhenchao.oauth.common.ErrorCode;
-import org.zhenchao.oauth.common.GlobalConstant;
 import static org.zhenchao.oauth.common.GlobalConstant.COOKIE_KEY_USER_LOGIN_SIGN;
 import org.zhenchao.oauth.common.RequestPath;
 import org.zhenchao.oauth.common.exception.VerificationException;
+import org.zhenchao.oauth.common.util.ScopeUtils;
 import org.zhenchao.oauth.entity.AppInfo;
 import org.zhenchao.oauth.entity.AuthorizeRelation;
 import org.zhenchao.oauth.entity.Scope;
 import org.zhenchao.oauth.entity.UserInfo;
-import org.zhenchao.oauth.enums.ResponseType;
 import org.zhenchao.oauth.handler.AuthCodeCacheHandler;
 import org.zhenchao.oauth.pojo.AuthorizationCode;
 import org.zhenchao.oauth.pojo.AuthorizeRequestParams;
@@ -29,21 +27,14 @@ import org.zhenchao.oauth.pojo.TokenRelevantRequestParams;
 import org.zhenchao.oauth.service.AuthorizeRelationService;
 import org.zhenchao.oauth.service.ScopeService;
 import org.zhenchao.oauth.token.AbstractAccessToken;
-import org.zhenchao.oauth.token.MacAccessToken;
 import org.zhenchao.oauth.token.TokenGeneratorFactory;
-import org.zhenchao.oauth.token.enums.TokenType;
 import org.zhenchao.oauth.token.generator.AbstractAccessTokenGenerator;
-import org.zhenchao.oauth.token.generator.AbstractTokenGenerator;
 import org.zhenchao.oauth.util.CookieUtils;
-import org.zhenchao.oauth.util.HttpRequestUtils;
 import org.zhenchao.oauth.util.JsonView;
 import org.zhenchao.oauth.util.ResponseUtils;
-import org.zhenchao.oauth.util.ScopeUtils;
 import org.zhenchao.oauth.util.SessionUtils;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.List;
 import java.util.Optional;
 import javax.annotation.Resource;
@@ -84,8 +75,9 @@ public class AuthCodeGrantController {
                                   @RequestParam(name = "skip_confirm", required = false, defaultValue = "false") boolean skipConfirm,
                                   @RequestParam(name = "force_login", required = false, defaultValue = "false") boolean forceLogin)
             throws VerificationException {
-        ModelAndView mav = new ModelAndView();
+
         log.info("Request authorize code, appId[{}]", clientId);
+        ModelAndView mav = new ModelAndView();
 
         // 请求参数封装与校验
         AuthorizeRequestParams requestParams = new AuthorizeRequestParams(responseType, clientId, redirectUri, scope, state);
@@ -101,24 +93,14 @@ public class AuthCodeGrantController {
                  */
                 return JsonView.render(new ResultInfo(validateResult, state), response, false);
             }
-            return ResponseUtils.buildErrorResponse(mav, redirectUri, validateResult, state);
+            return ResponseUtils.buildErrorResponse(redirectUri, validateResult, state);
         }
 
         AppInfo appInfo = requestParams.getAppInfo();
         UserInfo user = SessionUtils.getUser(session, CookieUtils.get(request, COOKIE_KEY_USER_LOGIN_SIGN));
         if (null == user || forceLogin) {
-            try {
-                // 用户未登录或需要强制登录，跳转到登录页面
-                log.info("User not login and redirect to login page, appId[{}]", clientId);
-                UriComponentsBuilder builder = UriComponentsBuilder.newInstance();
-                builder.path(RequestPath.PATH_ROOT_LOGIN)
-                        .queryParam(GlobalConstant.CALLBACK, HttpRequestUtils.getEncodeRequestUrl(request))
-                        .queryParam("app_name", URLEncoder.encode(appInfo.getAppName(), "UTF-8"));
-                mav.setViewName("redirect:" + builder.toUriString());
-                return mav;
-            } catch (UnsupportedEncodingException e) {
-                // never happen
-            }
+            // 用户未登录或需要强制登录，跳转到登录页面
+            return ResponseUtils.buildLoginResponse(request, appInfo);
         }
         requestParams.setUserInfo(user);
 
@@ -133,7 +115,7 @@ public class AuthCodeGrantController {
             String key = code.getValue();
             if (StringUtils.isBlank(key)) {
                 log.error("Generate auth code error, appId[{}], userId[{}], scope[{}]", clientId, user.getId(), requestParams.getScope());
-                return ResponseUtils.buildErrorResponse(mav, redirectUri, ErrorCode.AUTHORIZATION_CODE_GENERATE_ERROR, state);
+                return ResponseUtils.buildErrorResponse(redirectUri, ErrorCode.AUTHORIZATION_CODE_GENERATE_ERROR, state);
             }
             UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(requestParams.getRedirectUri());
             builder.queryParam("code", code);
@@ -143,21 +125,11 @@ public class AuthCodeGrantController {
             AuthCodeCacheHandler.getInstance().put(key, code);
             mav.setViewName("redirect:" + builder.toUriString());
             return mav;
-        } else {
-            // 用户未授权该APP，跳转到授权页面
-            // TODO 页面跳转需要添加参数签名，防止请求被更改或伪造
-            List<Scope> scopes = scopeService.getScopes(requestParams.getScope());
-            mav.setViewName("user-authorize");
-            mav.addObject(GlobalConstant.CALLBACK, HttpRequestUtils.getEncodeRequestUrl(request))
-                    .addObject("scopes", scopes)
-                    .addObject("user", user)
-                    .addObject("app", appInfo);
-            if (StringUtils.isNotBlank(state)) {
-                mav.addObject("state", StringUtils.trimToEmpty(state));
-            }
-            return mav;
         }
 
+        // 用户未授权该APP，跳转到授权页面
+        List<Scope> scopes = scopeService.getScopes(requestParams.getScope());
+        return ResponseUtils.buildAuthorizeResponse(request, scopes, user, appInfo, state);
     }
 
     /**
@@ -177,70 +149,48 @@ public class AuthCodeGrantController {
             throws VerificationException {
 
         log.info("Request authorize token, appId[{}]", clientId);
-
-        TokenRelevantRequestParams requestParams = new TokenRelevantRequestParams();
-        requestParams.setResponseType(ResponseType.AUTHORIZATION_CODE.getType()).setGrantType(grantType).setCode(code)
-                .setRedirectUri(redirectUri).setClientId(clientId).setTokenType(StringUtils.defaultString(tokenType, TokenType.MAC.getValue()))
-                .setClientSecret(clientSecret).setIrt(refresh);
-
+        // 请求参数封装与校验
+        TokenRelevantRequestParams requestParams = new TokenRelevantRequestParams(
+                grantType, code, redirectUri, clientId, tokenType, clientSecret, refresh);
         ErrorCode validateResult = requestParams.validate();
         if (!ErrorCode.NO_ERROR.equals(validateResult)) {
             log.error("Request authorize token with params error, appId[{}], code[{}]", clientId, validateResult);
             return JsonView.render(new ResultInfo(validateResult, StringUtils.EMPTY), response, false);
         }
 
+        AppInfo appInfo = requestParams.getAppInfo();
         // 校验用户与APP之间是否存在授权关系
         Optional<AuthorizeRelation> opt = authorizeRelationService.getAuthorizeRelation(
-                requestParams.getUserId(), requestParams.getAppInfo().getAppId(), ScopeUtils.getScopeSign(requestParams.getScope()));
+                requestParams.getUserId(), appInfo.getAppId(), requestParams.getScope());
         if (!opt.isPresent()) {
             // 用户与APP之间不存在指定的授权关系
-            log.error("No authorization between user[{}] and app[{}] on scope[{}]!",
-                    requestParams.getUserId(), requestParams.getAppInfo().getAppId(), requestParams.getScope());
+            log.error("No authorize relation found between user[{}] and app[{}] on scope[{}]!",
+                    requestParams.getUserId(), appInfo.getAppId(), requestParams.getScope());
             return JsonView.render(new ResultInfo(ErrorCode.UNAUTHORIZED_CLIENT, StringUtils.EMPTY), response, false);
         }
         requestParams.setAuthorizeRelation(opt.get());
 
         // 验证通过，下发accessToken
-        Optional<AbstractTokenGenerator> optTokenGenerator = TokenGeneratorFactory.getGenerator(requestParams.toTokenElement());
-        if (!optTokenGenerator.isPresent()) {
-            log.error("Unknown grantType[{}] or tokenType[{}]", requestParams.getGrantType(), requestParams.getTokenType());
-            return JsonView.render(new ResultInfo(ErrorCode.UNSUPPORTED_GRANT_TYPE, StringUtils.EMPTY), response, false);
-        }
-
-        AbstractAccessTokenGenerator accessTokenGenerator = (AbstractAccessTokenGenerator) optTokenGenerator.get();
+        AbstractAccessTokenGenerator accessTokenGenerator =
+                (AbstractAccessTokenGenerator) TokenGeneratorFactory.getGenerator(requestParams.toTokenElement());
         Optional<AbstractAccessToken> optAccessToken = accessTokenGenerator.create();
         if (!optAccessToken.isPresent()) {
-            log.error("Generate access token failed, params[{}]", requestParams);
+            log.error("Generate access token failed, appId[{}], userId[{}]", appInfo.getAppId(), requestParams.getUserId(), requestParams.getScope());
             return JsonView.render(new ResultInfo(ErrorCode.INVALID_REQUEST, StringUtils.EMPTY), response, false);
         }
 
-        // not cache
-        response.setHeader("Cache-Control", "no-store");
-        response.setHeader("Pragma", "no-cache");
-
         AbstractAccessToken accessToken = optAccessToken.get();
         try {
-            JSONObject result = new JSONObject();
-            result.put("access_token", accessToken.getValue());
-            result.put("expires_in", accessToken.getExpirationTime());
-            if (refresh) {
-                // 客户端指定下发refreshToken
-                result.put("refresh_token", accessToken.getRefreshToken());
-            }
-            if (!ScopeUtils.isSame(requestParams.getScope(), accessToken.getScope())) {
-                // 如果最终下发的scope与请求时不一致，需要说明
-                result.put("scope", accessToken.getScope());
-            }
-            if (TokenType.MAC.equals(accessToken.getType())) {
-                // MAC类型token需要指定key和algorithm
-                result.put("mac_key", accessToken.getKey());
-                result.put("mac_algorithm", ((MacAccessToken) accessToken).getAlgorithm().getValue());
-            }
-            return JsonView.render(result, response, true);
+            log.info("Issue code access token, appId[{}], userId[{}]", accessToken.getClientId(), accessToken.getUserId());
+            // not cache
+            response.setHeader("Cache-Control", "no-store");
+            response.setHeader("Pragma", "no-cache");
+            return JsonView.render(ResponseUtils.format(accessToken), response, false);
         } catch (IOException e) {
-            log.error("Get string access token error by [{}]!", accessToken, e);
+            log.error("Format access token to json error, appId[{}], userId[{}]", accessToken.getClientId(), accessToken.getUserId(), e);
         }
 
+        log.error("Issue code access token error, appId[{}], userId[{}]", accessToken.getClientId(), accessToken.getUserId());
         return JsonView.render(new ResultInfo(ErrorCode.SERVICE_ERROR, StringUtils.EMPTY), response, false);
     }
 

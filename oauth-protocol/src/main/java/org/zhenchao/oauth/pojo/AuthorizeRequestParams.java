@@ -13,7 +13,7 @@ import org.zhenchao.oauth.enums.ResponseType;
 import org.zhenchao.oauth.service.factory.SpringBeanFactory;
 import org.zhenchao.oauth.token.pojo.TokenElement;
 import org.zhenchao.oauth.util.RedirectUriUtils;
-import org.zhenchao.oauth.util.ScopeUtils;
+import org.zhenchao.oauth.common.util.ScopeUtils;
 
 import java.util.Optional;
 

@@ -6,8 +6,6 @@ import org.zhenchao.oauth.token.generator.BearerAccessTokenGenerator;
 import org.zhenchao.oauth.token.generator.MacAccessTokenGenerator;
 import org.zhenchao.oauth.token.pojo.TokenElement;
 
-import java.util.Optional;
-
 /**
  * static token generator factory
  *
@@ -15,20 +13,13 @@ import java.util.Optional;
  * @version 1.0.0
  */
 public class TokenGeneratorFactory {
-
-    /**
-     * get generator object
-     *
-     * @param element
-     * @return
-     */
-    public static Optional<AbstractTokenGenerator> getGenerator(TokenElement element) {
-        if (TokenType.MAC.equals(element.getTokenType())) {
-            return Optional.of(new MacAccessTokenGenerator(element));
-        } else if (TokenType.BEARER.equals(element.getTokenType())) {
-            return Optional.of(new BearerAccessTokenGenerator(element));
+    
+    public static AbstractTokenGenerator getGenerator(TokenElement element) {
+        if (TokenType.BEARER.equals(element.getTokenType())) {
+            return new BearerAccessTokenGenerator(element);
         }
-        return Optional.empty();
+        // 默认下发 mac 类型 token
+        return new MacAccessTokenGenerator(element);
     }
 
 }

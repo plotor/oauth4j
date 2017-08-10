@@ -107,7 +107,7 @@ public class LoginController {
             log.error("Validate user[{}] error!", username, e);
         }
         log.error("User login failed, username or password error!");
-        return JsonView.render(new ResultInfo(ErrorCode.VALIDATE_USER_ERROR, StringUtils.EMPTY), response, false);
+        return JsonView.render(new ResultInfo(ErrorCode.INVALID_USER, StringUtils.EMPTY), response, false);
     }
 
 }

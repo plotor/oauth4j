@@ -1,6 +1,5 @@
 package org.zhenchao.oauth.controller;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -9,9 +8,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.util.UriComponentsBuilder;
 import org.zhenchao.oauth.common.ErrorCode;
-import org.zhenchao.oauth.common.GlobalConstant;
 import static org.zhenchao.oauth.common.GlobalConstant.COOKIE_KEY_USER_LOGIN_SIGN;
 import org.zhenchao.oauth.common.RequestPath;
 import org.zhenchao.oauth.common.exception.VerificationException;
@@ -25,22 +22,14 @@ import org.zhenchao.oauth.pojo.TokenRelevantRequestParams;
 import org.zhenchao.oauth.service.AuthorizeRelationService;
 import org.zhenchao.oauth.service.ScopeService;
 import org.zhenchao.oauth.token.AbstractAccessToken;
-import org.zhenchao.oauth.token.MacAccessToken;
 import org.zhenchao.oauth.token.TokenGeneratorFactory;
-import org.zhenchao.oauth.token.enums.TokenType;
 import org.zhenchao.oauth.token.generator.AbstractAccessTokenGenerator;
-import org.zhenchao.oauth.token.generator.AbstractTokenGenerator;
 import org.zhenchao.oauth.util.CookieUtils;
-import org.zhenchao.oauth.util.HttpRequestUtils;
 import org.zhenchao.oauth.util.JsonView;
 import org.zhenchao.oauth.util.ResponseUtils;
-import org.zhenchao.oauth.util.ScopeUtils;
 import org.zhenchao.oauth.util.SessionUtils;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import javax.annotation.Resource;
@@ -69,10 +58,6 @@ public class ImplicitGrantController {
     /**
      * implicit grant
      *
-     * must not automatically redirect the user-agent to the invalid redirect uri :
-     * 1. missing, invalid, or mismatching redirect uri
-     * 2. client id is missing or invalid
-     *
      * @return
      */
     @RequestMapping(value = RequestPath.PATH_OAUTH_IMPLICIT_TOKEN, method = {GET, POST}, params = "response_type=token")
@@ -80,15 +65,15 @@ public class ImplicitGrantController {
                                   @RequestParam("response_type") String responseType,
                                   @RequestParam("client_id") long clientId,
                                   @RequestParam("redirect_uri") String redirectUri,
-                                  @RequestParam(value = "scope", required = false) String scope,
-                                  @RequestParam(value = "state", required = false) String state,
-                                  @RequestParam(value = "token_type", required = false) String tokenType,
-                                  @RequestParam(value = "force_login", required = false, defaultValue = "false") boolean forceLogin,
-                                  @RequestParam(value = "skip_confirm", required = false, defaultValue = "false") boolean skipConfirm)
+                                  @RequestParam(name = "scope", required = false) String scope,
+                                  @RequestParam(name = "state", required = false) String state,
+                                  @RequestParam(name = "token_type", required = false) String tokenType,
+                                  @RequestParam(name = "force_login", required = false, defaultValue = "false") boolean forceLogin,
+                                  @RequestParam(name = "skip_confirm", required = false, defaultValue = "false") boolean skipConfirm)
             throws VerificationException {
 
-        ModelAndView mav = new ModelAndView();
         log.debug("Request implicit token, appId[{}]", clientId);
+        ModelAndView mav = new ModelAndView();
 
         AuthorizeRequestParams requestParams = new AuthorizeRequestParams(responseType, clientId, redirectUri, scope, state);
         ErrorCode validateResult = requestParams.validate();
@@ -109,104 +94,40 @@ public class ImplicitGrantController {
         AppInfo appInfo = requestParams.getAppInfo();
         UserInfo user = SessionUtils.getUser(session, CookieUtils.get(request, COOKIE_KEY_USER_LOGIN_SIGN));
         if (null == user || forceLogin) {
-            try {
-                // 用户未登录或需要强制登录，跳转到登录页面
-                UriComponentsBuilder builder = UriComponentsBuilder.newInstance();
-                builder.path(RequestPath.PATH_ROOT_LOGIN)
-                        .queryParam(GlobalConstant.CALLBACK, HttpRequestUtils.getEncodeRequestUrl(request))
-                        .queryParam("app_name", URLEncoder.encode(appInfo.getAppName(), "UTF-8"));
-                mav.setViewName("redirect:" + builder.toUriString());
-                return mav;
-            } catch (UnsupportedEncodingException e) {
-                // never happen
-            }
+            return ResponseUtils.buildLoginResponse(request, appInfo);
         }
 
-        Optional<AuthorizeRelation> authorization =
-                authorizeRelationService.getAuthorizeRelation(
-                        user.getId(), requestParams.getClientId(), ScopeUtils.getScopeSign(requestParams.getScope()));
-        if (authorization.isPresent() && skipConfirm) {
+        Optional<AuthorizeRelation> opt =
+                authorizeRelationService.getAuthorizeRelation(user.getId(), requestParams.getClientId(), requestParams.getScope());
+        if (opt.isPresent() && skipConfirm) {
             // 用户已授权，下发token
-            AuthorizeRelation relation = authorization.get();
-            TokenRelevantRequestParams trp = new TokenRelevantRequestParams();
-            trp.setRedirectUri(redirectUri).setClientId(clientId).setTokenType(StringUtils.defaultString(tokenType, TokenType.MAC.getValue()));
-            trp.setResponseType(responseType).setIrt(false).setUserId(user.getId()).setScope(requestParams.getScope()).setAppInfo(appInfo).setAuthorizeRelation(relation);
-            // 验证通过，下发accessToken
-            Optional<AbstractTokenGenerator> optTokenGenerator = TokenGeneratorFactory.getGenerator(trp.toTokenElement());
-            if (!optTokenGenerator.isPresent()) {
-                log.error("Generate implicit access token failed, unknown tokenType[{}]", trp.getTokenType());
-                return this.buildErrorResponse(mav, redirectUri, ErrorCode.UNSUPPORTED_GRANT_TYPE, state);
-            }
+            TokenRelevantRequestParams tokenParams = new TokenRelevantRequestParams(redirectUri, clientId, tokenType, state);
+            tokenParams.setUserId(user.getId()).setScope(requestParams.getScope()).setAppInfo(appInfo).setAuthorizeRelation(opt.get());
 
-            AbstractAccessTokenGenerator accessTokenGenerator = (AbstractAccessTokenGenerator) optTokenGenerator.get();
+            // 验证通过，下发accessToken
+            AbstractAccessTokenGenerator accessTokenGenerator =
+                    (AbstractAccessTokenGenerator) TokenGeneratorFactory.getGenerator(tokenParams.toTokenElement());
             Optional<AbstractAccessToken> optAccessToken = accessTokenGenerator.create();
             if (!optAccessToken.isPresent()) {
-                log.error("Generate access token failed, params[{}]", requestParams);
-                return this.buildErrorResponse(mav, redirectUri, ErrorCode.INVALID_REQUEST, state);
+                log.error("Generate access token failed, appId[{}], userId[{}]", appInfo.getAppId(), tokenParams.getUserId(), tokenParams.getScope());
+                return ResponseUtils.buildImplicitErrorResponse(redirectUri, ErrorCode.INVALID_REQUEST, state);
             }
 
-            // not cache
-            response.setHeader("Cache-Control", "no-store");
-            response.setHeader("Pragma", "no-cache");
-
-            List<String> params = new ArrayList<>();
             AbstractAccessToken accessToken = optAccessToken.get();
             try {
-                params.add(String.format("access_token=%s", accessToken.getValue()));
-                params.add(String.format("token_type=%s", accessToken.getType().getValue()));
-                if (TokenType.MAC.equals(accessToken.getType())) {
-                    // mac类型token
-                    params.add(String.format("mac_key=%s", accessToken.getKey()));
-                    params.add(String.format("mac_algorithm=%s", ((MacAccessToken) accessToken).getAlgorithm().getValue()));
-                }
-                params.add(String.format("expires_in=%d", accessToken.getExpirationTime()));
-                if (!ScopeUtils.isSame(scope, accessToken.getScope())) {
-                    // 最终授权的scope与请求的scope不一致，返回说明
-                    params.add(String.format("scope=%s", URLEncoder.encode(accessToken.getScope(), "UTF-8")));
-                }
-                if (StringUtils.isNotBlank(state)) {
-                    params.add(String.format("state=%s", state));
-                }
-                mav.setViewName("redirect:" + String.format("%s#%s", redirectUri, StringUtils.join(params, "&")));
-                return mav;
+                log.info("Issue implicit access token, appId[{}], userId[{}]", accessToken.getClientId(), accessToken.getUserId());
+                // not cache
+                response.setHeader("Cache-Control", "no-store");
+                response.setHeader("Pragma", "no-cache");
+                return ResponseUtils.buildImplicitTokenResponse(accessToken, tokenParams);
             } catch (IOException e) {
-                log.error("Get string access token error by [{}]!", accessToken, e);
-                return this.buildErrorResponse(mav, redirectUri, ErrorCode.SERVICE_ERROR, state);
-            }
-        } else {
-            // 用户未授权该APP，跳转到授权页面
-            List<Scope> scopes = scopeService.getScopes(requestParams.getScope());
-            mav.setViewName("user-authorize");
-            mav.addObject(GlobalConstant.CALLBACK, HttpRequestUtils.getEncodeRequestUrl(request)).addObject("scopes", scopes)
-                    .addObject("user", user).addObject("app", appInfo).addObject("state", StringUtils.trimToEmpty(state));
-            return mav;
-        }
-    }
-
-    /**
-     * build error response
-     *
-     * @param mav
-     * @param redirectUri
-     * @param errorCode
-     * @param state
-     * @return
-     */
-    private ModelAndView buildErrorResponse(ModelAndView mav, String redirectUri, ErrorCode errorCode, String state) {
-        List<String> params = new ArrayList<>();
-        params.add(String.format("error=%s", errorCode.getCode()));
-        if (StringUtils.isNotBlank(errorCode.getDescription())) {
-            try {
-                params.add(String.format("error_description=%s", URLEncoder.encode(errorCode.getDescription(), "UTF-8")));
-            } catch (UnsupportedEncodingException e) {
-                // never happen
+                log.error("Issue implicit access token error, appId[{}], userId[{}]", accessToken.getClientId(), accessToken.getUserId(), e);
+                return ResponseUtils.buildImplicitErrorResponse(redirectUri, ErrorCode.SERVICE_ERROR, state);
             }
         }
-        if (StringUtils.isNotBlank(state)) {
-            params.add(String.format("state=%s", state));
-        }
-        mav.setViewName("redirect:" + String.format("%s#%s", redirectUri, StringUtils.join(params, "&")));
-        return mav;
+        // 用户未授权该APP，跳转到授权页面
+        List<Scope> scopes = scopeService.getScopes(requestParams.getScope());
+        return ResponseUtils.buildAuthorizeResponse(request, scopes, user, appInfo, state);
     }
 
 }

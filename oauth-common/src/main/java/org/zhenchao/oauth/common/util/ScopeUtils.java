@@ -1,4 +1,4 @@
-package org.zhenchao.oauth.util;
+package org.zhenchao.oauth.common.util;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.collections.CollectionUtils;
@@ -180,8 +180,7 @@ public abstract class ScopeUtils {
         if (StringUtils.isBlank(scope1) || StringUtils.isBlank(scope2)) {
             return false;
         }
-        return CollectionUtils.isEqualCollection(
-                Arrays.asList(scope1.split(SEP)), Arrays.asList(scope2.split(SEP)));
+        return CollectionUtils.isEqualCollection(Arrays.asList(scope1.split(SEP)), Arrays.asList(scope2.split(SEP)));
     }
 
 }

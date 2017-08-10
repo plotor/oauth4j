@@ -9,7 +9,6 @@ import org.zhenchao.oauth.common.ErrorCode;
 import org.zhenchao.oauth.common.exception.VerificationException;
 import org.zhenchao.oauth.entity.AppInfo;
 import org.zhenchao.oauth.entity.AuthorizeRelation;
-import org.zhenchao.oauth.enums.GrantType;
 import org.zhenchao.oauth.handler.AuthCodeCacheHandler;
 import org.zhenchao.oauth.token.enums.TokenType;
 import org.zhenchao.oauth.token.pojo.TokenElement;
@@ -24,8 +23,6 @@ import org.zhenchao.oauth.util.RedirectUriUtils;
 public class TokenRelevantRequestParams implements RequestParams {
 
     private static final Logger log = LoggerFactory.getLogger(TokenRelevantRequestParams.class);
-
-    private String responseType;
 
     private String grantType;
 
@@ -46,6 +43,8 @@ public class TokenRelevantRequestParams implements RequestParams {
 
     private String scope;
 
+    private String state;
+
     private AppInfo appInfo;
 
     private AuthorizeRelation authorizeRelation;
@@ -53,43 +52,36 @@ public class TokenRelevantRequestParams implements RequestParams {
     public TokenRelevantRequestParams() {
     }
 
-    public TokenRelevantRequestParams(String grantType, String code, String redirectUri, long clientId) {
-        this.grantType = grantType;
-        this.code = code;
+    public TokenRelevantRequestParams(String redirectUri, long clientId, String tokenType, String state) {
         this.redirectUri = redirectUri;
         this.clientId = clientId;
+        this.tokenType = StringUtils.defaultIfBlank(tokenType, TokenType.MAC.getValue());
+        this.state = StringUtils.trimToEmpty(state);
     }
 
-    public TokenRelevantRequestParams(
-            String grantType, String code, String redirectUri, long clientId, String tokenType, String clientSecret, boolean irt) {
+    public TokenRelevantRequestParams(String grantType, String code, String redirectUri, long clientId,
+                                      String tokenType, String clientSecret, boolean irt) {
         this.grantType = grantType;
         this.code = code;
         this.redirectUri = redirectUri;
         this.clientId = clientId;
-        this.tokenType = tokenType;
+        this.tokenType = StringUtils.defaultIfBlank(tokenType, TokenType.MAC.getValue());
         this.clientSecret = clientSecret;
         this.irt = irt;
     }
 
     @Override
     public ErrorCode validate() throws VerificationException {
-        // 检测grant type
-        if (!GrantType.AUTHORIZATION_CODE.getType().equals(responseType)) {
-            log.error("Illegal grant type, appId[{}], input[{}], expected[{}]!", clientId, responseType, GrantType.AUTHORIZATION_CODE);
-            return ErrorCode.UNSUPPORTED_GRANT_TYPE;
-        }
-
-        if (StringUtils.isBlank(code)) {
-            log.error("Authorization code missing when request access token, appId[{}]", clientId);
-            return ErrorCode.INVALID_AUTHORIZATION_CODE;
-        }
-
         // 验证token类型
         if (StringUtils.isNotBlank(tokenType) && !TokenType.isValid(tokenType)) {
             log.error("Unsupported token type, appId[{}], tokenType[{}]", clientId, tokenType);
             return ErrorCode.UNSUPPORTED_TOKEN_TYPE;
         }
 
+        if (StringUtils.isBlank(code)) {
+            log.error("Auth code missing when request access token, appId[{}]", clientId);
+            return ErrorCode.INVALID_AUTHORIZATION_CODE;
+        }
         AuthorizationCode authCode = AuthCodeCacheHandler.getInstance().get(code);
         if (null == authCode) {
             log.error("No cache auth code found, appId[{}], key[{}]", clientId, code);
@@ -104,7 +96,7 @@ public class TokenRelevantRequestParams implements RequestParams {
             return ErrorCode.UNAUTHORIZED_CLIENT;
         }
 
-        // 记录部分信息，创建token时需要
+        // 记录部分信息，创建 token 时需要
         this.setScope(authCode.getScopes());
         this.setAppInfo(authCode.getAppInfo());
 
@@ -126,10 +118,7 @@ public class TokenRelevantRequestParams implements RequestParams {
          * client_secret属于创建APP时下发，这一块可以调用开放平台接口进行验证
          * client_secret由APP自己保管，这个主要用来验证当前请求授权的APP是持有对应ID的APP自己
          * 如果client_secret遭到泄露，那么相关责任应该由APP自己承担
-         * 这一块的实现可以基于AES加密，client_secret是加密后的秘闻，然后每个APP持有一个aes key，这个存储在我们这，
-         * 当APP请求授权的时候，我们利用它的key去解密对应的client_secret，得到APP_ID，与传递而来的ID进行比对
          */
-
         return ErrorCode.NO_ERROR;
     }
 
@@ -142,15 +131,6 @@ public class TokenRelevantRequestParams implements RequestParams {
     @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this, ToStringStyle.JSON_STYLE);
-    }
-
-    public String getResponseType() {
-        return responseType;
-    }
-
-    public TokenRelevantRequestParams setResponseType(String responseType) {
-        this.responseType = responseType;
-        return this;
     }
 
     public String getGrantType() {
@@ -231,6 +211,15 @@ public class TokenRelevantRequestParams implements RequestParams {
 
     public TokenRelevantRequestParams setScope(String scope) {
         this.scope = scope;
+        return this;
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    public TokenRelevantRequestParams setState(String state) {
+        this.state = state;
         return this;
     }
 

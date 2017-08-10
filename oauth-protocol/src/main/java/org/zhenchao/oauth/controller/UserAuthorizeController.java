@@ -16,7 +16,7 @@ import org.zhenchao.oauth.entity.AuthorizeRelation;
 import org.zhenchao.oauth.pojo.ResultInfo;
 import org.zhenchao.oauth.service.AuthorizeRelationService;
 import org.zhenchao.oauth.util.JsonView;
-import org.zhenchao.oauth.util.ScopeUtils;
+import org.zhenchao.oauth.common.util.ScopeUtils;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;

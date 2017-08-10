@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletRequest;
  * @author zhenchao.wang 2017-01-05 17:28
  * @version 1.0.0
  */
-public class HttpRequestUtils {
+public abstract class RequestUtils {
 
     /**
      * 获取请求绝对路径

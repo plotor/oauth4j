@@ -14,7 +14,7 @@ import org.zhenchao.oauth.entity.AppInfo;
 import org.zhenchao.oauth.service.AppInfoService;
 import org.zhenchao.oauth.util.CookieUtils;
 import org.zhenchao.oauth.util.SessionUtils;
-import org.zhenchao.oauth.util.HttpRequestUtils;
+import org.zhenchao.oauth.util.RequestUtils;
 
 import java.net.URLEncoder;
 import java.util.Optional;
@@ -50,7 +50,7 @@ public class LoginInterceptor implements HandlerInterceptor {
         // 用户未登录，跳转到登录页
         UriComponentsBuilder builder = UriComponentsBuilder.newInstance();
         builder.path("/login")
-                .queryParam(GlobalConstant.CALLBACK, HttpRequestUtils.getEncodeRequestUrl(request))
+                .queryParam(GlobalConstant.CALLBACK, RequestUtils.getEncodeRequestUrl(request))
                 .queryParam("app_name", URLEncoder.encode(appName, "UTF-8"));
         response.sendRedirect(builder.build(true).toUriString());
         return false;

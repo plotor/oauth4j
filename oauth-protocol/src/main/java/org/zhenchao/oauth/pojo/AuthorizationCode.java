@@ -4,7 +4,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import static org.zhenchao.oauth.common.GlobalConstant.SALT;
 import org.zhenchao.oauth.entity.AppInfo;
-import org.zhenchao.oauth.util.ScopeUtils;
+import org.zhenchao.oauth.common.util.ScopeUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;

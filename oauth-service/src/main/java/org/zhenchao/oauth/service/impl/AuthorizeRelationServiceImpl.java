@@ -5,6 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.zhenchao.oauth.common.util.ScopeUtils;
 import org.zhenchao.oauth.dao.AuthorizeRelationMapper;
 import org.zhenchao.oauth.entity.AuthorizeRelation;
 import org.zhenchao.oauth.entity.AuthorizeRelationExample;
@@ -42,14 +43,14 @@ public class AuthorizeRelationServiceImpl implements AuthorizeRelationService {
     }
 
     @Override
-    public Optional<AuthorizeRelation> getAuthorizeRelation(long userId, long appId, String scopeSign) {
-        if (userId < 0 || appId < 0 || StringUtils.isBlank(scopeSign)) {
-            log.error("Get user and app authorization params error, userId[{}], appId[{}], scope sign [{}]!", userId, appId, scopeSign);
+    public Optional<AuthorizeRelation> getAuthorizeRelation(long userId, long appId, String scope) {
+        if (userId < 0 || appId < 0 || StringUtils.isBlank(scope)) {
+            log.error("Get authorize relation with error params, userId[{}], appId[{}], scope[{}]!", userId, appId, scope);
             return Optional.empty();
         }
         AuthorizeRelationExample example = new AuthorizeRelationExample();
         AuthorizeRelationExample.Criteria criteria = example.createCriteria();
-        criteria.andAppIdEqualTo(appId).andUserIdEqualTo(userId).andScopeSignEqualTo(scopeSign);
+        criteria.andAppIdEqualTo(appId).andUserIdEqualTo(userId).andScopeSignEqualTo(ScopeUtils.getScopeSign(scope));
         List<AuthorizeRelation> authorizations = authorizeRelationMapper.selectByExample(example);
         if (CollectionUtils.isEmpty(authorizations)) {
             return Optional.empty();
