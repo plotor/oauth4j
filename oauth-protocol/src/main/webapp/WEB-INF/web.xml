@@ -5,15 +5,6 @@
          version="3.0">
     <display-name>x-oauth</display-name>
 
-    <!-- 配置logback -->
-    <!--<context-param>
-        <param-name>logbackConfigLocation</param-name>
-        <param-value>classpath:/config/log/logback.xml</param-value>
-    </context-param>
-    <listener>
-        <listener-class>ch.qos.logback.ext.spring.web.LogbackConfigListener</listener-class>
-    </listener>-->
-
     <context-param>
         <param-name>log4jConfigLocation</param-name>
         <param-value>classpath:/config/log/log4j.properties</param-value>

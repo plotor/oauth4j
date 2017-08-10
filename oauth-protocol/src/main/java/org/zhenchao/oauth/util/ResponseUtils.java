@@ -100,7 +100,7 @@ public abstract class ResponseUtils {
     public static ModelAndView buildAuthorizeResponse(
             ModelAndView mav, HttpServletRequest request, List<Scope> scopes, UserInfo userInfo, AppInfo appInfo, String state) {
         // TODO 页面跳转需要添加参数签名，防止请求被更改或伪造
-        mav.setViewName("user-authorize");
+        mav.setViewName("user_authorize");
         mav.addObject(GlobalConstant.CALLBACK, RequestUtils.getEncodeRequestUrl(request))
                 .addObject("scopes", scopes)
                 .addObject("user", userInfo)

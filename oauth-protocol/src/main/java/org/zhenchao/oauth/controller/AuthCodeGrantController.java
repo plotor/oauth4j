@@ -65,7 +65,7 @@ public class AuthCodeGrantController {
      *
      * @return
      */
-    @RequestMapping(value = RequestPath.PATH_OAUTH_AUTHORIZE_CODE, method = {GET, POST}, params = "response_type=code")
+    @RequestMapping(path = RequestPath.PATH_OAUTH_AUTHORIZE_CODE, method = {GET, POST})
     public ModelAndView authorize(HttpServletRequest request, HttpServletResponse response, HttpSession session,
                                   @RequestParam("response_type") String responseType,
                                   @RequestParam("client_id") long clientId,
@@ -137,7 +137,7 @@ public class AuthCodeGrantController {
      *
      * @return
      */
-    @RequestMapping(value = RequestPath.PATH_OAUTH_AUTHORIZE_TOKEN, method = {GET, POST})
+    @RequestMapping(path = RequestPath.PATH_OAUTH_AUTHORIZE_TOKEN, method = {GET, POST})
     public ModelAndView issueToken(HttpServletResponse response,
                                    @RequestParam("grant_type") String grantType,
                                    @RequestParam("code") String code,

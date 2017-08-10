@@ -30,7 +30,7 @@ __注意：__ 实际应用中请强制开启HTTPS!
 - 请求获取授权码
 
 ```http
-http://localhost:8080/oauth/authorize/code?response_type=code&client_id=2882303761517520186&redirect_uri=http://www.zhenchao.com&scope=1%204&state=emhlbmNoYW8gcGFzc3BvcnQgb2F1dGg=
+http://localhost:8080/oauth/code?response_type=code&client_id=2882303761517520186&redirect_uri=http://www.zhenchao.com&scope=1%204&state=emhlbmNoYW8gcGFzc3BvcnQgb2F1dGg=
 ```
 
 响应示例：
@@ -43,7 +43,7 @@ Location: http://www.zhenchao.com/?code=E670AC74F54CACC6222ADFFBEE51CADB&state=e
 - 请求下发访问令牌
 
 ```http
-http://localhost:8080/oauth/authorize/token?grant_type=authorization_code&client_id=2882303761517520186&redirect_uri=http://www.zhenchao.com&code={your code here}
+http://localhost:8080/oauth/token?grant_type=authorization_code&client_id=2882303761517520186&redirect_uri=http://www.zhenchao.com&code={your code here}
 ```
 
 响应示例：

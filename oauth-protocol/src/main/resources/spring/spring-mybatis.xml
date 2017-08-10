@@ -73,13 +73,13 @@
     <!-- 配置myBatis -->
     <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
         <property name="dataSource" ref="dataSource"/>
-        <property name="mapperLocations" value="classpath:/org/zhenchao/passport/oauth/mapper/*.xml"/>
+        <property name="mapperLocations" value="classpath:/org/zhenchao/oauth/mapper/*.xml"/>
     </bean>
 
     <!-- myBatis mapper配置 -->
     <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
         <!--自动扫描注入-->
-        <property name="basePackage" value="org.zhenchao.passport.oauth.dao"/>
+        <property name="basePackage" value="org.zhenchao.oauth.dao"/>
         <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
     </bean>
 

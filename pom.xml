@@ -197,7 +197,7 @@
                 <version>4.5.2</version>
             </dependency>
 
-            <!-- MyBatis三方库 -->
+            <!-- MyBatis -->
             <dependency>
                 <groupId>org.mybatis</groupId>
                 <artifactId>mybatis</artifactId>
@@ -209,35 +209,32 @@
                 <version>1.3.0</version>
             </dependency>
 
-            <!-- MySQL驱动 -->
+            <!-- database -->
             <dependency>
                 <groupId>mysql</groupId>
                 <artifactId>mysql-connector-java</artifactId>
                 <version>5.1.40</version>
             </dependency>
-
-            <!-- 数据库连接池 -->
             <dependency>
                 <groupId>com.alibaba</groupId>
                 <artifactId>druid</artifactId>
                 <version>1.0.27</version>
             </dependency>
 
-            <!-- 缓存 -->
+            <!-- cache -->
             <dependency>
                 <groupId>org.ehcache</groupId>
                 <artifactId>ehcache</artifactId>
                 <version>3.2.0</version>
             </dependency>
 
-            <!-- 定时器框架 -->
+            <!-- quartz -->
             <dependency>
                 <groupId>org.quartz-scheduler</groupId>
                 <artifactId>quartz</artifactId>
                 <version>1.8.6</version>
             </dependency>
 
-            <!-- 日志相关 -->
             <!-- sl4j -->
             <dependency>
                 <groupId>org.slf4j</groupId>
@@ -255,6 +252,7 @@
                 <artifactId>log4j</artifactId>
                 <version>1.2.17</version>
             </dependency>
+
             <!-- json -->
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
@@ -271,22 +269,13 @@
                 <artifactId>fastjson</artifactId>
                 <version>1.2.35</version>
             </dependency>
-            <dependency>
-                <groupId>net.sf.json-lib</groupId>
-                <artifactId>json-lib</artifactId>
-                <version>2.4</version>
-                <classifier>jdk15</classifier>
-            </dependency>
-            <dependency>
-                <groupId>net.sf.ezmorph</groupId>
-                <artifactId>ezmorph</artifactId>
-                <version>1.0.6</version>
-            </dependency>
+
             <dependency>
                 <groupId>org.bouncycastle</groupId>
                 <artifactId>bcprov-jdk15on</artifactId>
                 <version>1.56</version>
             </dependency>
+
             <dependency>
                 <groupId>Javax.servlet</groupId>
                 <artifactId>javax.servlet-api</artifactId>
@@ -341,8 +330,6 @@
     </dependencyManagement>
 
     <build>
-        <!-- 用来指定war包的名称 -->
-        <finalName>x-oauth</finalName>
         <resources>
             <resource>
                 <directory>${project.basedir}/src/main/resources</directory>
@@ -382,41 +369,6 @@
                     <configuration>
                         <source>1.8</source>
                         <target>1.8</target>
-                    </configuration>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-war-plugin</artifactId>
-                    <version>2.4</version>
-                    <configuration>
-                        <warSourceDirectory>${basedir}/src/main/webapp</warSourceDirectory>
-                        <failOnMissingWebXml>false</failOnMissingWebXml>
-                    </configuration>
-                </plugin>
-                <!-- jetty deploy support -->
-                <plugin>
-                    <groupId>org.eclipse.jetty</groupId>
-                    <artifactId>jetty-maven-plugin</artifactId>
-                    <version>9.2.20.v20161216</version>
-                    <configuration>
-                        <webApp>
-                            <contextPath>/</contextPath>
-                        </webApp>
-                        <httpConnector>
-                            <port>8080</port>
-                        </httpConnector>
-                    </configuration>
-                </plugin>
-                <!-- tomcat deploy support -->
-                <plugin>
-                    <groupId>org.apache.tomcat.maven</groupId>
-                    <artifactId>tomcat7-maven-plugin</artifactId>
-                    <version>2.2</version>
-                    <configuration>
-                        <url>http://localhost:8080/manager/text</url>
-                        <server>tomcat7</server>
-                        <path>/${project.build.finalName}</path>
-                        <uriEncoding>UTF-8</uriEncoding>
                     </configuration>
                 </plugin>
             </plugins>

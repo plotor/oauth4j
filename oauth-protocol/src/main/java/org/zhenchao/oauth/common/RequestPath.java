@@ -12,9 +12,9 @@ public interface RequestPath {
 
     String PATH_ROOT_OAUTH = "/oauth";
 
-    String PATH_OAUTH_AUTHORIZE_CODE = "/authorize/code";
+    String PATH_OAUTH_AUTHORIZE_CODE = "/code";
 
-    String PATH_OAUTH_AUTHORIZE_TOKEN = "/authorize/token";
+    String PATH_OAUTH_AUTHORIZE_TOKEN = "/token";
 
     String PATH_OAUTH_IMPLICIT_TOKEN = "/implicit/token";
 

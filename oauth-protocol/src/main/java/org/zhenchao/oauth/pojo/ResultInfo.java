@@ -53,14 +53,14 @@ public class ResultInfo {
 
     public ResultInfo(ErrorCode errorCode, String state) {
         this.code = errorCode.getCode();
-        this.desc = errorCode.getDesc();
+        this.desc = errorCode.getDescription();
         this.uri = StringUtils.EMPTY;
         this.state = StringUtils.trimToEmpty(state);
     }
 
     public ResultInfo(ErrorCode errorCode, String uri, String state) {
         this.code = errorCode.getCode();
-        this.desc = errorCode.getDesc();
+        this.desc = errorCode.getDescription();
         this.uri = uri;
         this.state = StringUtils.trimToEmpty(state);
     }

@@ -60,8 +60,8 @@ public class ImplicitGrantController {
      *
      * @return
      */
-    @RequestMapping(value = RequestPath.PATH_OAUTH_IMPLICIT_TOKEN, method = {GET, POST}, params = "response_type=token")
-    public ModelAndView authorize(HttpServletRequest request, HttpServletResponse response, HttpSession session,
+    @RequestMapping(path = RequestPath.PATH_OAUTH_IMPLICIT_TOKEN, method = {GET, POST})
+    public ModelAndView implicit(HttpServletRequest request, HttpServletResponse response, HttpSession session,
                                   @RequestParam("response_type") String responseType,
                                   @RequestParam("client_id") long clientId,
                                   @RequestParam("redirect_uri") String redirectUri,
