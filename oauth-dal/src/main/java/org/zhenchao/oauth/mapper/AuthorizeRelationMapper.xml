@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.zhenchao.oauth.dao.AuthorizeRelationMapper">
+  <resultMap id="BaseResultMap" type="org.zhenchao.oauth.entity.AuthorizeRelation">
+    <result column="app_id" jdbcType="BIGINT" property="appId" />
+    <result column="user_id" jdbcType="BIGINT" property="userId" />
+    <result column="scope" jdbcType="VARCHAR" property="scope" />
+    <result column="scope_sign" jdbcType="CHAR" property="scopeSign" />
+    <result column="token_key" jdbcType="VARCHAR" property="tokenKey" />
+    <result column="refresh_token_key" jdbcType="VARCHAR" property="refreshTokenKey" />
+    <result column="refresh_token_expiration_time" jdbcType="BIGINT" property="refreshTokenExpirationTime" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    app_id, user_id, scope, scope_sign, token_key, refresh_token_key, refresh_token_expiration_time, 
+    create_time, update_time
+  </sql>
+  <select id="selectByExample" parameterType="org.zhenchao.oauth.entity.AuthorizeRelationExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from t_authorize_relation
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <delete id="deleteByExample" parameterType="org.zhenchao.oauth.entity.AuthorizeRelationExample">
+    delete from t_authorize_relation
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="org.zhenchao.oauth.entity.AuthorizeRelation">
+    insert into t_authorize_relation (app_id, user_id, scope, 
+      scope_sign, token_key, refresh_token_key, 
+      refresh_token_expiration_time, create_time, 
+      update_time)
+    values (#{appId,jdbcType=BIGINT}, #{userId,jdbcType=BIGINT}, #{scope,jdbcType=VARCHAR}, 
+      #{scopeSign,jdbcType=CHAR}, #{tokenKey,jdbcType=VARCHAR}, #{refreshTokenKey,jdbcType=VARCHAR}, 
+      #{refreshTokenExpirationTime,jdbcType=BIGINT}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{updateTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="org.zhenchao.oauth.entity.AuthorizeRelation">
+    insert into t_authorize_relation
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="appId != null">
+        app_id,
+      </if>
+      <if test="userId != null">
+        user_id,
+      </if>
+      <if test="scope != null">
+        scope,
+      </if>
+      <if test="scopeSign != null">
+        scope_sign,
+      </if>
+      <if test="tokenKey != null">
+        token_key,
+      </if>
+      <if test="refreshTokenKey != null">
+        refresh_token_key,
+      </if>
+      <if test="refreshTokenExpirationTime != null">
+        refresh_token_expiration_time,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="appId != null">
+        #{appId,jdbcType=BIGINT},
+      </if>
+      <if test="userId != null">
+        #{userId,jdbcType=BIGINT},
+      </if>
+      <if test="scope != null">
+        #{scope,jdbcType=VARCHAR},
+      </if>
+      <if test="scopeSign != null">
+        #{scopeSign,jdbcType=CHAR},
+      </if>
+      <if test="tokenKey != null">
+        #{tokenKey,jdbcType=VARCHAR},
+      </if>
+      <if test="refreshTokenKey != null">
+        #{refreshTokenKey,jdbcType=VARCHAR},
+      </if>
+      <if test="refreshTokenExpirationTime != null">
+        #{refreshTokenExpirationTime,jdbcType=BIGINT},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="org.zhenchao.oauth.entity.AuthorizeRelationExample" resultType="java.lang.Long">
+    select count(*) from t_authorize_relation
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update t_authorize_relation
+    <set>
+      <if test="record.appId != null">
+        app_id = #{record.appId,jdbcType=BIGINT},
+      </if>
+      <if test="record.userId != null">
+        user_id = #{record.userId,jdbcType=BIGINT},
+      </if>
+      <if test="record.scope != null">
+        scope = #{record.scope,jdbcType=VARCHAR},
+      </if>
+      <if test="record.scopeSign != null">
+        scope_sign = #{record.scopeSign,jdbcType=CHAR},
+      </if>
+      <if test="record.tokenKey != null">
+        token_key = #{record.tokenKey,jdbcType=VARCHAR},
+      </if>
+      <if test="record.refreshTokenKey != null">
+        refresh_token_key = #{record.refreshTokenKey,jdbcType=VARCHAR},
+      </if>
+      <if test="record.refreshTokenExpirationTime != null">
+        refresh_token_expiration_time = #{record.refreshTokenExpirationTime,jdbcType=BIGINT},
+      </if>
+      <if test="record.createTime != null">
+        create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.updateTime != null">
+        update_time = #{record.updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update t_authorize_relation
+    set app_id = #{record.appId,jdbcType=BIGINT},
+      user_id = #{record.userId,jdbcType=BIGINT},
+      scope = #{record.scope,jdbcType=VARCHAR},
+      scope_sign = #{record.scopeSign,jdbcType=CHAR},
+      token_key = #{record.tokenKey,jdbcType=VARCHAR},
+      refresh_token_key = #{record.refreshTokenKey,jdbcType=VARCHAR},
+      refresh_token_expiration_time = #{record.refreshTokenExpirationTime,jdbcType=BIGINT},
+      create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      update_time = #{record.updateTime,jdbcType=TIMESTAMP}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+</mapper>
