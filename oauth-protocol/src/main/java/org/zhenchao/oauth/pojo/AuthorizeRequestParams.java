@@ -6,14 +6,13 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zhenchao.oauth.common.ErrorCode;
+import org.zhenchao.oauth.common.enums.ResponseType;
 import org.zhenchao.oauth.common.exception.VerificationException;
-import org.zhenchao.oauth.entity.AppInfo;
-import org.zhenchao.oauth.entity.UserInfo;
-import org.zhenchao.oauth.enums.ResponseType;
-import org.zhenchao.oauth.service.factory.SpringBeanFactory;
-import org.zhenchao.oauth.token.pojo.TokenElement;
 import org.zhenchao.oauth.common.util.RedirectUriUtils;
 import org.zhenchao.oauth.common.util.ScopeUtils;
+import org.zhenchao.oauth.entity.AppInfo;
+import org.zhenchao.oauth.entity.UserInfo;
+import org.zhenchao.oauth.service.factory.SpringBeanFactory;
 
 import java.util.Optional;
 
@@ -100,12 +99,6 @@ public class AuthorizeRequestParams implements RequestParams {
         }
         log.info("Validate authorize request params success, appId[{}]", clientId);
         return ErrorCode.NO_ERROR;
-    }
-
-    @Override
-    public TokenElement toTokenElement() {
-        // TODO 2017-08-08 18:11:05
-        return null;
     }
 
     public AppInfo getAppInfo() {

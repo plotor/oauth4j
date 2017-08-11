@@ -10,7 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.zhenchao.oauth.common.ErrorCode;
 import org.zhenchao.oauth.common.RequestPath;
-import org.zhenchao.oauth.enums.ResponseType;
+import org.zhenchao.oauth.common.enums.ResponseType;
 import org.zhenchao.oauth.util.MockUserOperationUtils;
 
 import java.util.HashMap;

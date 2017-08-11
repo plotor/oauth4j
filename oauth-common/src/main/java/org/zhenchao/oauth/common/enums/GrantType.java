@@ -1,6 +1,4 @@
-package org.zhenchao.oauth.enums;
-
-import java.util.Optional;
+package org.zhenchao.oauth.common.enums;
 
 /**
  * grant type
@@ -40,17 +38,17 @@ public enum GrantType {
     }
 
     /**
-     * change string param to {@code GrantType} object
+     * resolve string param to {@code GrantType} object
      *
      * @param grantType
      * @return
      */
-    public static Optional<GrantType> toGrantType(String grantType) {
+    public static GrantType resolve(String grantType) {
         for (final GrantType type : GrantType.values()) {
-            if (type.getType().equals(grantType)) {
-                return Optional.of(type);
+            if (type.getType().equalsIgnoreCase(grantType)) {
+                return type;
             }
         }
-        return Optional.empty();
+        return null;
     }
 }

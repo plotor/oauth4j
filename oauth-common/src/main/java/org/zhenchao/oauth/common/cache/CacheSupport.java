@@ -23,34 +23,38 @@ public abstract class CacheSupport<T> implements Namespace {
 
     protected static CacheManager manager;
 
-    protected void init(String namespace, Class keyType, Class valueType, long expire) {
+    protected void init(String namespace, Class valueType, long expire) {
         // TIPS: 实际应用中对于授权码缓存，只应该在缓存时间上进行控制
         manager = CacheManagerBuilder.newCacheManagerBuilder().withCache(
                 namespace,
-                CacheConfigurationBuilder.newCacheConfigurationBuilder(keyType, valueType, ResourcePoolsBuilder.heap(1024))
+                CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class, valueType, ResourcePoolsBuilder.heap(1024))
                         .withExpiry(Expirations.timeToLiveExpiration(Duration.of(expire, TimeUnit.MINUTES)))).build();
         manager.init();
     }
 
-    public T get(String namespace, String key) {
-        Cache<String, Object> cache = manager.getCache(namespace, String.class, Object.class);
+    public T get(String namespace, Class<T> clazz, String key) {
+        Cache<String, T> cache = this.getCacheInstance(namespace, clazz);
         Object value = cache.get(key);
         return null == value ? null : (T) value;
     }
 
-    public void put(String namespace, String key, T value) {
-        Cache<String, Object> cache = manager.getCache(namespace, String.class, Object.class);
+    public void put(String namespace, Class<T> clazz, String key, T value) {
+        Cache<String, T> cache = this.getCacheInstance(namespace, clazz);
         cache.put(key, value);
     }
 
-    public void remove(String namespace, String key) {
-        Cache<String, Object> cache = manager.getCache(namespace, String.class, Object.class);
+    public void remove(String namespace, Class<T> clazz, String key) {
+        Cache<String, T> cache = this.getCacheInstance(namespace, clazz);
         cache.remove(key);
     }
 
-    public void remove(String namespace, String key, T value) {
-        Cache<String, Object> cache = manager.getCache(namespace, String.class, Object.class);
+    public void remove(String namespace, Class<T> clazz, String key, T value) {
+        Cache<String, T> cache = this.getCacheInstance(namespace, clazz);
         cache.remove(key, value);
+    }
+
+    private Cache<String, T> getCacheInstance(String namespace, Class<T> clazz) {
+        return manager.getCache(namespace, String.class, clazz);
     }
 
 }

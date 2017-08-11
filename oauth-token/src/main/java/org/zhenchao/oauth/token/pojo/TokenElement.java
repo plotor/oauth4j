@@ -2,6 +2,8 @@ package org.zhenchao.oauth.token.pojo;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
+import org.zhenchao.oauth.common.enums.GrantType;
+import org.zhenchao.oauth.entity.AppInfo;
 import org.zhenchao.oauth.token.enums.TokenType;
 
 /**
@@ -12,17 +14,17 @@ public class TokenElement {
 
     private TokenType tokenType;
 
-    private String responseType;
-
-    private Long clientId;
-
     private Long userId;
 
     private String scope;
 
-    private Long validity;
+    private AppInfo appInfo;
+
+    private GrantType grantType;
 
     private boolean issueRefreshToken;
+
+    private String tokenKey;
 
     public TokenElement() {
     }
@@ -38,24 +40,6 @@ public class TokenElement {
 
     public TokenElement setTokenType(TokenType tokenType) {
         this.tokenType = tokenType;
-        return this;
-    }
-
-    public String getResponseType() {
-        return responseType;
-    }
-
-    public TokenElement setResponseType(String responseType) {
-        this.responseType = responseType;
-        return this;
-    }
-
-    public Long getClientId() {
-        return clientId;
-    }
-
-    public TokenElement setClientId(Long clientId) {
-        this.clientId = clientId;
         return this;
     }
 
@@ -77,12 +61,21 @@ public class TokenElement {
         return this;
     }
 
-    public Long getValidity() {
-        return validity;
+    public AppInfo getAppInfo() {
+        return appInfo;
     }
 
-    public TokenElement setValidity(Long validity) {
-        this.validity = validity;
+    public TokenElement setAppInfo(AppInfo appInfo) {
+        this.appInfo = appInfo;
+        return this;
+    }
+
+    public GrantType getGrantType() {
+        return grantType;
+    }
+
+    public TokenElement setGrantType(GrantType grantType) {
+        this.grantType = grantType;
         return this;
     }
 
@@ -92,6 +85,15 @@ public class TokenElement {
 
     public TokenElement setIssueRefreshToken(boolean issueRefreshToken) {
         this.issueRefreshToken = issueRefreshToken;
+        return this;
+    }
+
+    public String getTokenKey() {
+        return tokenKey;
+    }
+
+    public TokenElement setTokenKey(String tokenKey) {
+        this.tokenKey = tokenKey;
         return this;
     }
 }

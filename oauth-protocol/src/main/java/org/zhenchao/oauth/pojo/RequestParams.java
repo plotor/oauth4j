@@ -2,7 +2,6 @@ package org.zhenchao.oauth.pojo;
 
 import org.zhenchao.oauth.common.ErrorCode;
 import org.zhenchao.oauth.common.exception.VerificationException;
-import org.zhenchao.oauth.token.pojo.TokenElement;
 
 /**
  * 请求参数接口
@@ -13,7 +12,5 @@ import org.zhenchao.oauth.token.pojo.TokenElement;
 public interface RequestParams {
 
     ErrorCode validate() throws VerificationException;
-
-    TokenElement toTokenElement();
 
 }

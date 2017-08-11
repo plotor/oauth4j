@@ -1,4 +1,4 @@
-package org.zhenchao.oauth.enums;
+package org.zhenchao.oauth.common.enums;
 
 import java.util.Optional;
 

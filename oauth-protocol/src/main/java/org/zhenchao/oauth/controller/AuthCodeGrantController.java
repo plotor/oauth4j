@@ -162,6 +162,7 @@ public class AuthCodeGrantController {
         }
 
         AppInfo appInfo = requestParams.getAppInfo();
+
         // 校验用户与APP之间是否存在授权关系
         Optional<AuthorizeRelation> opt = authorizeRelationService.getAuthorizeRelation(
                 requestParams.getUserId(), appInfo.getAppId(), requestParams.getScope());
@@ -171,6 +172,7 @@ public class AuthCodeGrantController {
                     requestParams.getUserId(), appInfo.getAppId(), requestParams.getScope());
             return JsonView.render(new ResultInfo(ErrorCode.UNAUTHORIZED_CLIENT, StringUtils.EMPTY), response, false);
         }
+        // 记录授权关系
         requestParams.setAuthorizeRelation(opt.get());
 
         // 验证通过，下发accessToken

@@ -6,13 +6,14 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zhenchao.oauth.common.ErrorCode;
+import org.zhenchao.oauth.common.enums.GrantType;
 import org.zhenchao.oauth.common.exception.VerificationException;
+import org.zhenchao.oauth.common.util.RedirectUriUtils;
 import org.zhenchao.oauth.entity.AppInfo;
 import org.zhenchao.oauth.entity.AuthorizeRelation;
 import org.zhenchao.oauth.handler.AuthCodeCacheHandler;
 import org.zhenchao.oauth.token.enums.TokenType;
 import org.zhenchao.oauth.token.pojo.TokenElement;
-import org.zhenchao.oauth.common.util.RedirectUriUtils;
 
 /**
  * 令牌请求参数
@@ -48,6 +49,8 @@ public class TokenRelevantRequestParams implements RequestParams {
     private AppInfo appInfo;
 
     private AuthorizeRelation authorizeRelation;
+
+    private AuthorizationCode authorizationCode;
 
     public TokenRelevantRequestParams() {
     }
@@ -89,16 +92,17 @@ public class TokenRelevantRequestParams implements RequestParams {
         }
         // 从缓存中删除授权码，一个授权码只能被使用一次
         AuthCodeCacheHandler.getInstance().remove(code);
-        this.appInfo = authCode.getAppInfo();
+
+        // 记录部分信息，创建 token 时需要
+        this.setAuthorizationCode(authCode);
+        this.setAppInfo(authCode.getAppInfo());
+        this.setScope(authCode.getScopes());
+        this.setUserId(authCode.getUserId());
 
         if (this.clientId != appInfo.getAppId()) {
             log.error("Client id mismatch, input[{}], in code [{}]", clientId, appInfo.getAppId());
             return ErrorCode.UNAUTHORIZED_CLIENT;
         }
-
-        // 记录部分信息，创建 token 时需要
-        this.setScope(authCode.getScopes());
-        this.setAppInfo(authCode.getAppInfo());
 
         // 回调地址验证
         String redirectUri = authCode.getRedirectUri();
@@ -122,10 +126,15 @@ public class TokenRelevantRequestParams implements RequestParams {
         return ErrorCode.NO_ERROR;
     }
 
-    @Override
     public TokenElement toTokenElement() {
-        // TODO 2017-08-08 18:11:29
-        return null;
+        return new TokenElement()
+                .setAppInfo(appInfo)
+                .setUserId(userId)
+                .setScope(scope)
+                .setTokenType(TokenType.resolve(tokenType))
+                .setGrantType(GrantType.resolve(grantType))
+                .setIssueRefreshToken(irt)
+                .setTokenKey(authorizeRelation.getTokenKey());
     }
 
     @Override
@@ -238,6 +247,15 @@ public class TokenRelevantRequestParams implements RequestParams {
 
     public TokenRelevantRequestParams setAuthorizeRelation(AuthorizeRelation authorizeRelation) {
         this.authorizeRelation = authorizeRelation;
+        return this;
+    }
+
+    public AuthorizationCode getAuthorizationCode() {
+        return authorizationCode;
+    }
+
+    public TokenRelevantRequestParams setAuthorizationCode(AuthorizationCode authorizationCode) {
+        this.authorizationCode = authorizationCode;
         return this;
     }
 }

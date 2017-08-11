@@ -1,7 +1,9 @@
 package org.zhenchao.oauth.token.generator;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.zhenchao.oauth.token.AbstractAccessToken;
 import org.zhenchao.oauth.token.MacAccessToken;
+import org.zhenchao.oauth.token.constant.TokenConstant;
 import org.zhenchao.oauth.token.enums.TokenVersion;
 import org.zhenchao.oauth.token.pojo.TokenElement;
 
@@ -28,14 +30,15 @@ public class MacAccessTokenGenerator extends AccessTokenGenerator {
         long currentTime = System.currentTimeMillis();
         accessToken.setVersion(TokenVersion.V_1_0_0)
                 .setUserId(element.getUserId())
-                .setClientId(element.getClientId())
+                .setClientId(element.getAppInfo().getAppId())
                 .setScope(element.getScope())
                 .setIssueTime(currentTime)
-                .setExpirationTime((currentTime + element.getValidity() * 1000L) / 1000L)  // 时间单位保持一致（过期时间以秒为单位）
-                .setType(MacAccessToken.TYPE);
+                .setExpirationTime((currentTime + TokenConstant.DEFAULT_ACCESS_TOKEN_VALIDITY * 1000L) / 1000L) // 时间单位保持一致（过期时间以秒为单位）
+                .setType(MacAccessToken.TYPE)
+                .setKey(element.getTokenKey());
         if (element.isIssueRefreshToken()) {
             // TODO 生成刷新令牌
-            accessToken.setRefreshToken("refresh token");
+            accessToken.setRefreshToken(RandomStringUtils.randomAlphanumeric(32));
         }
         return Optional.of(accessToken);
     }

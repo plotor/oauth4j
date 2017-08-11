@@ -46,10 +46,8 @@ public abstract class AbstractAccessToken implements Token {
      */
     protected byte[] encode() throws IOException {
         byte[] result;
-        DataOutputStream dos = null;
-        try {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            dos = new DataOutputStream(baos);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try (DataOutputStream dos = new DataOutputStream(baos)) {
             dos.writeBytes(this.version.getValue()); // version
             dos.writeChar('-');
             dos.writeLong(this.expirationTime); // expirationTime
@@ -62,10 +60,6 @@ public abstract class AbstractAccessToken implements Token {
             dos.writeBytes(this.type.getValue());
             dos.flush();
             result = baos.toByteArray();
-        } finally {
-            if (null != dos) {
-                dos.close();
-            }
         }
         return result;
     }

@@ -14,9 +14,9 @@ import org.junit.Test;
 import org.zhenchao.oauth.common.ErrorCode;
 import org.zhenchao.oauth.common.GlobalConstant;
 import org.zhenchao.oauth.common.RequestPath;
-import org.zhenchao.oauth.enums.GrantType;
+import org.zhenchao.oauth.common.enums.GrantType;
 import org.zhenchao.oauth.util.MockUserOperationUtils;
-import org.zhenchao.oauth.enums.ResponseType;
+import org.zhenchao.oauth.common.enums.ResponseType;
 import org.zhenchao.oauth.token.MacAccessToken;
 import org.zhenchao.oauth.util.ResultUtils;
 

@@ -42,4 +42,13 @@ public enum TokenType {
         return MAC.getValue().equals(tokenType) || BEARER.getValue().equals(tokenType);
     }
 
+    public static TokenType resolve(String tokenType) {
+        for (final TokenType type : TokenType.values()) {
+            if (type.getValue().equalsIgnoreCase(tokenType)) {
+                return type;
+            }
+        }
+        return null;
+    }
+
 }
