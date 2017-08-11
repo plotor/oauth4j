@@ -10,6 +10,8 @@ public interface RequestPath {
 
     String PATH_ROOT_LOGIN = "/login";
 
+    String PATH_SWITCH_ACCOUNT = "/switch-account";
+
     String PATH_ROOT_OAUTH = "/oauth";
 
     String PATH_OAUTH_AUTHORIZE_CODE = "/code";

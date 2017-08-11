@@ -105,4 +105,16 @@ public class LoginController {
         return JsonView.render(new ResultInfo(ErrorCode.INVALID_USER, StringUtils.EMPTY), response, false);
     }
 
+    @RequestMapping(path = RequestPath.PATH_SWITCH_ACCOUNT, method = RequestMethod.GET)
+    public ModelAndView switchAccount(
+            @RequestParam(name = "callback", required = false) String callback,
+            @RequestParam(name = "app_name", required = false) String appName) {
+        ModelAndView mav = new ModelAndView();
+
+        // TODO switch account
+
+        mav.setViewName("redirect:login");
+        return mav;
+    }
+
 }
