@@ -1,11 +1,12 @@
-## OAuth2.0授权协议实现
+## OAuth 2.0 授权协议实现
 
 本项目为 [RFC6749](https://tools.ietf.org/html/rfc6749) 协议的标准实现，主要用于对该协议的学习和理解，也可以在此基础上结合自己的业务场景做相应的改造，用于生产环境授权。
 
 项目采用 java 语言开发，基于 SSM 框架，开发和运行环境如下：
 
 > - 数据库: MySQL 5.7
-> - jdk版本: 1.8
+> - jdk: 1.8
+> - maven：3.2.5
 
 本项目主要实现了协议 [RFC6749](https://tools.ietf.org/html/rfc6749) 定义的 __授权码授权模式__ 和 __隐式授权模式__，并参考协议文档 “[HTTP Authentication: MAC Authentication](https://tools.ietf.org/html/draft-hammer-oauth-v2-mac-token-02)” 实现了 MAC 类型的令牌。
 

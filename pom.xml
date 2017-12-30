@@ -2,7 +2,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.zhenchao.oauth</groupId>
-    <artifactId>x-oauth</artifactId>
+    <artifactId>oauth4j</artifactId>
     <packaging>pom</packaging>
     <version>1.0.0-SNAPSHOT</version>
 
@@ -14,7 +14,7 @@
         <module>oauth-protocol</module>
     </modules>
 
-    <name>x-oauth</name>
+    <name>oauth4j</name>
     <url>http://maven.apache.org</url>
 
     <repositories>
@@ -36,7 +36,8 @@
         <profile>
             <id>local</id>
             <properties>
-                <datasource.url.master>jdbc:mysql://localhost:3306/passport_oauth?useUnicode=true&amp;amp;characterEncoding=utf8
+                <datasource.url.master>
+                    jdbc:mysql://localhost:3306/passport_oauth?useUnicode=true&amp;amp;characterEncoding=utf8
                 </datasource.url.master>
                 <datasource.username>root</datasource.username>
                 <!-- FIXME 暂时不启用密码加密 -->
@@ -133,7 +134,7 @@
                 <version>${spring.version}</version>
             </dependency>
 
-            <!-- apache common -->
+            <!-- apache commons -->
             <dependency>
                 <groupId>commons-collections</groupId>
                 <artifactId>commons-collections</artifactId>
@@ -235,7 +236,7 @@
                 <version>1.8.6</version>
             </dependency>
 
-            <!-- sl4j -->
+            <!-- log -->
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
@@ -246,7 +247,6 @@
                 <artifactId>slf4j-log4j12</artifactId>
                 <version>1.7.21</version>
             </dependency>
-            <!-- log4j -->
             <dependency>
                 <groupId>log4j</groupId>
                 <artifactId>log4j</artifactId>
