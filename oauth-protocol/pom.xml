@@ -179,7 +179,7 @@
         </dependency>
 
         <dependency>
-            <groupId>Javax.servlet</groupId>
+            <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
         </dependency>
         <dependency>

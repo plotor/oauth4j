@@ -15,6 +15,7 @@ import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
+
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
@@ -36,7 +37,10 @@ public class RSACoder {
     }
 
     public RSACoder(int keyLength) {
-        assert keyLength % 64 == 0 && keyLength >= 512 && keyLength <= 65535 : "RSA key length must multiple of 64 and between 512 and 65535!";
+        assert keyLength % 64 == 0
+                && keyLength >= 512
+                && keyLength <= 65535
+                : "RSA key length must multiple of 64 and between 512 and 65535!";
         this.keyLength = keyLength;
     }
 

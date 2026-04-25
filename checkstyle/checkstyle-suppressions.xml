@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<!DOCTYPE suppressions PUBLIC
+        "-//Puppy Crawl//DTD Suppressions 1.2//EN"
+        "https://checkstyle.org/dtds/suppressions_1_2.dtd">
+
+<suppressions>
+    <suppress files=".*[\\/]src[\\/]test[\\/].*" checks="JavadocType|JavadocMethod|MagicNumber|TrailingComment|RegexpSingleline|HideUtilityClassConstructor|LineLength|ImportOrder|NewlineAtEndOfFile"/>
+    <suppress files=".*Example\.java$" checks="."/>
+    <suppress files=".*DTO\.java$|.*VO\.java$|.*DO\.java$|.*BO\.java$|.*Entity\.java$" checks="VisibilityModifier"/>
+    <suppress files=".*[\\/]entity[\\/].*" checks="VisibilityModifier|JavadocMethod|HiddenField|NewlineAtEndOfFile"/>
+    <suppress files=".*[\\/]mapper[\\/].*" checks="."/>
+    <suppress files=".*[\\/]dao[\\/].*" checks="VisibilityModifier|JavadocMethod|ImportOrder|LineLength|NewlineAtEndOfFile"/>
+    <suppress files=".*Controller\.java$" checks="JavadocMethod|MagicNumber|ParameterNumber|ReturnCount|LineLength|ImportOrder|TrailingComment"/>
+    <suppress files=".*AppTest\.java$" checks="."/>
+    <suppress files=".*ErrorCode\.java$" checks="MagicNumber|DeclarationOrder"/>
+    <suppress files=".*GlobalConstant\.java$" checks="InterfaceIsType"/>
+    <suppress files=".*Namespace\.java$" checks="InterfaceIsType"/>
+    <suppress files=".*TokenConstant\.java$" checks="InterfaceIsType|MagicNumber"/>
+    <suppress files=".*RequestPath\.java$" checks="InterfaceIsType"/>
+    <suppress files=".*[\\/]exception[\\/].*" checks="MutableException"/>
+    <suppress files=".*[\\/]cipher[\\/].*" checks="MagicNumber"/>
+    <suppress files=".*CipherUtils\.java$" checks="MagicNumber"/>
+    <suppress files=".*CacheSupport\.java$" checks="MagicNumber|JavadocType"/>
+    <suppress files=".*ScopeUtils\.java$" checks="MagicNumber"/>
+    <suppress files=".*CompressUtils\.java$" checks="MagicNumber"/>
+    <suppress files=".*MacAccessTokenGenerator\.java$" checks="MagicNumber"/>
+    <suppress files=".*[\\/]pojo[\\/].*" checks="ReturnCount|HiddenField|LineLength|MagicNumber|ImportOrder"/>
+    <suppress files=".*[\\/]interceptor[\\/].*" checks="LineLength|ImportOrder"/>
+    <suppress files=".*[\\/]handler[\\/].*" checks="."/>
+    <suppress files=".*CookieUtils\.java$" checks="MagicNumber|HideUtilityClassConstructor|WhitespaceAfter"/>
+    <suppress files=".*JsonView\.java$" checks="ImportOrder|HideUtilityClassConstructor|WhitespaceAfter"/>
+    <suppress files=".*ResponseUtils\.java$" checks="ImportOrder|LineLength|ParameterNumber"/>
+    <suppress files=".*RequestUtils\.java$" checks="ImportOrder"/>
+    <suppress files=".*SessionUtils\.java$" checks="."/>
+    <suppress files=".*ResultInfo\.java$" checks="ImportOrder|MagicNumber"/>
+    <suppress files=".*AuthorizationCode\.java$" checks="ImportOrder"/>
+</suppressions>

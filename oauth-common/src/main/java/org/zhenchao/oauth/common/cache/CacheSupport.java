@@ -13,6 +13,8 @@ import org.slf4j.LoggerFactory;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * Cache support abstract class.
+ *
  * @author zhenchao.wang 2017-08-09 09:57
  * @version 1.0.0
  */
@@ -27,8 +29,10 @@ public abstract class CacheSupport<T> implements Namespace {
         // TIPS: 实际应用中对于授权码缓存，只应该在缓存时间上进行控制
         manager = CacheManagerBuilder.newCacheManagerBuilder().withCache(
                 namespace,
-                CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class, valueType, ResourcePoolsBuilder.heap(1024))
-                        .withExpiry(Expirations.timeToLiveExpiration(Duration.of(expire, TimeUnit.MINUTES)))).build();
+                CacheConfigurationBuilder.newCacheConfigurationBuilder(
+                        String.class, valueType, ResourcePoolsBuilder.heap(1024))
+                        .withExpiry(Expirations.timeToLiveExpiration(
+                                Duration.of(expire, TimeUnit.MINUTES)))).build();
         manager.init();
     }
 

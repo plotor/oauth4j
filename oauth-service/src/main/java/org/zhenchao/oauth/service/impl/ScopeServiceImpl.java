@@ -1,11 +1,12 @@
 package org.zhenchao.oauth.service.impl;
 
+import static org.zhenchao.oauth.common.GlobalConstant.SEPARATOR_REDIRECT_SCOPE;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import static org.zhenchao.oauth.common.GlobalConstant.SEPARATOR_REDIRECT_SCOPE;
 import org.zhenchao.oauth.dao.ScopeMapper;
 import org.zhenchao.oauth.entity.Scope;
 import org.zhenchao.oauth.entity.ScopeExample;
@@ -15,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+
 import javax.annotation.Resource;
 
 /**
@@ -39,7 +41,9 @@ public class ScopeServiceImpl implements ScopeService {
         ScopeExample example = new ScopeExample();
         ScopeExample.Criteria criteria = example.createCriteria();
         criteria.andIdIn(
-                Arrays.stream(StringUtils.trim(ids).split(SEPARATOR_REDIRECT_SCOPE)).map(Integer::valueOf).collect(Collectors.toList()));
+                Arrays.stream(StringUtils.trim(ids).split(SEPARATOR_REDIRECT_SCOPE))
+                        .map(Integer::valueOf)
+                        .collect(Collectors.toList()));
         return scopeMapper.selectByExample(example);
     }
 

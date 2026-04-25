@@ -14,6 +14,7 @@ import org.zhenchao.oauth.service.AuthorizeRelationService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
 import javax.annotation.Resource;
 
 /**
@@ -45,12 +46,14 @@ public class AuthorizeRelationServiceImpl implements AuthorizeRelationService {
     @Override
     public Optional<AuthorizeRelation> getAuthorizeRelation(long userId, long appId, String scope) {
         if (userId < 0 || appId < 0 || StringUtils.isBlank(scope)) {
-            log.error("Get authorize relation with error params, userId[{}], appId[{}], scope[{}]!", userId, appId, scope);
+            log.error("Get authorize relation with error params, userId[{}], appId[{}], scope[{}]!",
+                    userId, appId, scope);
             return Optional.empty();
         }
         AuthorizeRelationExample example = new AuthorizeRelationExample();
         AuthorizeRelationExample.Criteria criteria = example.createCriteria();
-        criteria.andAppIdEqualTo(appId).andUserIdEqualTo(userId).andScopeSignEqualTo(ScopeUtils.getScopeSign(scope));
+        criteria.andAppIdEqualTo(appId).andUserIdEqualTo(userId)
+                .andScopeSignEqualTo(ScopeUtils.getScopeSign(scope));
         List<AuthorizeRelation> authorizations = authorizeRelationMapper.selectByExample(example);
         if (CollectionUtils.isEmpty(authorizations)) {
             return Optional.empty();
@@ -66,7 +69,9 @@ public class AuthorizeRelationServiceImpl implements AuthorizeRelationService {
         AuthorizeRelationExample example = new AuthorizeRelationExample();
         AuthorizeRelationExample.Criteria criteria = example.createCriteria();
         criteria.andUserIdEqualTo(
-                relation.getUserId()).andAppIdEqualTo(relation.getAppId()).andScopeSignEqualTo(relation.getScopeSign());
+                        relation.getUserId())
+                .andAppIdEqualTo(relation.getAppId())
+                .andScopeSignEqualTo(relation.getScopeSign());
         List<AuthorizeRelation> authorizations = authorizeRelationMapper.selectByExample(example);
 
         if (CollectionUtils.isEmpty(authorizations)) {
@@ -81,7 +86,9 @@ public class AuthorizeRelationServiceImpl implements AuthorizeRelationService {
             ar.setUpdateTime(relation.getUpdateTime());
             example = new AuthorizeRelationExample();
             criteria = example.createCriteria();
-            criteria.andUserIdEqualTo(ar.getUserId()).andAppIdEqualTo(ar.getAppId()).andScopeSignEqualTo(relation.getScopeSign());
+            criteria.andUserIdEqualTo(ar.getUserId())
+                    .andAppIdEqualTo(ar.getAppId())
+                    .andScopeSignEqualTo(relation.getScopeSign());
             return authorizeRelationMapper.updateByExampleSelective(ar, example) > 0;
         }
     }

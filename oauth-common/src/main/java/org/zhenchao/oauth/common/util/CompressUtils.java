@@ -16,7 +16,7 @@ import java.util.zip.Inflater;
  * @author zhenchao.wang 2017-02-11 14:29
  * @version 1.0.0
  */
-public class CompressUtils {
+public final class CompressUtils {
 
     private static final Logger log = LoggerFactory.getLogger(CompressUtils.class);
 

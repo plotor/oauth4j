@@ -24,7 +24,8 @@ public class ParameterVerificationException extends VerificationException {
         super(cause, errorCode);
     }
 
-    public ParameterVerificationException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace, ErrorCode errorCode) {
+    public ParameterVerificationException(String message, Throwable cause, boolean enableSuppression,
+                                          boolean writableStackTrace, ErrorCode errorCode) {
         super(message, cause, enableSuppression, writableStackTrace, errorCode);
     }
 }

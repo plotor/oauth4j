@@ -1,9 +1,10 @@
 package org.zhenchao.oauth.dao;
 
-import java.util.List;
 import org.apache.ibatis.annotations.Param;
 import org.zhenchao.oauth.entity.UserInfo;
 import org.zhenchao.oauth.entity.UserInfoExample;
+
+import java.util.List;
 
 public interface UserInfoMapper {
     long countByExample(UserInfoExample example);
