@@ -8,6 +8,7 @@ import org.zhenchao.oauth.entity.AppInfo;
 import org.zhenchao.oauth.service.AppInfoService;
 
 import java.util.Optional;
+
 import javax.annotation.Resource;
 
 /**

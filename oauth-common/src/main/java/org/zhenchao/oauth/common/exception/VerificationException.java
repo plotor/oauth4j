@@ -29,7 +29,8 @@ public abstract class VerificationException extends Exception {
         this.errorCode = errorCode;
     }
 
-    public VerificationException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace, ErrorCode errorCode) {
+    public VerificationException(String message, Throwable cause, boolean enableSuppression,
+                                 boolean writableStackTrace, ErrorCode errorCode) {
         super(message, cause, enableSuppression, writableStackTrace);
         this.errorCode = errorCode;
     }

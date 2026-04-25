@@ -33,7 +33,8 @@ public abstract class ServiceException extends Exception {
         this.errorCode = errorCode;
     }
 
-    public ServiceException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace, ErrorCode errorCode) {
+    public ServiceException(String message, Throwable cause, boolean enableSuppression,
+                            boolean writableStackTrace, ErrorCode errorCode) {
         super(message, cause, enableSuppression, writableStackTrace);
         this.errorCode = errorCode;
     }

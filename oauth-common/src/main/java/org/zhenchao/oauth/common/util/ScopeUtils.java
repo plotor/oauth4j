@@ -63,7 +63,8 @@ public abstract class ScopeUtils {
                 scopes.add(item);
             }
         });
-        Collections.sort(scopes); // 按照字典顺序
+        // 按照字典顺序
+        Collections.sort(scopes);
         return StringUtils.join(scopes, SEP);
     }
 
@@ -86,7 +87,8 @@ public abstract class ScopeUtils {
         Set<String> set = new HashSet<>(scopes);
         scopes.clear();
         scopes.addAll(set);
-        Collections.sort(scopes); // 按照字典顺序
+        // 按照字典顺序
+        Collections.sort(scopes);
         return StringUtils.join(scopes, SEP);
     }
 

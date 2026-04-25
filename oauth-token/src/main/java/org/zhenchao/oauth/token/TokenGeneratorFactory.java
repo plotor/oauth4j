@@ -12,8 +12,11 @@ import org.zhenchao.oauth.token.pojo.TokenElement;
  * @author zhenchao.wang 2017-02-11 15:27
  * @version 1.0.0
  */
-public class TokenGeneratorFactory {
-    
+public final class TokenGeneratorFactory {
+
+    private TokenGeneratorFactory() {
+    }
+
     public static AbstractTokenGenerator getGenerator(TokenElement element) {
         if (TokenType.BEARER.equals(element.getTokenType())) {
             return new BearerAccessTokenGenerator(element);

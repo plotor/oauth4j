@@ -26,7 +26,9 @@ public abstract class RedirectUriUtils {
     private static UrlValidator urlValidator = UrlValidator.getInstance();
 
     public static String format(List<String> redirectUris) {
-        if (CollectionUtils.isEmpty(redirectUris)) return StringUtils.EMPTY;
+        if (CollectionUtils.isEmpty(redirectUris)) {
+            return StringUtils.EMPTY;
+        }
         Set<String> set = new HashSet<>();
         redirectUris.forEach(uri -> {
             if (urlValidator.isValid(uri)) {
@@ -37,7 +39,9 @@ public abstract class RedirectUriUtils {
     }
 
     public static boolean isValid(String input, String redirectUris) {
-        if (StringUtils.isBlank(input) || StringUtils.isBlank(redirectUris)) return false;
+        if (StringUtils.isBlank(input) || StringUtils.isBlank(redirectUris)) {
+            return false;
+        }
         return isValid(input, Arrays.asList(redirectUris.trim().split("\\s*[;\\s]+\\s*")));
     }
 

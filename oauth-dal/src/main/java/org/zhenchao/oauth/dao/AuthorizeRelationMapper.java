@@ -1,9 +1,10 @@
 package org.zhenchao.oauth.dao;
 
-import java.util.List;
 import org.apache.ibatis.annotations.Param;
 import org.zhenchao.oauth.entity.AuthorizeRelation;
 import org.zhenchao.oauth.entity.AuthorizeRelationExample;
+
+import java.util.List;
 
 public interface AuthorizeRelationMapper {
     long countByExample(AuthorizeRelationExample example);
@@ -16,7 +17,9 @@ public interface AuthorizeRelationMapper {
 
     List<AuthorizeRelation> selectByExample(AuthorizeRelationExample example);
 
-    int updateByExampleSelective(@Param("record") AuthorizeRelation record, @Param("example") AuthorizeRelationExample example);
+    int updateByExampleSelective(@Param("record") AuthorizeRelation record,
+                                 @Param("example") AuthorizeRelationExample example);
 
-    int updateByExample(@Param("record") AuthorizeRelation record, @Param("example") AuthorizeRelationExample example);
+    int updateByExample(@Param("record") AuthorizeRelation record,
+                        @Param("example") AuthorizeRelationExample example);
 }

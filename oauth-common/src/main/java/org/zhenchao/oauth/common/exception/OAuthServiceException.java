@@ -28,7 +28,8 @@ public class OAuthServiceException extends ServiceException {
         super(cause, errorCode);
     }
 
-    public OAuthServiceException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace, ErrorCode errorCode) {
+    public OAuthServiceException(String message, Throwable cause, boolean enableSuppression,
+                                 boolean writableStackTrace, ErrorCode errorCode) {
         super(message, cause, enableSuppression, writableStackTrace, errorCode);
     }
 }

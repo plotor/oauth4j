@@ -34,7 +34,8 @@ public class CodecException extends Exception {
         this.errorCode = errorCode;
     }
 
-    protected CodecException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace, ErrorCode errorCode) {
+    protected CodecException(String message, Throwable cause, boolean enableSuppression,
+                             boolean writableStackTrace, ErrorCode errorCode) {
         super(message, cause, enableSuppression, writableStackTrace);
         this.errorCode = errorCode;
     }

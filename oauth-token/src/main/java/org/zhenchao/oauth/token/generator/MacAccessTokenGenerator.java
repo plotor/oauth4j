@@ -28,16 +28,16 @@ public class MacAccessTokenGenerator extends AccessTokenGenerator {
         }
         MacAccessToken accessToken = new MacAccessToken();
         long currentTime = System.currentTimeMillis();
+        long expirationTime = (currentTime + TokenConstant.DEFAULT_ACCESS_TOKEN_VALIDITY * 1000L) / 1000L;
         accessToken.setVersion(TokenVersion.V_1_0_0)
                 .setUserId(element.getUserId())
                 .setClientId(element.getAppInfo().getAppId())
                 .setScope(element.getScope())
                 .setIssueTime(currentTime)
-                .setExpirationTime((currentTime + TokenConstant.DEFAULT_ACCESS_TOKEN_VALIDITY * 1000L) / 1000L) // 时间单位保持一致（过期时间以秒为单位）
+                .setExpirationTime(expirationTime)
                 .setType(MacAccessToken.TYPE)
                 .setKey(element.getTokenKey());
         if (null != element.getGrantType() && element.isIssueRefreshToken()) {
-            // TODO 生成刷新令牌
             accessToken.setRefreshToken(RandomStringUtils.randomAlphanumeric(32));
         }
         return Optional.of(accessToken);

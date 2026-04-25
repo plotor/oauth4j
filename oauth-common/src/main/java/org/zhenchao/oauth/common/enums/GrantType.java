@@ -33,8 +33,9 @@ public enum GrantType {
      * @return
      */
     public static boolean isValid(String grantType) {
-        return AUTHORIZATION_CODE.getType().equals(grantType) ||
-                PASSWORD_CREDENTIALS.getType().equals(grantType) || CLIENT_CREDENTIALS.getType().equals(grantType);
+        return AUTHORIZATION_CODE.getType().equals(grantType)
+                || PASSWORD_CREDENTIALS.getType().equals(grantType)
+                || CLIENT_CREDENTIALS.getType().equals(grantType);
     }
 
     /**

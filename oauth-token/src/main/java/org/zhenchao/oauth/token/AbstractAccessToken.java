@@ -34,9 +34,9 @@ public abstract class AbstractAccessToken implements Token {
 
     protected String refreshToken;
 
-    private String key;
-
     protected String value;
+
+    private String key;
 
     /**
      * encode token
@@ -48,9 +48,9 @@ public abstract class AbstractAccessToken implements Token {
         byte[] result;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try (DataOutputStream dos = new DataOutputStream(baos)) {
-            dos.writeBytes(this.version.getValue()); // version
+            dos.writeBytes(this.version.getValue());
             dos.writeChar('-');
-            dos.writeLong(this.expirationTime); // expirationTime
+            dos.writeLong(this.expirationTime);
             dos.writeLong(this.issueTime);
             dos.writeLong(this.userId);
             dos.writeLong(this.clientId);
